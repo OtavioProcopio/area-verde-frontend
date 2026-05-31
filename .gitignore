@@ -1,0 +1,32 @@
+# App dependencies and artifacts
+app/node_modules/
+app/build/
+app/dist/
+app/coverage/
+app/.vite/
+app/*.tsbuildinfo
+
+# Nested app env files
+app/.env
+app/.env.local
+app/.env.development.local
+app/.env.test.local
+app/.env.production.local
+!app/.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE
+.idea/
+.DS_Store
+.devcontainer/.cache/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json

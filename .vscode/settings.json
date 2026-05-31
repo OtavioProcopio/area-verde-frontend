@@ -1,0 +1,15 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "explorer.excludeGitIgnore": false,
+  "git.decorations.enabled": true,
+  "typescript.tsdk": "app/node_modules/typescript/lib",
+  "vitest.enable": true,
+  "tailwindCSS.experimental.configFile": "app/src/index.css",
+  "files.exclude": {
+    "app/coverage": true,
+    "app/dist": true
+  }
+}

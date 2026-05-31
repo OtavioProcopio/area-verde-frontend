@@ -1,0 +1,28 @@
+{
+  "name": "Area Verde Frontend Dev Container",
+  "dockerComposeFile": ["docker-compose.yml"],
+  "service": "devcontainer",
+  "workspaceFolder": "/workspaces/areaverde/area-verde-frontend",
+  "remoteUser": "node",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "version": "latest",
+      "enableNonRootDocker": "true"
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/onstart.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bradlc.vscode-tailwindcss",
+        "ms-vscode.vscode-typescript-next",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "vitest.explorer",
+        "christian-kohler.path-intellisense",
+        "mhutchie.git-graph",
+        "bierner.markdown-mermaid"
+      ]
+    }
+  }
+}

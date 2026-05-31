@@ -1,0 +1,14 @@
+services:
+  devcontainer:
+    container_name: area-verde-frontend-devcontainer
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - ../..:/workspaces/areaverde:cached
+      - ${HOME}/.ssh:/home/node/.ssh:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    privileged: true
+    environment:
+      - TZ=America/Sao_Paulo
+    command: sleep infinity
