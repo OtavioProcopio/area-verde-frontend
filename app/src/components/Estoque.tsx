@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
 import { Product, Category, StockMovement } from '../types';
+import {
+  createStockAdjustment,
+  createStockEntry,
+  fetchStockMovements,
+} from '../features/estoque/services/estoqueService';
 import { 
   Package, 
   ArrowDownToLine, 
@@ -17,10 +22,15 @@ interface EstoqueProps {
   products: Product[];
   categories: Category[];
   onUpdateProduct: (p: Product) => void;
+  onRefreshState: () => Promise<void>;
 }
 
-export default function Estoque({ products, categories, onUpdateProduct }: EstoqueProps) {
-  // Mocked state for movements. In a real app backend provides this.
+export default function Estoque({
+  products,
+  categories,
+  onUpdateProduct,
+  onRefreshState,
+}: EstoqueProps) {
   const [movements, setMovements] = useState<StockMovement[]>([]);
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -68,37 +78,25 @@ export default function Estoque({ products, categories, onUpdateProduct }: Estoq
     setActiveModal('ajuste');
   };
 
-  const openHistory = (p: Product) => {
+  const openHistory = async (p: Product) => {
     setSelectedProduct(p);
+    const loadedMovements = await fetchStockMovements(p.id);
+    setMovements(loadedMovements);
     setActiveModal('history');
   };
 
-  const handleSaveEntrada = (e: React.FormEvent) => {
+  const handleSaveEntrada = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedProduct) return;
     const parsedQty = parseFloat(qty);
     if (isNaN(parsedQty) || parsedQty <= 0) return;
 
-    const newBalance = selectedProduct.stock + parsedQty;
-
-    const mov: StockMovement = {
-      id: Date.now().toString(36),
-      productId: selectedProduct.id,
-      type: 'entrada',
-      quantity: parsedQty,
-      date: new Date().toISOString(),
-      origin: 'Entrada Manual',
-      note,
-      previousBalance: selectedProduct.stock,
-      newBalance
-    };
-
-    setMovements([mov, ...movements]);
-    onUpdateProduct({ ...selectedProduct, stock: newBalance });
+    await createStockEntry(selectedProduct.id, parsedQty, note || undefined);
+    await onRefreshState();
     setActiveModal(null);
   };
 
-  const handleSaveAjuste = (e: React.FormEvent) => {
+  const handleSaveAjuste = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedProduct) return;
     const parsedNewBalance = parseFloat(qty);
@@ -106,22 +104,12 @@ export default function Estoque({ products, categories, onUpdateProduct }: Estoq
 
     if (!window.confirm("Confirmar o ajuste de estoque?")) return;
 
-    const diff = parsedNewBalance - selectedProduct.stock;
-
-    const mov: StockMovement = {
-      id: Date.now().toString(36),
-      productId: selectedProduct.id,
-      type: 'ajuste',
-      quantity: diff,
-      date: new Date().toISOString(),
-      origin: 'Ajuste Manual',
-      note,
-      previousBalance: selectedProduct.stock,
-      newBalance: parsedNewBalance
-    };
-
-    setMovements([mov, ...movements]);
-    onUpdateProduct({ ...selectedProduct, stock: parsedNewBalance });
+    await createStockAdjustment(
+      selectedProduct.id,
+      parsedNewBalance,
+      note || undefined,
+    );
+    await onRefreshState();
     setActiveModal(null);
   };
 

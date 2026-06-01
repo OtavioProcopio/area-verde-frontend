@@ -22,6 +22,31 @@ export default defineConfig(() => {
         reportsDirectory: './coverage',
       },
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (!id.includes('node_modules')) {
+              return;
+            }
+
+            if (id.includes('react') || id.includes('scheduler')) {
+              return 'react-vendor';
+            }
+
+            if (id.includes('lucide-react')) {
+              return 'icons-vendor';
+            }
+
+            if (id.includes('motion')) {
+              return 'motion-vendor';
+            }
+
+            return 'vendor';
+          },
+        },
+      },
+    },
     server: {
       hmr: process.env.DISABLE_HMR !== 'true',
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
