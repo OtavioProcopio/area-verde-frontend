@@ -1,7 +1,12 @@
-import {useState} from 'react';
-import {EMPTY_CASHIER} from '../mappers/caixaMapper';
-import {closeCaixa, createReforco, createSangria, openCaixa} from '../services/caixaService';
-import type {Cashier, ClosedCashier} from '../../../types';
+import { useState } from 'react';
+import { EMPTY_CASHIER } from '../mappers/caixaMapper';
+import {
+  closeCaixa,
+  createReforco,
+  createSangria,
+  openCaixa,
+} from '../services/caixaService';
+import type { Cashier, ClosedCashier } from '../../../types';
 
 type RefreshRef = {
   current: () => Promise<void>;

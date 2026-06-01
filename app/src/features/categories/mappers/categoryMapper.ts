@@ -1,5 +1,5 @@
-import type {Category} from '../../../types';
-import type {ApiCategory} from '../types';
+import type { Category } from '../../../types';
+import type { ApiCategory } from '../types';
 
 export function mapCategory(category: ApiCategory): Category {
   return {

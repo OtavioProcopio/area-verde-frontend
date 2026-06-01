@@ -1,6 +1,6 @@
-import {useState} from 'react';
-import {createCategory, saveCategory} from '../services/categoriesService';
-import type {Category} from '../../../types';
+import { useState } from 'react';
+import { createCategory, saveCategory } from '../services/categoriesService';
+import type { Category } from '../../../types';
 
 type RefreshRef = {
   current: () => Promise<void>;
@@ -19,7 +19,9 @@ export function useCategoriesState(refreshRef: RefreshRef) {
     await saveCategory(
       updated.id,
       updated.name,
-      original && original.active !== updated.active ? updated.active : undefined,
+      original && original.active !== updated.active
+        ? updated.active
+        : undefined,
     );
     await refreshRef.current();
   };

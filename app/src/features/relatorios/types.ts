@@ -1,6 +1,6 @@
 export type ApiDailyReport = {
   data: string;
-  caixa: {id: number; status: 'ABERTO' | 'FECHADO'} | null;
+  caixa: { id: number; status: 'ABERTO' | 'FECHADO' } | null;
   vendas: {
     totalVendido: string | number;
     totalRecebido: string | number;

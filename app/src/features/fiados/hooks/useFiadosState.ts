@@ -1,6 +1,6 @@
-import {useState} from 'react';
-import {settleFiado} from '../services/fiadosService';
-import type {Fiado} from '../../../types';
+import { useState } from 'react';
+import { settleFiado } from '../services/fiadosService';
+import type { Fiado } from '../../../types';
 
 type RefreshRef = {
   current: () => Promise<void>;
@@ -13,13 +13,18 @@ export function useFiadosState(refreshRef: RefreshRef) {
     customerId: string,
     valor: number,
     metodo: 'dinheiro' | 'pix' | 'cartao',
-  ): Promise<{success: boolean; msg: string}> => {
+  ): Promise<{ success: boolean; msg: string }> => {
     const pendencias = fiados
-      .filter((fiado) => fiado.customerId === customerId && fiado.status === 'aberto')
+      .filter(
+        (fiado) => fiado.customerId === customerId && fiado.status === 'aberto',
+      )
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     if (pendencias.length === 0) {
-      return {success: false, msg: 'Nenhuma pendência aberta para este cliente.'};
+      return {
+        success: false,
+        msg: 'Nenhuma pendência aberta para este cliente.',
+      };
     }
 
     let restante = Number(valor.toFixed(2));
@@ -46,7 +51,7 @@ export function useFiadosState(refreshRef: RefreshRef) {
     }
 
     await refreshRef.current();
-    return {success: true, msg: 'Fiado quitado com sucesso.'};
+    return { success: true, msg: 'Fiado quitado com sucesso.' };
   };
 
   return {

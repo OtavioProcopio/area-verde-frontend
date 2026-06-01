@@ -1,7 +1,7 @@
 export type ApiProduct = {
   id: number;
   nome: string;
-  categoria: {id: number; nome: string};
+  categoria: { id: number; nome: string };
   precoVenda: number;
   tipoProduto: 'SIMPLES' | 'COMPOSTO';
   controlaEstoque: boolean;

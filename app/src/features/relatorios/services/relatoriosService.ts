@@ -1,4 +1,4 @@
-import {apiRequest} from '../../../lib/api';
+import { apiRequest } from '../../../lib/api';
 import {
   mapBestSellingProduct,
   mapCommandaReportItem,
@@ -21,7 +21,10 @@ type PeriodFilter = {
   dataFim?: string;
 };
 
-function withQuery(path: string, params: Record<string, string | number | undefined>) {
+function withQuery(
+  path: string,
+  params: Record<string, string | number | undefined>,
+) {
   const query = new URLSearchParams();
 
   for (const [key, value] of Object.entries(params)) {
@@ -36,12 +39,14 @@ function withQuery(path: string, params: Record<string, string | number | undefi
 
 export async function fetchDailyReport(data?: string) {
   const report = await apiRequest<ApiDailyReport>(
-    withQuery('/relatorios/diario', {data}),
+    withQuery('/relatorios/diario', { data }),
   );
   return mapDailyReport(report);
 }
 
-export async function fetchBestSellingProducts(filters: PeriodFilter & {limite?: number} = {}) {
+export async function fetchBestSellingProducts(
+  filters: PeriodFilter & { limite?: number } = {},
+) {
   const response = await apiRequest<ApiBestSellingProduct[]>(
     withQuery('/relatorios/produtos-mais-vendidos', filters),
   );
@@ -60,9 +65,11 @@ export async function fetchFiadosReport(
   return response.map(mapFiadoReportItem);
 }
 
-export async function fetchStockReport(tipo: 'baixo' | 'negativo' | 'todos' = 'todos') {
+export async function fetchStockReport(
+  tipo: 'baixo' | 'negativo' | 'todos' = 'todos',
+) {
   const response = await apiRequest<ApiStockReportItem[]>(
-    withQuery('/relatorios/estoque', {tipo}),
+    withQuery('/relatorios/estoque', { tipo }),
   );
   return response.map(mapStockReportItem);
 }

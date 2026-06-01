@@ -1,4 +1,4 @@
-import type {ApiProduct} from '../products/types';
+import type { ApiProduct } from '../products/types';
 
 export type ApiStockMovement = {
   id: number;

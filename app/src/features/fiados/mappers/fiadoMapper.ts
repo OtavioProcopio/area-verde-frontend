@@ -1,6 +1,6 @@
-import type {Fiado} from '../../../types';
-import {toNumber} from '../../shared/utils/toNumber';
-import type {ApiPendenciaResumo} from '../types';
+import type { Fiado } from '../../../types';
+import { toNumber } from '../../shared/utils/toNumber';
+import type { ApiPendenciaResumo } from '../types';
 
 export function mapFiado(pendencia: ApiPendenciaResumo): Fiado {
   const value = toNumber(pendencia.total);

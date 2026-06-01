@@ -1,6 +1,10 @@
-import {useState} from 'react';
-import {createProduct, inactivateProduct, saveProduct} from '../services/productsService';
-import type {Category, Product} from '../../../types';
+import { useState } from 'react';
+import {
+  createProduct,
+  inactivateProduct,
+  saveProduct,
+} from '../services/productsService';
+import type { Category, Product } from '../../../types';
 
 type RefreshRef = {
   current: () => Promise<void>;
@@ -22,7 +26,9 @@ export function useProductsState(
     await saveProduct(
       updated,
       categories,
-      original && original.active !== updated.active ? updated.active : undefined,
+      original && original.active !== updated.active
+        ? updated.active
+        : undefined,
     );
     await refreshRef.current();
   };

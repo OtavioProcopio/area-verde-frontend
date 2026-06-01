@@ -1,6 +1,10 @@
-import {useState} from 'react';
-import {createCustomer, inactivateCustomer, saveCustomer} from '../services/customersService';
-import type {Customer} from '../../../types';
+import { useState } from 'react';
+import {
+  createCustomer,
+  inactivateCustomer,
+  saveCustomer,
+} from '../services/customersService';
+import type { Customer } from '../../../types';
 
 type RefreshRef = {
   current: () => Promise<void>;

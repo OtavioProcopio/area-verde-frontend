@@ -1,4 +1,4 @@
-import type {ApiPagamento} from '../comandas/types';
+import type { ApiPagamento } from '../comandas/types';
 
 export type ApiCaixaMovement = {
   id: number;

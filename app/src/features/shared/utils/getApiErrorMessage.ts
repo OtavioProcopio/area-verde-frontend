@@ -1,4 +1,4 @@
-import {ApiError} from '../../../lib/api';
+import { ApiError } from '../../../lib/api';
 
 const CODE_MESSAGES: Record<string, string> = {
   senha_nao_configurada:

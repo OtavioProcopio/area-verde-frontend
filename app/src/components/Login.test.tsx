@@ -1,5 +1,5 @@
-import {fireEvent, render, screen} from '@testing-library/react';
-import {describe, expect, it, vi} from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 import Login from './Login';
 
 describe('Login', () => {
@@ -16,11 +16,11 @@ describe('Login', () => {
     );
 
     const input = screen.getByPlaceholderText('****');
-    const button = screen.getByRole('button', {name: 'Entrar'});
+    const button = screen.getByRole('button', { name: 'Entrar' });
 
     expect(button).toBeDisabled();
 
-    fireEvent.change(input, {target: {value: '1234'}});
+    fireEvent.change(input, { target: { value: '1234' } });
 
     expect(button).not.toBeDisabled();
   });

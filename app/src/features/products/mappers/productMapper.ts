@@ -1,7 +1,7 @@
-import type {Product, RecipeItem} from '../../../types';
-import {mapUnit, mapUnitToApi} from '../../shared/mappers/apiValueMappers';
-import {toNumber} from '../../shared/utils/toNumber';
-import type {ApiProduct} from '../types';
+import type { Product, RecipeItem } from '../../../types';
+import { mapUnit, mapUnitToApi } from '../../shared/mappers/apiValueMappers';
+import { toNumber } from '../../shared/utils/toNumber';
+import type { ApiProduct } from '../types';
 
 export function mapProduct(
   product: ApiProduct,
@@ -22,4 +22,4 @@ export function mapProduct(
   };
 }
 
-export {mapUnitToApi};
+export { mapUnitToApi };

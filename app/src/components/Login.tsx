@@ -3,16 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, {useState} from 'react';
-import {KeyRound, Loader2, Lock, ShieldCheck, Sprout} from 'lucide-react';
-import {InlineFeedback} from '../features/shared/components/InlineFeedback';
+import React, { useState } from 'react';
+import { KeyRound, Loader2, Lock, ShieldCheck, Sprout } from 'lucide-react';
+import { InlineFeedback } from '../features/shared/components/InlineFeedback';
 
 interface LoginProps {
   onLogin: (pin: string) => Promise<boolean>;
   onSetupInitialPassword: (newPassword: string) => Promise<boolean>;
   isLoading: boolean;
   senhaConfigurada: boolean;
-  feedback: {tone: 'success' | 'error' | 'info'; message: string} | null;
+  feedback: { tone: 'success' | 'error' | 'info'; message: string } | null;
   onClearFeedback: () => void;
 }
 
@@ -67,7 +67,9 @@ export default function Login({
     }
   };
 
-  const primaryDisabled = senhaConfigurada ? !pin || isLoading : !newPassword || !confirmPassword || isLoading;
+  const primaryDisabled = senhaConfigurada
+    ? !pin || isLoading
+    : !newPassword || !confirmPassword || isLoading;
 
   return (
     <div
@@ -98,8 +100,14 @@ export default function Login({
           </p>
         </div>
 
-        {feedback && <InlineFeedback tone={feedback.tone} message={feedback.message} />}
-        {localError && <div className="mt-4"><InlineFeedback tone="error" message={localError} /></div>}
+        {feedback && (
+          <InlineFeedback tone={feedback.tone} message={feedback.message} />
+        )}
+        {localError && (
+          <div className="mt-4">
+            <InlineFeedback tone="error" message={localError} />
+          </div>
+        )}
 
         {senhaConfigurada ? (
           <form onSubmit={handleLogin} className="mt-5 space-y-5">
@@ -108,7 +116,10 @@ export default function Login({
                 Digite sua senha
               </label>
               <div className="relative">
-                <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+                <Lock
+                  size={18}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
+                />
                 <input
                   type="password"
                   value={pin}
@@ -129,13 +140,21 @@ export default function Login({
               disabled={primaryDisabled}
               className="mb-6 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3.5 text-sm font-bold text-white transition hover:bg-emerald-500 disabled:bg-emerald-900/50 disabled:text-emerald-200"
             >
-              {isLoading ? <Loader2 size={18} className="animate-spin" /> : 'Entrar'}
+              {isLoading ? (
+                <Loader2 size={18} className="animate-spin" />
+              ) : (
+                'Entrar'
+              )}
             </button>
           </form>
         ) : (
-          <form onSubmit={handleInitialPasswordSetup} className="mt-5 space-y-4">
+          <form
+            onSubmit={handleInitialPasswordSetup}
+            className="mt-5 space-y-4"
+          >
             <div className="rounded-2xl border border-emerald-900 bg-emerald-950/30 p-4 text-xs text-emerald-300">
-              O backend ainda nao possui uma senha configurada. Defina uma senha com no minimo 4 caracteres para liberar o acesso.
+              O backend ainda nao possui uma senha configurada. Defina uma senha
+              com no minimo 4 caracteres para liberar o acesso.
             </div>
 
             <div>
@@ -143,7 +162,10 @@ export default function Login({
                 Nova senha
               </label>
               <div className="relative">
-                <KeyRound size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+                <KeyRound
+                  size={18}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
+                />
                 <input
                   type="password"
                   value={newPassword}
@@ -164,7 +186,10 @@ export default function Login({
                 Confirmar senha
               </label>
               <div className="relative">
-                <ShieldCheck size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+                <ShieldCheck
+                  size={18}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
+                />
                 <input
                   type="password"
                   value={confirmPassword}
@@ -199,7 +224,8 @@ export default function Login({
             <span className="mb-0.5 block font-bold text-emerald-300">
               Acesso centralizado
             </span>
-            A validacao da senha e feita pela API do bar. O frontend so mantem a sessao atual em memoria.
+            A validacao da senha e feita pela API do bar. O frontend so mantem a
+            sessao atual em memoria.
           </div>
         </div>
       </div>
