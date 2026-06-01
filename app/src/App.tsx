@@ -31,7 +31,6 @@ import {
   Lock,
   Unlock,
   Sprout,
-  UserCheck,
 } from 'lucide-react';
 
 export default function App() {

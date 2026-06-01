@@ -4,26 +4,16 @@
  */
 
 import React, { useState } from 'react';
-import { Cashier, CashierLog, ClosedCashier } from '../types';
+import { Cashier, ClosedCashier } from '../types';
 import {
   Lock,
   Unlock,
-  ArrowUpRight,
-  ArrowDownRight,
   Plus,
   Minus,
   Coins,
   History,
-  CheckCircle2,
   AlertTriangle,
-  FileSpreadsheet,
   X,
-  HelpCircle,
-  Calendar,
-  Layers,
-  TrendingUp,
-  MessageSquare,
-  DollarSign,
 } from 'lucide-react';
 
 interface CaixaProps {
