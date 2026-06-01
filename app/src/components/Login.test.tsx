@@ -4,7 +4,16 @@ import Login from './Login';
 
 describe('Login', () => {
   it('habilita o envio quando uma senha e informada', () => {
-    render(<Login onLogin={vi.fn(() => true)} />);
+    render(
+      <Login
+        onLogin={vi.fn(async () => true)}
+        onSetupInitialPassword={vi.fn(async () => true)}
+        isLoading={false}
+        senhaConfigurada
+        feedback={null}
+        onClearFeedback={vi.fn()}
+      />,
+    );
 
     const input = screen.getByPlaceholderText('****');
     const button = screen.getByRole('button', {name: 'Entrar'});

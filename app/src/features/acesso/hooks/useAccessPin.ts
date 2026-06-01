@@ -1,46 +1,120 @@
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
+import {updateAccessPassword, validateAccess} from '../services/acessoService';
+import {getApiErrorMessage} from '../../shared/utils/getApiErrorMessage';
 
-const PIN_STORAGE_KEY = 'av_pin';
-const DEFAULT_PIN = '1234';
+type AccessFeedback = {
+  tone: 'success' | 'error' | 'info';
+  message: string;
+} | null;
 
 export function useAccessPin() {
-  const [accessPin, setAccessPin] = useState(DEFAULT_PIN);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAuthenticatingAccess, setIsAuthenticatingAccess] = useState(false);
+  const [accessFeedback, setAccessFeedback] = useState<AccessFeedback>(null);
 
-  useEffect(() => {
-    const storedPin = localStorage.getItem(PIN_STORAGE_KEY);
-    setAccessPin(storedPin || DEFAULT_PIN);
-  }, []);
+  const login = async (senha: string) => {
+    setIsAuthenticatingAccess(true);
+    setAccessFeedback(null);
 
-  const login = (pin: string): boolean => {
-    if (pin === accessPin) {
+    try {
+      const response = await validateAccess({senha});
+
+      if (!response.valido) {
+        setAccessFeedback({
+          tone: 'error',
+          message: 'Senha inválida. Confira e tente novamente.',
+        });
+        return false;
+      }
+
       setIsLoggedIn(true);
       return true;
+    } catch (error) {
+      setAccessFeedback({
+        tone: 'error',
+        message: getApiErrorMessage(
+          error,
+          'Nao foi possivel validar o acesso agora.',
+        ),
+      });
+      return false;
+    } finally {
+      setIsAuthenticatingAccess(false);
+    }
+  };
+
+  const changePassword = async (
+    senhaAtual: string | null,
+    novaSenha: string,
+    successMessage: string,
+  ) => {
+    setIsAuthenticatingAccess(true);
+    setAccessFeedback(null);
+
+    try {
+      await updateAccessPassword({
+        senhaAtual,
+        novaSenha,
+      });
+      setAccessFeedback({
+        tone: 'success',
+        message: successMessage,
+      });
+      return true;
+    } catch (error) {
+      setAccessFeedback({
+        tone: 'error',
+        message: getApiErrorMessage(
+          error,
+          'Nao foi possivel atualizar a senha de acesso.',
+        ),
+      });
+      return false;
+    } finally {
+      setIsAuthenticatingAccess(false);
+    }
+  };
+
+  const setupInitialPassword = async (novaSenha: string) => {
+    const success = await changePassword(
+      null,
+      novaSenha,
+      'Senha inicial configurada com sucesso. A sessao foi liberada.',
+    );
+
+    if (success) {
+      setIsLoggedIn(true);
     }
 
-    return false;
+    return success;
   };
+
+  const updatePassword = async (senhaAtual: string, novaSenha: string) =>
+    changePassword(
+      senhaAtual,
+      novaSenha,
+      'Senha de acesso atualizada com sucesso.',
+    );
 
   const logout = () => {
     setIsLoggedIn(false);
-  };
-
-  const savePin = (newPin: string) => {
-    setAccessPin(newPin);
-    localStorage.setItem(PIN_STORAGE_KEY, newPin);
+    setAccessFeedback(null);
   };
 
   const resetPin = () => {
-    localStorage.removeItem(PIN_STORAGE_KEY);
-    setAccessPin(DEFAULT_PIN);
+    setIsLoggedIn(false);
+    setAccessFeedback(null);
   };
 
   return {
-    accessPin,
     isLoggedIn,
+    isAuthenticatingAccess,
+    accessFeedback,
+    clearAccessFeedback: () => setAccessFeedback(null),
     login,
     logout,
-    setAccessPin: savePin,
     resetPin,
+    setupInitialPassword,
+    changePassword: updatePassword,
   };
 }
