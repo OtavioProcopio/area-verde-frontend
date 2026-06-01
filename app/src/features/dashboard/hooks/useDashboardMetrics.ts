@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   fetchBestSellingProducts,
   fetchCommandasReport,
@@ -55,7 +55,11 @@ export function useDashboardMetrics() {
         negativeStockItems,
       ] = await Promise.all([
         fetchDailyReport(today),
-        fetchCommandasReport({status: 'ABERTA', dataInicio: today, dataFim: today}),
+        fetchCommandasReport({
+          status: 'ABERTA',
+          dataInicio: today,
+          dataFim: today,
+        }),
         fetchBestSellingProducts({
           dataInicio: today,
           dataFim: today,
@@ -65,7 +69,9 @@ export function useDashboardMetrics() {
         fetchStockReport('negativo'),
       ]);
 
-      const openCommandas = commandasReport.find((item) => item.status === 'ABERTA');
+      const openCommandas = commandasReport.find(
+        (item) => item.status === 'ABERTA',
+      );
 
       setMetrics({
         dailyReport,

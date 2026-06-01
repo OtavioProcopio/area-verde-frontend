@@ -1,6 +1,6 @@
-import {apiRequest} from '../../../lib/api';
-import type {Customer} from '../../../types';
-import {mapCustomer} from '../mappers/customerMapper';
+import { apiRequest } from '../../../lib/api';
+import type { Customer } from '../../../types';
+import { mapCustomer } from '../mappers/customerMapper';
 import type {
   ApiCustomerDetail,
   ApiCustomerPendencias,
@@ -13,7 +13,9 @@ export async function fetchCustomers(): Promise<Customer[]> {
     customers.map(async (customer) => {
       const [detail, pendencias] = await Promise.all([
         apiRequest<ApiCustomerDetail>(`/clientes/${customer.id}`),
-        apiRequest<ApiCustomerPendencias>(`/clientes/${customer.id}/pendencias`),
+        apiRequest<ApiCustomerPendencias>(
+          `/clientes/${customer.id}/pendencias`,
+        ),
       ]);
       return mapCustomer(detail, pendencias);
     }),
@@ -36,7 +38,7 @@ export async function createCustomer(
   });
 
   if (customer.active === false) {
-    await apiRequest(`/clientes/${created.id}/inativar`, {method: 'PATCH'});
+    await apiRequest(`/clientes/${created.id}/inativar`, { method: 'PATCH' });
   }
 }
 
@@ -55,9 +57,12 @@ export async function saveCustomer(
   });
 
   if (activeChanged !== undefined) {
-    await apiRequest(`/clientes/${customer.id}/${activeChanged ? 'ativar' : 'inativar'}`, {
-      method: 'PATCH',
-    });
+    await apiRequest(
+      `/clientes/${customer.id}/${activeChanged ? 'ativar' : 'inativar'}`,
+      {
+        method: 'PATCH',
+      },
+    );
   }
 }
 

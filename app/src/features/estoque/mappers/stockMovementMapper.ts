@@ -1,6 +1,6 @@
-import type {StockMovement} from '../../../types';
-import {toNumber} from '../../shared/utils/toNumber';
-import type {ApiStockMovement} from '../types';
+import type { StockMovement } from '../../../types';
+import { toNumber } from '../../shared/utils/toNumber';
+import type { ApiStockMovement } from '../types';
 
 export function mapStockMovement(movement: ApiStockMovement): StockMovement {
   return {

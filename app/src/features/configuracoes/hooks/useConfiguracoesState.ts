@@ -1,7 +1,7 @@
-import {useState} from 'react';
-import {getApiErrorMessage} from '../../shared/utils/getApiErrorMessage';
-import {updateConfiguracao as persistConfiguracao} from '../services/configuracoesService';
-import type {Configuracao, ConfiguracaoUpdateInput} from '../types';
+import { useState } from 'react';
+import { getApiErrorMessage } from '../../shared/utils/getApiErrorMessage';
+import { updateConfiguracao as persistConfiguracao } from '../services/configuracoesService';
+import type { Configuracao, ConfiguracaoUpdateInput } from '../types';
 
 type RefreshRef = {
   current: () => Promise<void>;

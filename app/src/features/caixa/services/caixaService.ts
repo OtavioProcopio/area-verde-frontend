@@ -1,12 +1,12 @@
-import type {Cashier, ClosedCashier} from '../../../types';
-import {apiRequest} from '../../../lib/api';
+import type { Cashier, ClosedCashier } from '../../../types';
+import { apiRequest } from '../../../lib/api';
 import {
   EMPTY_CASHIER,
   isCaixaNaoEncontrado,
   mapCaixa,
   mapClosedCaixa,
 } from '../mappers/caixaMapper';
-import type {ApiCaixaDetail, ApiCaixaSummary} from '../types';
+import type { ApiCaixaDetail, ApiCaixaSummary } from '../types';
 
 export async function fetchCaixaAtual(): Promise<Cashier> {
   try {

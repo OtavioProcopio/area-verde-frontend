@@ -1,8 +1,8 @@
-import {apiRequest} from '../../../lib/api';
-import type {Category, Product, RecipeItem} from '../../../types';
-import {toNumber} from '../../shared/utils/toNumber';
-import {mapProduct, mapUnitToApi} from '../mappers/productMapper';
-import type {ApiProduct, ApiProductComposition} from '../types';
+import { apiRequest } from '../../../lib/api';
+import type { Category, Product, RecipeItem } from '../../../types';
+import { toNumber } from '../../shared/utils/toNumber';
+import { mapProduct, mapUnitToApi } from '../mappers/productMapper';
+import type { ApiProduct, ApiProductComposition } from '../types';
 
 function getCategoryIdByName(categories: Category[], categoryName: string) {
   const category = categories.find((item) => item.name === categoryName);
@@ -59,12 +59,15 @@ export async function syncProductComposition(
     const componentId = Number(item.ingredientId);
     nextIds.add(componentId);
     if (currentMap.has(componentId)) {
-      await apiRequest(`/produtos/${numericId}/composicao/componentes/${componentId}`, {
-        method: 'PUT',
-        body: {
-          quantidadeBaixa: item.quantity,
+      await apiRequest(
+        `/produtos/${numericId}/composicao/componentes/${componentId}`,
+        {
+          method: 'PUT',
+          body: {
+            quantidadeBaixa: item.quantity,
+          },
         },
-      });
+      );
     } else {
       await apiRequest(`/produtos/${numericId}/composicao/componentes`, {
         method: 'POST',
@@ -80,7 +83,7 @@ export async function syncProductComposition(
     if (!nextIds.has(component.produtoComponenteId)) {
       await apiRequest(
         `/produtos/${numericId}/composicao/componentes/${component.produtoComponenteId}`,
-        {method: 'DELETE'},
+        { method: 'DELETE' },
       );
     }
   }
@@ -110,7 +113,7 @@ export async function createProduct(
   }
 
   if (!product.active) {
-    await apiRequest(`/produtos/${created.id}/inativar`, {method: 'PATCH'});
+    await apiRequest(`/produtos/${created.id}/inativar`, { method: 'PATCH' });
   }
 }
 
@@ -139,9 +142,12 @@ export async function saveProduct(
   }
 
   if (activeChanged !== undefined) {
-    await apiRequest(`/produtos/${product.id}/${activeChanged ? 'ativar' : 'inativar'}`, {
-      method: 'PATCH',
-    });
+    await apiRequest(
+      `/produtos/${product.id}/${activeChanged ? 'ativar' : 'inativar'}`,
+      {
+        method: 'PATCH',
+      },
+    );
   }
 }
 

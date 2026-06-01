@@ -1,9 +1,11 @@
-import {apiRequest} from '../../../lib/api';
-import type {StockMovement} from '../../../types';
-import {mapStockMovement} from '../mappers/stockMovementMapper';
-import type {ApiStockMovement} from '../types';
+import { apiRequest } from '../../../lib/api';
+import type { StockMovement } from '../../../types';
+import { mapStockMovement } from '../mappers/stockMovementMapper';
+import type { ApiStockMovement } from '../types';
 
-export async function fetchStockMovements(productId: string): Promise<StockMovement[]> {
+export async function fetchStockMovements(
+  productId: string,
+): Promise<StockMovement[]> {
   const movements = await apiRequest<ApiStockMovement[]>(
     `/estoque/produtos/${productId}/movimentos`,
   );

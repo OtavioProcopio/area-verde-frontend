@@ -1,6 +1,9 @@
-import {useState} from 'react';
-import {updateAccessPassword, validateAccess} from '../services/acessoService';
-import {getApiErrorMessage} from '../../shared/utils/getApiErrorMessage';
+import { useState } from 'react';
+import {
+  updateAccessPassword,
+  validateAccess,
+} from '../services/acessoService';
+import { getApiErrorMessage } from '../../shared/utils/getApiErrorMessage';
 
 type AccessFeedback = {
   tone: 'success' | 'error' | 'info';
@@ -17,7 +20,7 @@ export function useAccessPin() {
     setAccessFeedback(null);
 
     try {
-      const response = await validateAccess({senha});
+      const response = await validateAccess({ senha });
 
       if (!response.valido) {
         setAccessFeedback({

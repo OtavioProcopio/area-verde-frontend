@@ -1,14 +1,14 @@
-import {useRef} from 'react';
-import {useAccessPin} from './features/acesso/hooks/useAccessPin';
-import {useCaixaState} from './features/caixa/hooks/useCaixaState';
-import {useCategoriesState} from './features/categories/hooks/useCategoriesState';
-import {useComandasState} from './features/comandas/hooks/useComandasState';
-import {useConfiguracoesState} from './features/configuracoes/hooks/useConfiguracoesState';
-import {useCustomersState} from './features/customers/hooks/useCustomersState';
-import {useFiadosState} from './features/fiados/hooks/useFiadosState';
-import {useProductsState} from './features/products/hooks/useProductsState';
-import {useBackupState} from './features/system/hooks/useBackupState';
-import {useRemoteBootstrap} from './features/system/hooks/useRemoteBootstrap';
+import { useRef } from 'react';
+import { useAccessPin } from './features/acesso/hooks/useAccessPin';
+import { useCaixaState } from './features/caixa/hooks/useCaixaState';
+import { useCategoriesState } from './features/categories/hooks/useCategoriesState';
+import { useComandasState } from './features/comandas/hooks/useComandasState';
+import { useConfiguracoesState } from './features/configuracoes/hooks/useConfiguracoesState';
+import { useCustomersState } from './features/customers/hooks/useCustomersState';
+import { useFiadosState } from './features/fiados/hooks/useFiadosState';
+import { useProductsState } from './features/products/hooks/useProductsState';
+import { useBackupState } from './features/system/hooks/useBackupState';
+import { useRemoteBootstrap } from './features/system/hooks/useRemoteBootstrap';
 
 export function useSystemState() {
   const refreshRef = useRef<() => Promise<void>>(async () => {});
@@ -16,7 +16,10 @@ export function useSystemState() {
   const configuracoesState = useConfiguracoesState(refreshRef);
   const access = useAccessPin();
   const categoriesState = useCategoriesState(refreshRef);
-  const productsState = useProductsState(categoriesState.categories, refreshRef);
+  const productsState = useProductsState(
+    categoriesState.categories,
+    refreshRef,
+  );
   const customersState = useCustomersState(refreshRef);
   const fiadosState = useFiadosState(refreshRef);
   const caixaState = useCaixaState(refreshRef);
@@ -52,7 +55,7 @@ export function useSystemState() {
 
     if (success) {
       configuracoesState.setConfiguracao((current) =>
-        current ? {...current, senhaConfigurada: true} : current,
+        current ? { ...current, senhaConfigurada: true } : current,
       );
     }
 
@@ -67,7 +70,7 @@ export function useSystemState() {
 
     if (success) {
       configuracoesState.setConfiguracao((current) =>
-        current ? {...current, senhaConfigurada: true} : current,
+        current ? { ...current, senhaConfigurada: true } : current,
       );
     }
 

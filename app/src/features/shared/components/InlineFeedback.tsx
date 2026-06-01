@@ -11,9 +11,11 @@ const TONE_CLASSES: Record<InlineFeedbackProps['tone'], string> = {
   info: 'bg-slate-800/70 border-slate-700 text-slate-300',
 };
 
-export function InlineFeedback({tone, message}: InlineFeedbackProps) {
+export function InlineFeedback({ tone, message }: InlineFeedbackProps) {
   return (
-    <div className={`rounded-lg border p-3 text-xs font-semibold ${TONE_CLASSES[tone]}`}>
+    <div
+      className={`rounded-lg border p-3 text-xs font-semibold ${TONE_CLASSES[tone]}`}
+    >
       {message}
     </div>
   );

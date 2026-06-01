@@ -1,8 +1,8 @@
-import {ApiError} from '../../../lib/api';
-import type {Cashier, CashierLog, ClosedCashier} from '../../../types';
-import {mapPaymentMethod} from '../../shared/mappers/apiValueMappers';
-import {toNumber} from '../../shared/utils/toNumber';
-import type {ApiCaixaDetail, ApiCaixaSummary} from '../types';
+import { ApiError } from '../../../lib/api';
+import type { Cashier, CashierLog, ClosedCashier } from '../../../types';
+import { mapPaymentMethod } from '../../shared/mappers/apiValueMappers';
+import { toNumber } from '../../shared/utils/toNumber';
+import type { ApiCaixaDetail, ApiCaixaSummary } from '../types';
 
 export const EMPTY_CASHIER: Cashier = {
   isOpen: false,
@@ -46,7 +46,9 @@ export function mapCaixa(detail: ApiCaixaDetail): Cashier {
       description: `Pagamento da comanda #${payment.comandaId}`,
       timestamp: payment.criadoEm,
     })),
-  ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  ].sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+  );
 
   return {
     id: String(detail.id),

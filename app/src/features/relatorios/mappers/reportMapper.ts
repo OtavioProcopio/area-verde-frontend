@@ -1,5 +1,5 @@
-import {mapUnit} from '../../shared/mappers/apiValueMappers';
-import {toNumber} from '../../shared/utils/toNumber';
+import { mapUnit } from '../../shared/mappers/apiValueMappers';
+import { toNumber } from '../../shared/utils/toNumber';
 import type {
   ApiBestSellingProduct,
   ApiCommandaReportItem,
@@ -41,7 +41,9 @@ export function mapDailyReport(report: ApiDailyReport): DailyReport {
   };
 }
 
-export function mapBestSellingProduct(item: ApiBestSellingProduct): BestSellingProduct {
+export function mapBestSellingProduct(
+  item: ApiBestSellingProduct,
+): BestSellingProduct {
   return {
     id: item.produtoId === null ? 'unknown' : String(item.produtoId),
     name: item.produtoNome,
@@ -85,7 +87,9 @@ export function mapConsumedStockReportItem(
   };
 }
 
-export function mapCommandaReportItem(item: ApiCommandaReportItem): CommandaReportItem {
+export function mapCommandaReportItem(
+  item: ApiCommandaReportItem,
+): CommandaReportItem {
   return {
     status: item.status,
     quantity: item.quantidade,

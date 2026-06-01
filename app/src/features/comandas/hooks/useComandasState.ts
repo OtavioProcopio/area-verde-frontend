@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import { useState } from 'react';
 import {
   addItemToComanda as createComandaItem,
   cancelComanda,
@@ -10,7 +10,7 @@ import {
   linkCustomerToComanda,
   markComandaAsFiado,
 } from '../services/comandasService';
-import type {Comanda, TabItem} from '../../../types';
+import type { Comanda, TabItem } from '../../../types';
 
 type RefreshRef = {
   current: () => Promise<void>;
@@ -89,9 +89,9 @@ export function useComandasState(refreshRef: RefreshRef) {
     desconto = 0,
     acrescimo = 0,
     clienteIdParaFiado: string | null = null,
-  ): Promise<{success: boolean; msg: string}> => {
+  ): Promise<{ success: boolean; msg: string }> => {
     const comanda = comandas.find((item) => item.id === comandaId);
-    if (!comanda) return {success: false, msg: 'Comanda não encontrada.'};
+    if (!comanda) return { success: false, msg: 'Comanda não encontrada.' };
 
     if (desconto > 0 || acrescimo > 0) {
       return {
@@ -116,12 +116,12 @@ export function useComandasState(refreshRef: RefreshRef) {
 
       await markComandaAsFiado(comandaId, customerId);
       await refreshRef.current();
-      return {success: true, msg: 'Comanda marcada como fiado.'};
+      return { success: true, msg: 'Comanda marcada como fiado.' };
     }
 
     await closeComanda(comandaId, metodo, total);
     await refreshRef.current();
-    return {success: true, msg: 'Comanda finalizada com sucesso.'};
+    return { success: true, msg: 'Comanda finalizada com sucesso.' };
   };
 
   const reativarComanda = async () => {

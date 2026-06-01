@@ -30,11 +30,11 @@ export interface Product {
   id: string;
   name: string;
   category: string;
-  price: number;     // Preço de venda
+  price: number; // Preço de venda
   costPrice: number; // Preço de custo
-  stock: number;     // Estoque atual
-  minStock: number;  // Alerta de estoque mínimo
-  active: boolean;   // Status do produto
+  stock: number; // Estoque atual
+  minStock: number; // Alerta de estoque mínimo
+  active: boolean; // Status do produto
   unit: 'un' | 'ml'; // Unidades compatíveis com a API
   isComposite: boolean; // Se é feito a partir de outros produtos do estoque
   recipe?: RecipeItem[]; // Lista de ingredientes e suas proporções
@@ -65,7 +65,7 @@ export interface Customer {
   name: string;
   nickname?: string;
   phone: string;
-  balance: number;    // Saldo pendente (positivo = deve ao bar)
+  balance: number; // Saldo pendente (positivo = deve ao bar)
   history: CustomerHistoryEntry[];
   notes?: string;
   active?: boolean;
@@ -94,7 +94,13 @@ export interface Comanda {
 
 export interface CashierLog {
   id: string;
-  type: 'abertura' | 'fechamento' | 'venda' | 'suprimento' | 'sangria' | 'recebimento_fiado';
+  type:
+    | 'abertura'
+    | 'fechamento'
+    | 'venda'
+    | 'suprimento'
+    | 'sangria'
+    | 'recebimento_fiado';
   amount: number;
   paymentMethod?: 'dinheiro' | 'pix' | 'cartao' | 'fiado';
   description: string;
@@ -106,7 +112,7 @@ export interface Cashier {
   isOpen: boolean;
   openedAt: string | null;
   closedAt: string | null;
-  initialCash: number;       // Fundo de caixa inicial em dinheiro
+  initialCash: number; // Fundo de caixa inicial em dinheiro
   currentCashInMoney: number; // Total acumulado de dinheiro em caixa física (inicial + vendas dinheiro + suprimentos + fiado dinheiro - sangrias)
   logs: CashierLog[];
   notes?: string; // Observação inicial na abertura ou fechamento

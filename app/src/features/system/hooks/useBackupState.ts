@@ -36,7 +36,7 @@ export function useBackupState({
     await refreshState();
   };
 
-  const importBackup = (): {success: boolean; msg: string} => ({
+  const importBackup = (): { success: boolean; msg: string } => ({
     success: false,
     msg: 'Importação de backup não é suportada enquanto o frontend usa a API real.',
   });

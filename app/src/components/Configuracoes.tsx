@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Download,
   FolderSync,
@@ -21,7 +21,7 @@ import type {
   Configuracao,
   ConfiguracaoUpdateInput,
 } from '../features/configuracoes/types';
-import {InlineFeedback} from '../features/shared/components/InlineFeedback';
+import { InlineFeedback } from '../features/shared/components/InlineFeedback';
 
 type Feedback = {
   tone: 'success' | 'error' | 'info';
@@ -39,7 +39,7 @@ interface ConfiguracoesProps {
   onClearAccessFeedback: () => void;
   isUpdatingPassword: boolean;
   onResetAllData: () => Promise<void>;
-  onImportBackup: (data: string) => {success: boolean; msg: string};
+  onImportBackup: (data: string) => { success: boolean; msg: string };
   onExportBackup: () => string;
 }
 
@@ -65,7 +65,9 @@ export default function Configuracoes({
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [localPasswordError, setLocalPasswordError] = useState<string | null>(null);
+  const [localPasswordError, setLocalPasswordError] = useState<string | null>(
+    null,
+  );
   const [backupText, setBackupText] = useState('');
   const [backupMsg, setBackupMsg] = useState<Feedback>(null);
 
@@ -110,7 +112,9 @@ export default function Configuracoes({
     onClearAccessFeedback();
 
     if (newPassword.length < 4) {
-      setLocalPasswordError('A nova senha precisa ter pelo menos 4 caracteres.');
+      setLocalPasswordError(
+        'A nova senha precisa ter pelo menos 4 caracteres.',
+      );
       return;
     }
 
@@ -241,7 +245,8 @@ export default function Configuracoes({
                     Permitir estoque fisico negativo
                   </label>
                   <p className="text-xs text-slate-500 mb-2">
-                    Quando ativo, o backend permite venda mesmo sem saldo, deixando a quantidade negativa para conferencia posterior.
+                    Quando ativo, o backend permite venda mesmo sem saldo,
+                    deixando a quantidade negativa para conferencia posterior.
                   </p>
 
                   <button
@@ -257,7 +262,11 @@ export default function Configuracoes({
                         : 'bg-slate-800/50 text-slate-500 border-slate-800 hover:bg-slate-800'
                     }`}
                   >
-                    {allowNegativeStock ? <ToggleRight size={16} /> : <ToggleLeft size={16} />}
+                    {allowNegativeStock ? (
+                      <ToggleRight size={16} />
+                    ) : (
+                      <ToggleLeft size={16} />
+                    )}
                     {allowNegativeStock ? 'PERMITIDO' : 'BLOQUEADO'}
                   </button>
                 </div>
@@ -267,7 +276,8 @@ export default function Configuracoes({
                     Dias para alerta de fiado
                   </label>
                   <p className="text-[10px] text-slate-500 mb-2">
-                    Novas pendencias usam este prazo padrao para destacar vencimentos e alertas.
+                    Novas pendencias usam este prazo padrao para destacar
+                    vencimentos e alertas.
                   </p>
 
                   <div className="flex gap-2 items-center">
@@ -335,7 +345,9 @@ export default function Configuracoes({
                   Status da senha
                 </span>
                 <span className="text-sm font-semibold text-slate-200">
-                  {configuracao?.senhaConfigurada ? 'Senha configurada' : 'Senha pendente'}
+                  {configuracao?.senhaConfigurada
+                    ? 'Senha configurada'
+                    : 'Senha pendente'}
                 </span>
               </div>
               <span
@@ -352,7 +364,10 @@ export default function Configuracoes({
 
             {accessFeedback && (
               <div className="mb-4">
-                <InlineFeedback tone={accessFeedback.tone} message={accessFeedback.message} />
+                <InlineFeedback
+                  tone={accessFeedback.tone}
+                  message={accessFeedback.message}
+                />
               </div>
             )}
 
@@ -454,10 +469,16 @@ export default function Configuracoes({
               Backup Geral e Recuperacao
             </h4>
             <p className="text-[10px] text-slate-500 leading-relaxed font-mono">
-              Enquanto a aplicacao usa a API real, o backup exportado serve como leitura operacional dos dados carregados no frontend.
+              Enquanto a aplicacao usa a API real, o backup exportado serve como
+              leitura operacional dos dados carregados no frontend.
             </p>
 
-            {backupMsg && <InlineFeedback tone={backupMsg.tone} message={backupMsg.message} />}
+            {backupMsg && (
+              <InlineFeedback
+                tone={backupMsg.tone}
+                message={backupMsg.message}
+              />
+            )}
 
             <div className="flex gap-2">
               <button
@@ -469,7 +490,10 @@ export default function Configuracoes({
               </button>
             </div>
 
-            <form onSubmit={handleImport} className="space-y-3.5 border-t border-slate-800 pt-4">
+            <form
+              onSubmit={handleImport}
+              className="space-y-3.5 border-t border-slate-800 pt-4"
+            >
               <div>
                 <label
                   htmlFor="tx-import-backup"

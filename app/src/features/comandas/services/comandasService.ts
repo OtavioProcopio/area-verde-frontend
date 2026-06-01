@@ -1,8 +1,12 @@
-import {apiRequest} from '../../../lib/api';
-import type {Comanda, TabItem} from '../../../types';
-import {toApiPaymentMethod} from '../../shared/mappers/apiValueMappers';
-import {mapComanda} from '../mappers/comandaMapper';
-import type {ApiComandaDetail, ApiComandaSummary, ApiPagamento} from '../types';
+import { apiRequest } from '../../../lib/api';
+import type { Comanda, TabItem } from '../../../types';
+import { toApiPaymentMethod } from '../../shared/mappers/apiValueMappers';
+import { mapComanda } from '../mappers/comandaMapper';
+import type {
+  ApiComandaDetail,
+  ApiComandaSummary,
+  ApiPagamento,
+} from '../types';
 
 export async function fetchComandas(): Promise<Comanda[]> {
   const comandas = await apiRequest<ApiComandaSummary[]>('/comandas');
@@ -81,7 +85,7 @@ export async function incrementComandaItem(
 ) {
   await apiRequest(`/comandas/${comandaId}/itens/${itemId}/incrementar`, {
     method: 'PATCH',
-    body: {quantidade},
+    body: { quantidade },
   });
 }
 
@@ -92,7 +96,7 @@ export async function decrementComandaItem(
 ) {
   await apiRequest(`/comandas/${comandaId}/itens/${itemId}/diminuir`, {
     method: 'PATCH',
-    body: {quantidade},
+    body: { quantidade },
   });
 }
 

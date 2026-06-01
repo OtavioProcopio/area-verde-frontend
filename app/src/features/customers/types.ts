@@ -1,4 +1,4 @@
-import type {ApiPendenciaResumo} from '../fiados/types';
+import type { ApiPendenciaResumo } from '../fiados/types';
 
 export type ApiCustomerSummary = {
   id: number;

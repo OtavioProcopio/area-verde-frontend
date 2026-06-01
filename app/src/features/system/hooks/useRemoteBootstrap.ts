@@ -1,13 +1,16 @@
-import {useCallback, useEffect, useState} from 'react';
-import {fetchCaixaAtual, fetchCaixasHistory} from '../../caixa/services/caixaService';
-import {fetchCategories} from '../../categories/services/categoriesService';
-import {fetchComandas} from '../../comandas/services/comandasService';
-import {fetchConfiguracao} from '../../configuracoes/services/configuracoesService';
-import type {Configuracao} from '../../configuracoes/types';
-import {fetchCustomers} from '../../customers/services/customersService';
-import {fetchFiados} from '../../fiados/services/fiadosService';
-import {fetchProducts} from '../../products/services/productsService';
-import {getApiErrorMessage} from '../../shared/utils/getApiErrorMessage';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  fetchCaixaAtual,
+  fetchCaixasHistory,
+} from '../../caixa/services/caixaService';
+import { fetchCategories } from '../../categories/services/categoriesService';
+import { fetchComandas } from '../../comandas/services/comandasService';
+import { fetchConfiguracao } from '../../configuracoes/services/configuracoesService';
+import type { Configuracao } from '../../configuracoes/types';
+import { fetchCustomers } from '../../customers/services/customersService';
+import { fetchFiados } from '../../fiados/services/fiadosService';
+import { fetchProducts } from '../../products/services/productsService';
+import { getApiErrorMessage } from '../../shared/utils/getApiErrorMessage';
 import type {
   Cashier,
   Category,

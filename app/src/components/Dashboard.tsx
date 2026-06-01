@@ -4,8 +4,8 @@
  */
 
 import React from 'react';
-import {Product, Customer, Comanda, Cashier} from '../types';
-import {useDashboardMetrics} from '../features/dashboard/hooks/useDashboardMetrics';
+import { Product, Customer, Comanda, Cashier } from '../types';
+import { useDashboardMetrics } from '../features/dashboard/hooks/useDashboardMetrics';
 import {
   DollarSign,
   Users,
@@ -43,7 +43,9 @@ function formatCurrency(value: number) {
 }
 
 function LoadingValue() {
-  return <span className="text-sm font-mono text-slate-500">Carregando...</span>;
+  return (
+    <span className="text-sm font-mono text-slate-500">Carregando...</span>
+  );
 }
 
 export default function Dashboard({
@@ -54,7 +56,7 @@ export default function Dashboard({
   onChangeTab,
   onOpenCaixaTrigger,
 }: DashboardProps) {
-  const {metrics, isLoading, error, reload} = useDashboardMetrics();
+  const { metrics, isLoading, error, reload } = useDashboardMetrics();
 
   const operationDate = metrics?.dailyReport?.date
     ? new Date(`${metrics.dailyReport.date}T12:00:00`)
@@ -70,14 +72,20 @@ export default function Dashboard({
 
   const renderMetric = (content: React.ReactNode) => {
     if (isLoading) return <LoadingValue />;
-    if (error) return <span className="text-sm font-mono text-rose-500">Indisponível</span>;
+    if (error)
+      return (
+        <span className="text-sm font-mono text-rose-500">Indisponível</span>
+      );
     return content;
   };
 
   const recentComandas = comandas.slice(0, 5);
 
   return (
-    <div id="dashboard-module" className="space-y-6 animate-fade-in text-slate-200">
+    <div
+      id="dashboard-module"
+      className="space-y-6 animate-fade-in text-slate-200"
+    >
       <div
         id="dashboard-header-block"
         className="flex flex-col gap-4 rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-xs sm:flex-row sm:items-center sm:justify-between"
@@ -119,7 +127,10 @@ export default function Dashboard({
             Atualizar
           </button>
 
-          <div id="dashboard-cashier-widget" className="flex items-center gap-4">
+          <div
+            id="dashboard-cashier-widget"
+            className="flex items-center gap-4"
+          >
             <div className="text-right">
               <span className="mb-1 block text-[10px] font-bold font-mono uppercase text-slate-500">
                 Status do Caixa
@@ -297,7 +308,9 @@ export default function Dashboard({
               {renderMetric(
                 <>
                   {lowStockProducts.length}{' '}
-                  <span className="text-xs font-normal text-slate-500">itens</span>
+                  <span className="text-xs font-normal text-slate-500">
+                    itens
+                  </span>
                 </>,
               )}
             </h3>
@@ -331,13 +344,17 @@ export default function Dashboard({
             </p>
             <h3
               className={`text-xl font-bold font-mono leading-none tracking-tight ${
-                negativeStockProducts.length > 0 ? 'text-rose-500' : 'text-slate-50'
+                negativeStockProducts.length > 0
+                  ? 'text-rose-500'
+                  : 'text-slate-50'
               }`}
             >
               {renderMetric(
                 <>
                   {negativeStockProducts.length}{' '}
-                  <span className="text-xs font-normal text-slate-500">itens</span>
+                  <span className="text-xs font-normal text-slate-500">
+                    itens
+                  </span>
                 </>,
               )}
             </h3>
@@ -353,7 +370,8 @@ export default function Dashboard({
         className="rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-xs"
       >
         <h3 className="mb-3.5 flex items-center gap-1.5 text-sm font-semibold font-mono uppercase tracking-wider text-slate-500">
-          <Gauge size={14} className="text-emerald-500" /> Atalhos Principais do Balcoista
+          <Gauge size={14} className="text-emerald-500" /> Atalhos Principais do
+          Balcoista
         </h3>
         <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-6">
           <button
@@ -362,7 +380,9 @@ export default function Dashboard({
             className="flex flex-col items-center gap-2 rounded-xl border border-slate-800 bg-slate-800/50 p-4 text-center transition duration-150 hover:border-emerald-300 hover:bg-emerald-950/40"
           >
             <Unlock size={22} className="text-emerald-500" />
-            <span className="block text-xs font-bold text-slate-300">Abrir Caixa</span>
+            <span className="block text-xs font-bold text-slate-300">
+              Abrir Caixa
+            </span>
           </button>
 
           <button
@@ -371,7 +391,9 @@ export default function Dashboard({
             className="flex flex-col items-center gap-2 rounded-xl border border-emerald-900 bg-slate-800/50 p-4 text-center transition-all hover:bg-emerald-900/25"
           >
             <PlusCircle size={22} className="animate-pulse text-emerald-400" />
-            <span className="block text-xs font-black text-emerald-300">Nova Comanda</span>
+            <span className="block text-xs font-black text-emerald-300">
+              Nova Comanda
+            </span>
           </button>
 
           <button
@@ -380,7 +402,9 @@ export default function Dashboard({
             className="flex flex-col items-center gap-2 rounded-xl border border-slate-800 bg-slate-800/50 p-4 text-center transition duration-150 hover:border-emerald-300 hover:bg-emerald-950/40"
           >
             <ClipboardList size={22} className="text-amber-500" />
-            <span className="block text-xs font-bold text-slate-300">Comandas Ativas</span>
+            <span className="block text-xs font-bold text-slate-300">
+              Comandas Ativas
+            </span>
           </button>
 
           <button
@@ -389,7 +413,9 @@ export default function Dashboard({
             className="flex flex-col items-center gap-2 rounded-xl border border-slate-800 bg-slate-800/50 p-4 text-center transition duration-150 hover:border-emerald-300 hover:bg-emerald-950/40"
           >
             <PackageOpen size={22} className="text-sky-500" />
-            <span className="block text-xs font-bold text-slate-300">Lançar Estoque</span>
+            <span className="block text-xs font-bold text-slate-300">
+              Lançar Estoque
+            </span>
           </button>
 
           <button
@@ -398,7 +424,9 @@ export default function Dashboard({
             className="flex flex-col items-center gap-2 rounded-xl border border-slate-800 bg-slate-800/50 p-4 text-center transition duration-150 hover:border-emerald-300 hover:bg-emerald-950/40"
           >
             <Users size={22} className="text-rose-500" />
-            <span className="block text-xs font-bold text-slate-300">Ver Fiados</span>
+            <span className="block text-xs font-bold text-slate-300">
+              Ver Fiados
+            </span>
           </button>
 
           <button
@@ -407,7 +435,9 @@ export default function Dashboard({
             className="flex flex-col items-center gap-2 rounded-xl border border-slate-800 bg-slate-800/50 p-4 text-center transition duration-150 hover:border-emerald-300 hover:bg-emerald-950/40"
           >
             <TrendingUp size={22} className="text-blue-500" />
-            <span className="block text-xs font-bold text-slate-300">Ver Relatórios</span>
+            <span className="block text-xs font-bold text-slate-300">
+              Ver Relatórios
+            </span>
           </button>
         </div>
       </div>
@@ -454,10 +484,15 @@ export default function Dashboard({
                     );
 
                     return (
-                      <tr key={comanda.id} className="duration-100 hover:bg-slate-800/40">
+                      <tr
+                        key={comanda.id}
+                        className="duration-100 hover:bg-slate-800/40"
+                      >
                         <td className="px-4 py-3">
                           <div>
-                            <span className="block font-bold text-slate-200">{comanda.code}</span>
+                            <span className="block font-bold text-slate-200">
+                              {comanda.code}
+                            </span>
                             {linkedCustomer ? (
                               <span className="text-[10px] font-semibold text-emerald-400">
                                 Cliente: {linkedCustomer.name}
@@ -471,7 +506,8 @@ export default function Dashboard({
                         </td>
                         <td className="px-4 py-3 text-center font-mono">
                           <span className="rounded bg-slate-800 px-2 py-0.5 text-[10px] font-bold text-slate-300">
-                            {comanda.items.length} {comanda.items.length === 1 ? 'item' : 'itens'}
+                            {comanda.items.length}{' '}
+                            {comanda.items.length === 1 ? 'item' : 'itens'}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-right font-bold font-mono text-slate-200">
@@ -503,7 +539,10 @@ export default function Dashboard({
 
                   {recentComandas.length === 0 && (
                     <tr>
-                      <td colSpan={5} className="py-10 text-center italic text-slate-500">
+                      <td
+                        colSpan={5}
+                        className="py-10 text-center italic text-slate-500"
+                      >
                         Nenhuma comanda aberta ou finalizada no sistema.
                       </td>
                     </tr>
@@ -524,7 +563,8 @@ export default function Dashboard({
                   Ranking de Vendas (Produtos Mais Vendidos)
                 </h4>
                 <p className="mt-0.5 block text-[10px] leading-tight text-slate-500">
-                  Produtos mais vendidos consolidados pelo backend para o dia atual.
+                  Produtos mais vendidos consolidados pelo backend para o dia
+                  atual.
                 </p>
               </div>
               <button
@@ -591,7 +631,7 @@ export default function Dashboard({
                       <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
                         <div
                           className="h-full rounded-full bg-emerald-600 transition-all duration-300"
-                          style={{width: `${widthPercent}%`}}
+                          style={{ width: `${widthPercent}%` }}
                         />
                       </div>
                     </div>
@@ -622,8 +662,11 @@ export default function Dashboard({
                   >
                     <Lock size={16} className="mt-0.5 shrink-0 text-rose-500" />
                     <div>
-                      <span className="mb-0.5 block font-bold text-rose-300">Caixa Fechado</span>
-                      Você não poderá processar recebimentos de comandas nem lançamentos financeiros até abrir o caixa.
+                      <span className="mb-0.5 block font-bold text-rose-300">
+                        Caixa Fechado
+                      </span>
+                      Você não poderá processar recebimentos de comandas nem
+                      lançamentos financeiros até abrir o caixa.
                     </div>
                   </div>
                 )}
@@ -633,12 +676,19 @@ export default function Dashboard({
                     id="alert-box-negative-stock"
                     className="flex items-start gap-2.5 rounded-xl border border-rose-800/60 bg-rose-950/40 p-3.5 text-xs font-medium text-rose-400"
                   >
-                    <AlertTriangle size={16} className="mt-0.5 shrink-0 text-rose-500" />
+                    <AlertTriangle
+                      size={16}
+                      className="mt-0.5 shrink-0 text-rose-500"
+                    />
                     <div>
                       <span className="mb-0.5 block font-bold text-rose-300">
                         Estoque Negativo Grave!
                       </span>
-                      Há <strong className="font-mono">{negativeStockProducts.length}</strong> produto(s) com saldo negativo segundo a API.
+                      Há{' '}
+                      <strong className="font-mono">
+                        {negativeStockProducts.length}
+                      </strong>{' '}
+                      produto(s) com saldo negativo segundo a API.
                     </div>
                   </div>
                 )}
@@ -648,12 +698,18 @@ export default function Dashboard({
                     id="alert-box-low-stock"
                     className="flex items-start gap-2.5 rounded-xl border border-amber-800/60 bg-amber-950/40 p-3.5 text-xs font-medium text-amber-400"
                   >
-                    <AlertTriangle size={16} className="mt-0.5 shrink-0 text-amber-500" />
+                    <AlertTriangle
+                      size={16}
+                      className="mt-0.5 shrink-0 text-amber-500"
+                    />
                     <div>
                       <span className="mb-0.5 block font-bold text-amber-300">
                         Estoque de Segurança Baixo
                       </span>
-                      <strong className="font-mono">{lowStockProducts.length}</strong> item(ns) aparecem em alerta de estoque baixo na API.
+                      <strong className="font-mono">
+                        {lowStockProducts.length}
+                      </strong>{' '}
+                      item(ns) aparecem em alerta de estoque baixo na API.
                     </div>
                   </div>
                 )}
@@ -662,12 +718,16 @@ export default function Dashboard({
                   id="info-box-tip-vincular"
                   className="flex items-start gap-2.5 rounded-xl border border-emerald-800/60 bg-emerald-950/40 p-3.5 text-xs leading-relaxed text-emerald-300"
                 >
-                  <HelpCircle size={16} className="mt-0.5 shrink-0 text-emerald-500" />
+                  <HelpCircle
+                    size={16}
+                    className="mt-0.5 shrink-0 text-emerald-500"
+                  />
                   <div>
                     <span className="mb-0.5 block font-bold text-emerald-200">
                       Dica de Atendimento
                     </span>
-                    Vincule o cadastro dos fregueses nas comandas para facilitar o fechamento em fiado no fim do consumo.
+                    Vincule o cadastro dos fregueses nas comandas para facilitar
+                    o fechamento em fiado no fim do consumo.
                   </div>
                 </div>
 
@@ -678,15 +738,22 @@ export default function Dashboard({
                   <ul className="space-y-1.5 text-[10px] leading-tight">
                     <li className="flex gap-1.5">
                       <span className="font-bold text-emerald-500">•</span>
-                      <span>Contar cédulas da gaveta antes de fechar o dia físico.</span>
+                      <span>
+                        Contar cédulas da gaveta antes de fechar o dia físico.
+                      </span>
                     </li>
                     <li className="flex gap-1.5">
                       <span className="font-bold text-emerald-500">•</span>
-                      <span>Cadastrar o telefone do fiador no caderno virtual.</span>
+                      <span>
+                        Cadastrar o telefone do fiador no caderno virtual.
+                      </span>
                     </li>
                     <li className="flex gap-1.5">
                       <span className="font-bold text-emerald-500">•</span>
-                      <span>Evitar dar descontos excessivos sem autorização familiar.</span>
+                      <span>
+                        Evitar dar descontos excessivos sem autorização
+                        familiar.
+                      </span>
                     </li>
                   </ul>
                 </div>

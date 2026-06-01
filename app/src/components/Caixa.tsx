@@ -4,26 +4,16 @@
  */
 
 import React, { useState } from 'react';
-import { Cashier, CashierLog, ClosedCashier } from '../types';
-import { 
-  Lock, 
-  Unlock, 
-  ArrowUpRight, 
-  ArrowDownRight, 
-  Plus, 
+import { Cashier, ClosedCashier } from '../types';
+import {
+  Lock,
+  Unlock,
+  Plus,
   Minus,
-  Coins, 
-  History, 
-  CheckCircle2, 
+  Coins,
+  History,
   AlertTriangle,
-  FileSpreadsheet,
   X,
-  HelpCircle,
-  Calendar,
-  Layers,
-  TrendingUp,
-  MessageSquare,
-  DollarSign
 } from 'lucide-react';
 
 interface CaixaProps {
@@ -41,9 +31,8 @@ export default function Caixa({
   onAbrirCaixa,
   onFecharCaixa,
   onAdicionarSuprimento,
-  onRealizarSangria
+  onRealizarSangria,
 }: CaixaProps) {
-  
   // Modal toggle states
   const [isAbrirModalOpen, setIsAbrirModalOpen] = useState(false);
   const [isReforcoModalOpen, setIsReforcoModalOpen] = useState(false);
@@ -66,9 +55,12 @@ export default function Caixa({
   const [fechamentoObs, setFechamentoObs] = useState('');
 
   // Log filter state inside cashier
-  const [logFilter, setLogFilter] = useState<'all' | 'venda' | 'suprimento' | 'sangria'>('all');
+  const [logFilter, setLogFilter] = useState<
+    'all' | 'venda' | 'suprimento' | 'sangria'
+  >('all');
 
-  const fmt = (v: number) => `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const fmt = (v: number) =>
+    `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   // Form submissions
   const handleAberturaSubmit = (e: React.FormEvent) => {
@@ -100,7 +92,9 @@ export default function Caixa({
     if (!isNaN(val) && val > 0 && sangriaDesc.trim() !== '') {
       // Prevent withdrawing more than available cash physically
       if (val > caixa.currentCashInMoney) {
-        alert(`Sangria excede o dinheiro físico disponível na gaveta (${fmt(caixa.currentCashInMoney)})!`);
+        alert(
+          `Sangria excede o dinheiro físico disponível na gaveta (${fmt(caixa.currentCashInMoney)})!`,
+        );
         return;
       }
       onRealizarSangria(val, sangriaDesc);
@@ -121,23 +115,33 @@ export default function Caixa({
 
   // Calculations for open state
   const totalRecebidoHoje = caixa.logs
-    .filter(l => (l.type === 'venda' || l.type === 'recebimento_fiado') && l.paymentMethod === 'dinheiro')
+    .filter(
+      (l) =>
+        (l.type === 'venda' || l.type === 'recebimento_fiado') &&
+        l.paymentMethod === 'dinheiro',
+    )
     .reduce((sum, l) => sum + l.amount, 0);
 
   const totalReforcos = caixa.logs
-    .filter(l => l.type === 'suprimento')
+    .filter((l) => l.type === 'suprimento')
     .reduce((sum, l) => sum + l.amount, 0);
 
   const totalSangrias = caixa.logs
-    .filter(l => l.type === 'sangria')
+    .filter((l) => l.type === 'sangria')
     .reduce((sum, l) => sum + l.amount, 0);
 
   const OUTROS_MEIOS_SOMA = caixa.logs
-    .filter(l => (l.type === 'venda' || l.type === 'recebimento_fiado') && l.paymentMethod !== 'dinheiro' && l.paymentMethod !== 'fiado')
+    .filter(
+      (l) =>
+        (l.type === 'venda' || l.type === 'recebimento_fiado') &&
+        l.paymentMethod !== 'dinheiro' &&
+        l.paymentMethod !== 'fiado',
+    )
     .reduce((sum, l) => sum + l.amount, 0);
 
   // Expected Cash = Initial + Received in Cash + Suprimentos - Sangrias
-  const saldoEsperadoGaveta = caixa.initialCash + totalRecebidoHoje + totalReforcos - totalSangrias;
+  const saldoEsperadoGaveta =
+    caixa.initialCash + totalRecebidoHoje + totalReforcos - totalSangrias;
 
   // Filter cashier logs
   const filteredLogs = caixa.logs.filter((log) => {
@@ -146,17 +150,25 @@ export default function Caixa({
   });
 
   return (
-    <div id="caixa-diario-module" className="space-y-6 animate-fade-in text-slate-200">
-      
+    <div
+      id="caixa-diario-module"
+      className="space-y-6 animate-fade-in text-slate-200"
+    >
       {/* Title block */}
-      <div id="caixa-header-container" className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xs">
+      <div
+        id="caixa-header-container"
+        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xs"
+      >
         <div>
-          <span className="text-xs uppercase tracking-widest font-mono text-emerald-500 font-bold block mb-1">Tesouraria e Operação</span>
+          <span className="text-xs uppercase tracking-widest font-mono text-emerald-500 font-bold block mb-1">
+            Tesouraria e Operação
+          </span>
           <h2 className="text-3xl font-display font-bold text-slate-50 tracking-tight">
             Caixa <span className="text-emerald-500">Diário</span> Balcão
           </h2>
           <p className="text-xs text-slate-500 mt-1 leading-normal">
-            Controle de abertura física, suprimento de troco, sangrias para compras rápidas e fechamento fiscal de mesa.
+            Controle de abertura física, suprimento de troco, sangrias para
+            compras rápidas e fechamento fiscal de mesa.
           </p>
         </div>
 
@@ -177,13 +189,20 @@ export default function Caixa({
 
       {/* 1. SEM CAIXA ABERTO STATE CARD */}
       {!caixa.isOpen && (
-        <div id="state-caixa-fechado-card" className="bg-slate-900 border border-slate-800 rounded-2xl p-8 flex flex-col items-center justify-center text-center shadow-xs">
+        <div
+          id="state-caixa-fechado-card"
+          className="bg-slate-900 border border-slate-800 rounded-2xl p-8 flex flex-col items-center justify-center text-center shadow-xs"
+        >
           <div className="p-4 bg-rose-950/40 border border-rose-900 rounded-2xl text-rose-500 mb-5 animate-pulse">
             <Lock size={40} className="stroke-[1.5]" />
           </div>
-          <h3 className="text-xl font-display font-black text-slate-50 mb-2">Nenhum Caixa Aberto</h3>
+          <h3 className="text-xl font-display font-black text-slate-50 mb-2">
+            Nenhum Caixa Aberto
+          </h3>
           <p className="text-sm text-slate-500 max-w-lg mb-6 leading-relaxed">
-            As operações diárias de comandas e recebimentos fiscais estão suspensas no momento. Abra o caixa informando o fundo de troco líquido necessário para a operação diária no balcão.
+            As operações diárias de comandas e recebimentos fiscais estão
+            suspensas no momento. Abra o caixa informando o fundo de troco
+            líquido necessário para a operação diária no balcão.
           </p>
           <button
             id="btn-open-abertura-modal"
@@ -199,7 +218,6 @@ export default function Caixa({
       {/* 2. CAIXA ABERTO STATE DASHBOARD */}
       {caixa.isOpen && (
         <div id="state-caixa-aberto-container" className="space-y-6">
-          
           {/* Header metadata row */}
           <div className="bg-emerald-900/5 border border-emerald-900/10 p-4 rounded-xl flex flex-wrap justify-between items-center gap-2 text-xs">
             <div className="flex items-center gap-2 text-emerald-300 font-bold">
@@ -207,43 +225,74 @@ export default function Caixa({
               <span>Caixa de Atendimento Ativo</span>
             </div>
             <div className="text-slate-500 font-mono">
-              Abertura oficial em: <strong className="text-slate-200">{new Date(caixa.openedAt || '').toLocaleString('pt-BR')}</strong>
+              Abertura oficial em:{' '}
+              <strong className="text-slate-200">
+                {new Date(caixa.openedAt || '').toLocaleString('pt-BR')}
+              </strong>
             </div>
           </div>
 
           {/* KPI Cards Strip */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            
             <div className="bg-slate-900 rounded-2xl border border-slate-800 p-4.5 shadow-xs">
-              <span className="text-[10px] uppercase font-mono text-slate-500 block font-bold mb-1">Fundo Inicial</span>
-              <h4 className="text-lg font-bold font-mono text-slate-200">{fmt(caixa.initialCash)}</h4>
-              <p className="text-[9px] text-slate-500 mt-1">Lançamento de abertura</p>
+              <span className="text-[10px] uppercase font-mono text-slate-500 block font-bold mb-1">
+                Fundo Inicial
+              </span>
+              <h4 className="text-lg font-bold font-mono text-slate-200">
+                {fmt(caixa.initialCash)}
+              </h4>
+              <p className="text-[9px] text-slate-500 mt-1">
+                Lançamento de abertura
+              </p>
             </div>
 
             <div className="bg-slate-900 rounded-2xl border border-slate-800 p-4.5 shadow-xs">
-              <span className="text-[10px] uppercase font-mono text-slate-500 block font-bold mb-1">Total Recebido (Dinheiro)</span>
-              <h4 className="text-lg font-bold font-mono text-emerald-500">+{fmt(totalRecebidoHoje)}</h4>
-              <p className="text-[9px] text-slate-500 mt-1">Comandas e fiados pagos</p>
+              <span className="text-[10px] uppercase font-mono text-slate-500 block font-bold mb-1">
+                Total Recebido (Dinheiro)
+              </span>
+              <h4 className="text-lg font-bold font-mono text-emerald-500">
+                +{fmt(totalRecebidoHoje)}
+              </h4>
+              <p className="text-[9px] text-slate-500 mt-1">
+                Comandas e fiados pagos
+              </p>
             </div>
 
             <div className="bg-slate-900 rounded-2xl border border-slate-800 p-4.5 shadow-xs">
-              <span className="text-[10px] uppercase font-mono text-slate-500 block font-bold mb-1">Total Reforços</span>
-              <h4 className="text-lg font-bold font-mono text-blue-500">+{fmt(totalReforcos)}</h4>
-              <p className="text-[9px] text-slate-500 mt-1">Adicionados à gaveta</p>
+              <span className="text-[10px] uppercase font-mono text-slate-500 block font-bold mb-1">
+                Total Reforços
+              </span>
+              <h4 className="text-lg font-bold font-mono text-blue-500">
+                +{fmt(totalReforcos)}
+              </h4>
+              <p className="text-[9px] text-slate-500 mt-1">
+                Adicionados à gaveta
+              </p>
             </div>
 
             <div className="bg-slate-900 rounded-2xl border border-slate-800 p-4.5 shadow-xs">
-              <span className="text-[10px] uppercase font-mono text-slate-500 block font-bold mb-1">Total Sangrias</span>
-              <h4 className="text-lg font-bold font-mono text-rose-500">-{fmt(totalSangrias)}</h4>
-              <p className="text-[9px] text-slate-500 mt-1">Retiradas emergenciais</p>
+              <span className="text-[10px] uppercase font-mono text-slate-500 block font-bold mb-1">
+                Total Sangrias
+              </span>
+              <h4 className="text-lg font-bold font-mono text-rose-500">
+                -{fmt(totalSangrias)}
+              </h4>
+              <p className="text-[9px] text-slate-500 mt-1">
+                Retiradas emergenciais
+              </p>
             </div>
 
             <div className="bg-emerald-950/40 border border-emerald-250 rounded-2xl p-4.5 text-emerald-100">
-              <span className="text-[10px] uppercase font-mono block font-bold mb-1 text-emerald-300">Saldo Esperado (Físico)</span>
-              <h4 className="text-xl font-black font-mono text-emerald-400">{fmt(caixa.currentCashInMoney)}</h4>
-              <p className="text-[9px] text-emerald-300/80 mt-1">Estoque vivo na gaveta</p>
+              <span className="text-[10px] uppercase font-mono block font-bold mb-1 text-emerald-300">
+                Saldo Esperado (Físico)
+              </span>
+              <h4 className="text-xl font-black font-mono text-emerald-400">
+                {fmt(caixa.currentCashInMoney)}
+              </h4>
+              <p className="text-[9px] text-emerald-300/80 mt-1">
+                Estoque vivo na gaveta
+              </p>
             </div>
-
           </div>
 
           {/* Action Triggers Row */}
@@ -280,7 +329,6 @@ export default function Caixa({
 
           {/* Main area: Logs & Other Payment totals */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
             {/* Logs List - Left Column (8 cols) */}
             <div className="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xs">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
@@ -291,46 +339,61 @@ export default function Caixa({
 
                 {/* Filter list */}
                 <div className="flex gap-1 bg-slate-800/50 border border-slate-800 p-1 rounded-lg">
-                  {(['all', 'venda', 'suprimento', 'sangria'] as const).map((opt) => {
-                    const labels: Record<string, string> = {
-                      all: 'Tudo',
-                      venda: 'Vendas',
-                      suprimento: 'Reforços',
-                      sangria: 'Sangrias'
-                    };
-                    return (
-                      <button
-                        key={opt}
-                        onClick={() => setLogFilter(opt)}
-                        className={`px-2 py-1 text-[10px] font-bold rounded cursor-pointer ${
-                          logFilter === opt
-                            ? 'bg-emerald-600 text-white font-black'
-                            : 'text-slate-500 hover:text-slate-855'
-                        }`}
-                      >
-                        {labels[opt]}
-                      </button>
-                    );
-                  })}
+                  {(['all', 'venda', 'suprimento', 'sangria'] as const).map(
+                    (opt) => {
+                      const labels: Record<string, string> = {
+                        all: 'Tudo',
+                        venda: 'Vendas',
+                        suprimento: 'Reforços',
+                        sangria: 'Sangrias',
+                      };
+                      return (
+                        <button
+                          key={opt}
+                          onClick={() => setLogFilter(opt)}
+                          className={`px-2 py-1 text-[10px] font-bold rounded cursor-pointer ${
+                            logFilter === opt
+                              ? 'bg-emerald-600 text-white font-black'
+                              : 'text-slate-500 hover:text-slate-855'
+                          }`}
+                        >
+                          {labels[opt]}
+                        </button>
+                      );
+                    },
+                  )}
                 </div>
               </div>
 
               <div className="space-y-2.5 max-h-[350px] overflow-y-auto pr-1">
                 {filteredLogs.map((log) => {
-                  const isPositive = log.type === 'venda' || log.type === 'suprimento' || log.type === 'recebimento_fiado' || log.type === 'abertura';
+                  const isPositive =
+                    log.type === 'venda' ||
+                    log.type === 'suprimento' ||
+                    log.type === 'recebimento_fiado' ||
+                    log.type === 'abertura';
                   return (
-                    <div key={log.id} className="p-3 bg-slate-800/50/70 border border-slate-700 rounded-xl flex justify-between items-center text-xs">
+                    <div
+                      key={log.id}
+                      className="p-3 bg-slate-800/50/70 border border-slate-700 rounded-xl flex justify-between items-center text-xs"
+                    >
                       <div className="space-y-0.5">
                         <div className="flex items-center gap-1.5 font-bold text-slate-200">
-                          <span className={`w-1.5 h-1.5 rounded-full ${isPositive ? 'bg-emerald-950/400 animate-pulse' : 'bg-rose-950/400'}`} />
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${isPositive ? 'bg-emerald-950/400 animate-pulse' : 'bg-rose-950/400'}`}
+                          />
                           <span>{log.description}</span>
                         </div>
                         <div className="text-[10px] text-slate-500 font-mono">
-                          {new Date(log.timestamp).toLocaleTimeString('pt-BR')} - {log.type.toUpperCase()} 
-                          {log.paymentMethod && ` [${log.paymentMethod.toUpperCase()}]`}
+                          {new Date(log.timestamp).toLocaleTimeString('pt-BR')}{' '}
+                          - {log.type.toUpperCase()}
+                          {log.paymentMethod &&
+                            ` [${log.paymentMethod.toUpperCase()}]`}
                         </div>
                       </div>
-                      <span className={`font-mono font-bold text-sm ${isPositive ? 'text-emerald-500' : 'text-rose-500'}`}>
+                      <span
+                        className={`font-mono font-bold text-sm ${isPositive ? 'text-emerald-500' : 'text-rose-500'}`}
+                      >
                         {isPositive ? '+' : '-'} {fmt(log.amount)}
                       </span>
                     </div>
@@ -343,63 +406,81 @@ export default function Caixa({
                   </div>
                 )}
               </div>
-
             </div>
 
             {/* Other totals summary widget - Right Column (4 cols) */}
             <div className="lg:col-span-4 space-y-6">
-              
               {/* Other Payment Channels Today info */}
               <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xs">
                 <h4 className="text-xs uppercase font-mono text-slate-500 font-extrabold mb-3.5 tracking-wider block">
                   Outros Meios de Pagamento (Hoje)
                 </h4>
-                
+
                 <div className="space-y-2.5">
                   {[
                     { id: 'pix', label: 'Pix Instantâneo' },
                     { id: 'cartao', label: 'Cartão' },
-                    { id: 'fiado', label: 'Assinados no Caderno' }
+                    { id: 'fiado', label: 'Assinados no Caderno' },
                   ].map((m) => {
                     const soma = caixa.logs
-                      .filter(l => (l.type === 'venda' || l.type === 'recebimento_fiado') && l.paymentMethod === m.id)
+                      .filter(
+                        (l) =>
+                          (l.type === 'venda' ||
+                            l.type === 'recebimento_fiado') &&
+                          l.paymentMethod === m.id,
+                      )
                       .reduce((sum, l) => sum + l.amount, 0);
 
                     return (
-                      <div key={m.id} className="p-3 bg-slate-800/50 border border-slate-700 rounded-xl flex justify-between items-center text-xs">
+                      <div
+                        key={m.id}
+                        className="p-3 bg-slate-800/50 border border-slate-700 rounded-xl flex justify-between items-center text-xs"
+                      >
                         <div>
-                          <span className="font-semibold text-slate-850 block">{m.label}</span>
-                          <span className="text-[9px] uppercase tracking-wider text-slate-500 font-mono">Lançamentos</span>
+                          <span className="font-semibold text-slate-850 block">
+                            {m.label}
+                          </span>
+                          <span className="text-[9px] uppercase tracking-wider text-slate-500 font-mono">
+                            Lançamentos
+                          </span>
                         </div>
-                        <span className="font-mono font-bold text-slate-300">{fmt(soma)}</span>
+                        <span className="font-mono font-bold text-slate-300">
+                          {fmt(soma)}
+                        </span>
                       </div>
                     );
                   })}
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-slate-800 flex justify-between text-xs">
-                  <span className="font-bold text-slate-500">Subtotal Somas:</span>
-                  <span className="font-mono font-black text-slate-200">{fmt(OUTROS_MEIOS_SOMA)}</span>
+                  <span className="font-bold text-slate-500">
+                    Subtotal Somas:
+                  </span>
+                  <span className="font-mono font-black text-slate-200">
+                    {fmt(OUTROS_MEIOS_SOMA)}
+                  </span>
                 </div>
               </div>
 
               {/* Opened notes indicator */}
               {caixa.notes && (
                 <div className="p-4 bg-emerald-950/40/50 border border-emerald-150 rounded-2xl text-xs text-emerald-300">
-                  <span className="font-semibold block mb-0.5 font-mono text-[10px] uppercase text-emerald-400">Anotação de abertura:</span>
+                  <span className="font-semibold block mb-0.5 font-mono text-[10px] uppercase text-emerald-400">
+                    Anotação de abertura:
+                  </span>
                   <p className="italic">"{caixa.notes}"</p>
                 </div>
               )}
-
             </div>
-
           </div>
-
         </div>
       )}
 
       {/* 3. HISTÓRICO DE FECHAMENTOS DE CAIXA */}
-      <div id="historico-caixas-fechados-container" className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xs">
+      <div
+        id="historico-caixas-fechados-container"
+        className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xs"
+      >
         <h3 className="text-base font-display font-bold text-slate-50 tracking-tight flex items-center gap-2 mb-4">
           <History size={16} className="text-slate-500" />
           Histórico de Caixas Anteriores (Fechados)
@@ -421,7 +502,10 @@ export default function Caixa({
             </thead>
             <tbody className="divide-y divide-slate-100">
               {caixasHistory.map((s) => (
-                <tr key={s.id} className="hover:bg-slate-800/50/80 duration-100">
+                <tr
+                  key={s.id}
+                  className="hover:bg-slate-800/50/80 duration-100"
+                >
                   <td className="px-4 py-3 font-mono text-[11px] leading-tight text-slate-300">
                     {new Date(s.openedAt).toLocaleString('pt-BR')}
                   </td>
@@ -430,7 +514,7 @@ export default function Caixa({
                   </td>
                   <td className="px-4 py-3 text-center">
                     <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase font-mono bg-slate-800 text-slate-500 border border-slate-800">
-                       {s.status.toUpperCase()}
+                      {s.status.toUpperCase()}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right font-mono text-slate-705">
@@ -453,8 +537,12 @@ export default function Caixa({
 
               {caixasHistory.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="text-center py-10 text-slate-500 italic">
-                    Nenhum registro de fechamento anterior catalogado localmente.
+                  <td
+                    colSpan={8}
+                    className="text-center py-10 text-slate-500 italic"
+                  >
+                    Nenhum registro de fechamento anterior catalogado
+                    localmente.
                   </td>
                 </tr>
               )}
@@ -463,14 +551,13 @@ export default function Caixa({
         </div>
       </div>
 
-
       {/* ---- REACT MODALS & OVERLAYS ---- */}
 
       {/* 1. MODAL ABRIR CAIXA */}
       {isAbrirModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
           <div className="bg-slate-900 rounded-2xl border border-slate-800 max-w-md w-full shadow-2xl p-6 relative animate-fade-in">
-            <button 
+            <button
               onClick={() => setIsAbrirModalOpen(false)}
               className="absolute right-4 top-4 text-slate-500 hover:text-slate-500 cursor-pointer"
             >
@@ -482,8 +569,12 @@ export default function Caixa({
                 <Unlock size={20} />
               </div>
               <div>
-                <h3 className="text-lg font-black font-display text-slate-50">Iniciar Nova Operação</h3>
-                <p className="text-xs text-slate-500 mt-0.5 font-mono">PROCESSO DE ABERTURA - AREA VERDE</p>
+                <h3 className="text-lg font-black font-display text-slate-50">
+                  Iniciar Nova Operação
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5 font-mono">
+                  PROCESSO DE ABERTURA - AREA VERDE
+                </p>
               </div>
             </div>
 
@@ -493,7 +584,9 @@ export default function Caixa({
                   Valor Inicial (Fundo de Troco em cédulas/moedas):
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-mono font-bold">R$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-mono font-bold">
+                    R$
+                  </span>
                   <input
                     type="number"
                     step="0.01"
@@ -515,7 +608,7 @@ export default function Caixa({
                     <button
                       key={p}
                       type="button"
-                      onClick={() => setAberturaValor((flt).toFixed(2))}
+                      onClick={() => setAberturaValor(flt.toFixed(2))}
                       className={`px-2.5 py-1 text-[11px] font-mono rounded border transition cursor-pointer ${
                         parseFloat(aberturaValor) === flt
                           ? 'bg-emerald-600 text-white border-emerald-500'
@@ -564,7 +657,7 @@ export default function Caixa({
       {isReforcoModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
           <div className="bg-slate-900 rounded-2xl border border-slate-800 max-w-sm w-full shadow-2xl p-6 relative animate-fade-in">
-            <button 
+            <button
               onClick={() => setIsReforcoModalOpen(false)}
               className="absolute right-4 top-4 text-slate-500 hover:text-slate-500 cursor-pointer"
             >
@@ -576,8 +669,12 @@ export default function Caixa({
                 <Plus size={18} />
               </div>
               <div>
-                <h3 className="text-base font-black font-display text-slate-50">Registrar Reforço</h3>
-                <p className="text-[10px] text-slate-500 font-mono">SUPRIMENTO DE FLUXO DE TROCO</p>
+                <h3 className="text-base font-black font-display text-slate-50">
+                  Registrar Reforço
+                </h3>
+                <p className="text-[10px] text-slate-500 font-mono">
+                  SUPRIMENTO DE FLUXO DE TROCO
+                </p>
               </div>
             </div>
 
@@ -587,7 +684,9 @@ export default function Caixa({
                   Valor Entrando R$:
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-mono font-bold">R$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-mono font-bold">
+                    R$
+                  </span>
                   <input
                     type="number"
                     step="0.01"
@@ -639,7 +738,7 @@ export default function Caixa({
       {isSangriaModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
           <div className="bg-slate-900 rounded-2xl border border-slate-800 max-w-sm w-full shadow-2xl p-6 relative animate-fade-in">
-            <button 
+            <button
               onClick={() => setIsSangriaModalOpen(false)}
               className="absolute right-4 top-4 text-slate-500 hover:text-slate-500 cursor-pointer"
             >
@@ -651,8 +750,12 @@ export default function Caixa({
                 <Minus size={18} />
               </div>
               <div>
-                <h3 className="text-base font-black font-display text-slate-50">Registrar Sangria</h3>
-                <p className="text-[10px] text-slate-500 font-mono">RETIRADA RÁPIDA DE DINHEIRO</p>
+                <h3 className="text-base font-black font-display text-slate-50">
+                  Registrar Sangria
+                </h3>
+                <p className="text-[10px] text-slate-500 font-mono">
+                  RETIRADA RÁPIDA DE DINHEIRO
+                </p>
               </div>
             </div>
 
@@ -662,7 +765,9 @@ export default function Caixa({
                   Valor Retirado R$:
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-mono font-bold">R$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-mono font-bold">
+                    R$
+                  </span>
                   <input
                     type="number"
                     step="0.01"
@@ -674,7 +779,10 @@ export default function Caixa({
                     required
                   />
                 </div>
-                <p className="text-[9px] text-slate-500 mt-1">Disponível em dinheiro físico: <strong>{fmt(caixa.currentCashInMoney)}</strong></p>
+                <p className="text-[9px] text-slate-500 mt-1">
+                  Disponível em dinheiro físico:{' '}
+                  <strong>{fmt(caixa.currentCashInMoney)}</strong>
+                </p>
               </div>
 
               <div>
@@ -715,7 +823,7 @@ export default function Caixa({
       {isFecharModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
           <div className="bg-slate-900 rounded-2xl border border-slate-800 max-w-md w-full shadow-2xl p-6 relative animate-fade-in">
-            <button 
+            <button
               onClick={() => setIsFecharModalOpen(false)}
               className="absolute right-4 top-4 text-slate-500 hover:text-slate-500 cursor-pointer"
             >
@@ -727,39 +835,62 @@ export default function Caixa({
                 <Lock size={18} />
               </div>
               <div>
-                <h3 className="text-base font-black font-display text-slate-50">Fechar Caixa Diário</h3>
-                <p className="text-[10px] text-slate-500 font-mono">CONSOLIDAÇÃO DE DADOS DE BALCÃO</p>
+                <h3 className="text-base font-black font-display text-slate-50">
+                  Fechar Caixa Diário
+                </h3>
+                <p className="text-[10px] text-slate-500 font-mono">
+                  CONSOLIDAÇÃO DE DADOS DE BALCÃO
+                </p>
               </div>
             </div>
 
             <form onSubmit={handleFechamentoConfirm} className="space-y-4">
-              
               <div className="bg-slate-800/50 border border-slate-700 p-3.5 rounded-xl space-y-2 text-xs">
-                <span className="text-[9px] uppercase tracking-wider font-mono text-slate-500 block font-bold leading-none">Resumo Consolidado Interno:</span>
-                
+                <span className="text-[9px] uppercase tracking-wider font-mono text-slate-500 block font-bold leading-none">
+                  Resumo Consolidado Interno:
+                </span>
+
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Fundo de Troco Inicial:</span>
-                  <span className="font-mono font-bold text-slate-200">{fmt(caixa.initialCash)}</span>
+                  <span className="text-slate-500">
+                    Fundo de Troco Inicial:
+                  </span>
+                  <span className="font-mono font-bold text-slate-200">
+                    {fmt(caixa.initialCash)}
+                  </span>
                 </div>
 
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Faturamento Vendas (Dinheiro):</span>
-                  <span className="font-mono font-bold text-emerald-500">+{fmt(totalRecebidoHoje)}</span>
+                  <span className="text-slate-500">
+                    Faturamento Vendas (Dinheiro):
+                  </span>
+                  <span className="font-mono font-bold text-emerald-500">
+                    +{fmt(totalRecebidoHoje)}
+                  </span>
                 </div>
 
                 <div className="flex justify-between">
-                  <span className="text-slate-500 font-medium">Reforços de Caixa:</span>
-                  <span className="font-mono font-bold text-blue-500">+{fmt(totalReforcos)}</span>
+                  <span className="text-slate-500 font-medium">
+                    Reforços de Caixa:
+                  </span>
+                  <span className="font-mono font-bold text-blue-500">
+                    +{fmt(totalReforcos)}
+                  </span>
                 </div>
 
                 <div className="flex justify-between">
-                  <span className="text-slate-500 font-medium">Sangrias Totais:</span>
-                  <span className="font-mono font-bold text-rose-500">-{fmt(totalSangrias)}</span>
+                  <span className="text-slate-500 font-medium">
+                    Sangrias Totais:
+                  </span>
+                  <span className="font-mono font-bold text-rose-500">
+                    -{fmt(totalSangrias)}
+                  </span>
                 </div>
 
                 <div className="border-t border-slate-800 my-1 pt-1.5 flex justify-between font-bold text-slate-50">
                   <span>Saldo Final em Dinheiro:</span>
-                  <span className="font-mono text-emerald-400 font-black text-sm">{fmt(saldoEsperadoGaveta)}</span>
+                  <span className="font-mono text-emerald-400 font-black text-sm">
+                    {fmt(saldoEsperadoGaveta)}
+                  </span>
                 </div>
               </div>
 
@@ -776,8 +907,15 @@ export default function Caixa({
               </div>
 
               <div className="p-3 bg-amber-950/40 border border-amber-800/60 rounded-lg flex items-start gap-2 text-[10px] text-amber-800 leading-normal">
-                <AlertTriangle size={14} className="text-amber-500 shrink-0 mt-0.2" />
-                <span>Esta ação fechará oficialmente o movimento. Vendas adicionais exigirão iniciar um novo caixa. Confirme se as notas fiscais e contagem de cédulas estão de acordo.</span>
+                <AlertTriangle
+                  size={14}
+                  className="text-amber-500 shrink-0 mt-0.2"
+                />
+                <span>
+                  Esta ação fechará oficialmente o movimento. Vendas adicionais
+                  exigirão iniciar um novo caixa. Confirme se as notas fiscais e
+                  contagem de cédulas estão de acordo.
+                </span>
               </div>
 
               <div className="flex gap-2 pt-1">
@@ -799,7 +937,6 @@ export default function Caixa({
           </div>
         </div>
       )}
-
     </div>
   );
 }
