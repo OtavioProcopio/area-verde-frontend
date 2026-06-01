@@ -3,98 +3,203 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
-import { ShieldCheck, Lock, Sprout, Loader2 } from 'lucide-react';
+import React, {useState} from 'react';
+import {KeyRound, Loader2, Lock, ShieldCheck, Sprout} from 'lucide-react';
+import {InlineFeedback} from '../features/shared/components/InlineFeedback';
 
 interface LoginProps {
-  onLogin: (pin: string) => boolean;
+  onLogin: (pin: string) => Promise<boolean>;
+  onSetupInitialPassword: (newPassword: string) => Promise<boolean>;
+  isLoading: boolean;
+  senhaConfigurada: boolean;
+  feedback: {tone: 'success' | 'error' | 'info'; message: string} | null;
+  onClearFeedback: () => void;
 }
 
-export default function Login({ onLogin }: LoginProps) {
+export default function Login({
+  onLogin,
+  onSetupInitialPassword,
+  isLoading,
+  senhaConfigurada,
+  feedback,
+  onClearFeedback,
+}: LoginProps) {
   const [pin, setPin] = useState('');
-  const [error, setError] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [localError, setLocalError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!pin) return;
-    
-    setError(false);
-    setIsLoading(true);
-
-    // Simulate backend loading state
-    setTimeout(() => {
-      const success = onLogin(pin);
-      setIsLoading(false);
-      if (!success) {
-        setError(true);
-      }
-    }, 800);
+  const clearMessages = () => {
+    setLocalError(null);
+    onClearFeedback();
   };
 
+  const handleLogin = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!pin) {
+      return;
+    }
+
+    clearMessages();
+    await onLogin(pin);
+  };
+
+  const handleInitialPasswordSetup = async (event: React.FormEvent) => {
+    event.preventDefault();
+    clearMessages();
+
+    if (newPassword.length < 4) {
+      setLocalError('A senha precisa ter pelo menos 4 caracteres.');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setLocalError('As senhas informadas nao coincidem.');
+      return;
+    }
+
+    const success = await onSetupInitialPassword(newPassword);
+
+    if (success) {
+      setNewPassword('');
+      setConfirmPassword('');
+    }
+  };
+
+  const primaryDisabled = senhaConfigurada ? !pin || isLoading : !newPassword || !confirmPassword || isLoading;
+
   return (
-    <div id="login-screen" className="min-h-screen flex items-center justify-center bg-slate-800/50 p-6 selection:bg-emerald-600">
-      {/* Background Decorative Forest Elements */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-900/50/30 rounded-full blur-[100px] pointer-events-none"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-green-100/30 rounded-full blur-[100px] pointer-events-none"></div>
+    <div
+      id="login-screen"
+      className="min-h-screen flex items-center justify-center bg-slate-800/50 p-6 selection:bg-emerald-600"
+    >
+      <div className="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-emerald-900/30 blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 h-96 w-96 rounded-full bg-green-100/20 blur-[100px] pointer-events-none" />
 
-      <div className="w-full max-w-sm bg-slate-900 border border-slate-205 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
-        {/* Top Accent Color Bar */}
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-600 via-green-500 to-emerald-700"></div>
+      <div className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 p-8 shadow-2xl">
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-600 via-green-500 to-emerald-700" />
 
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center gap-2 mb-3">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
-            <span className="text-xs uppercase tracking-widest font-mono text-emerald-400 font-bold">Acesso Restrito</span>
+        <div className="mb-8 text-center">
+          <div className="mb-3 inline-flex items-center justify-center gap-2">
+            <span className="h-2.5 w-2.5 rounded-full bg-emerald-600 animate-pulse" />
+            <span className="text-xs uppercase tracking-widest font-mono text-emerald-400 font-bold">
+              {senhaConfigurada ? 'Acesso Restrito' : 'Configuracao Inicial'}
+            </span>
           </div>
-          
-          <h1 className="text-4xl font-display font-bold text-slate-50 tracking-tight mb-2">
+
+          <h1 className="mb-2 text-4xl font-display font-bold tracking-tight text-slate-50">
             Area <span className="text-emerald-500">Verde</span>
           </h1>
-          <p className="text-slate-500 text-sm font-medium">
-            Sistema de gestão do bar
+          <p className="text-sm font-medium text-slate-500">
+            {senhaConfigurada
+              ? 'Entre com a senha cadastrada no backend.'
+              : 'Defina a primeira senha operacional do sistema.'}
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block text-xs uppercase font-mono text-slate-500 mb-2 font-bold text-center">Digite sua Senha</label>
-            <div className="relative">
-              <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
-              <input
-                type="password"
-                value={pin}
-                onChange={(e) => {
-                  setPin(e.target.value);
-                  setError(false);
-                }}
-                disabled={isLoading}
-                className={`w-full pl-11 pr-4 py-3 bg-slate-800/50 border ${error ? 'border-rose-300 bg-rose-950/40 text-rose-900' : 'border-slate-800 focus:border-emerald-500'} rounded-xl text-center text-xl tracking-widest font-mono font-bold outline-none transition`}
-                placeholder="****"
-                autoFocus
-              />
+        {feedback && <InlineFeedback tone={feedback.tone} message={feedback.message} />}
+        {localError && <div className="mt-4"><InlineFeedback tone="error" message={localError} /></div>}
+
+        {senhaConfigurada ? (
+          <form onSubmit={handleLogin} className="mt-5 space-y-5">
+            <div>
+              <label className="mb-2 block text-center text-xs uppercase font-mono font-bold text-slate-500">
+                Digite sua senha
+              </label>
+              <div className="relative">
+                <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+                <input
+                  type="password"
+                  value={pin}
+                  onChange={(event) => {
+                    setPin(event.target.value);
+                    clearMessages();
+                  }}
+                  disabled={isLoading}
+                  className="w-full rounded-xl border border-slate-800 bg-slate-800/50 py-3 pl-11 pr-4 text-center text-xl font-mono font-bold tracking-widest text-slate-100 outline-none transition focus:border-emerald-500"
+                  placeholder="****"
+                  autoFocus
+                />
+              </div>
             </div>
-            {error && (
-              <p className="text-rose-500 text-xs font-semibold mt-2 text-center animate-pulse">
-                Senha inválida! Tente novamente.
-              </p>
-            )}
-          </div>
 
-          <button
-            type="submit"
-            disabled={isLoading || !pin}
-            className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-950/400 disabled:bg-emerald-300 text-white font-bold rounded-xl text-sm transition cursor-pointer flex items-center justify-center gap-2 shadow-md mb-6"
-          >
-            {isLoading ? <Loader2 size={18} className="animate-spin" /> : 'Entrar'}
-          </button>
-        </form>
+            <button
+              type="submit"
+              disabled={primaryDisabled}
+              className="mb-6 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3.5 text-sm font-bold text-white transition hover:bg-emerald-500 disabled:bg-emerald-900/50 disabled:text-emerald-200"
+            >
+              {isLoading ? <Loader2 size={18} className="animate-spin" /> : 'Entrar'}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleInitialPasswordSetup} className="mt-5 space-y-4">
+            <div className="rounded-2xl border border-emerald-900 bg-emerald-950/30 p-4 text-xs text-emerald-300">
+              O backend ainda nao possui uma senha configurada. Defina uma senha com no minimo 4 caracteres para liberar o acesso.
+            </div>
 
-        <div className="bg-emerald-950/40 border border-emerald-900 rounded-2xl p-4 flex gap-3 text-xs text-emerald-300 mt-6">
-          <ShieldCheck size={20} className="text-emerald-500 shrink-0 mt-0.5" />
+            <div>
+              <label className="mb-2 block text-xs uppercase font-mono font-bold text-slate-500">
+                Nova senha
+              </label>
+              <div className="relative">
+                <KeyRound size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(event) => {
+                    setNewPassword(event.target.value);
+                    clearMessages();
+                  }}
+                  disabled={isLoading}
+                  className="w-full rounded-xl border border-slate-800 bg-slate-800/50 py-3 pl-11 pr-4 text-center text-lg font-mono font-bold tracking-widest text-slate-100 outline-none transition focus:border-emerald-500"
+                  placeholder="****"
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-2 block text-xs uppercase font-mono font-bold text-slate-500">
+                Confirmar senha
+              </label>
+              <div className="relative">
+                <ShieldCheck size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(event) => {
+                    setConfirmPassword(event.target.value);
+                    clearMessages();
+                  }}
+                  disabled={isLoading}
+                  className="w-full rounded-xl border border-slate-800 bg-slate-800/50 py-3 pl-11 pr-4 text-center text-lg font-mono font-bold tracking-widest text-slate-100 outline-none transition focus:border-emerald-500"
+                  placeholder="****"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={primaryDisabled}
+              className="mb-6 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3.5 text-sm font-bold text-white transition hover:bg-emerald-500 disabled:bg-emerald-900/50 disabled:text-emerald-200"
+            >
+              {isLoading ? (
+                <Loader2 size={18} className="animate-spin" />
+              ) : (
+                'Definir senha e entrar'
+              )}
+            </button>
+          </form>
+        )}
+
+        <div className="mt-6 flex gap-3 rounded-2xl border border-emerald-900 bg-emerald-950/40 p-4 text-xs text-emerald-300">
+          <Sprout size={20} className="shrink-0 text-emerald-500 mt-0.5" />
           <div>
-            <span className="font-bold text-emerald-300 block mb-0.5">Acesso de Segurança</span>
-            Senha padrão de fábrica do bar é <strong className="text-emerald-200 font-mono bg-emerald-900/50/70 px-1.5 py-0.5 rounded">1234</strong>. Pode redefini-la no painel de ajustes.
+            <span className="mb-0.5 block font-bold text-emerald-300">
+              Acesso centralizado
+            </span>
+            A validacao da senha e feita pela API do bar. O frontend so mantem a sessao atual em memoria.
           </div>
         </div>
       </div>

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { lazy, Suspense, useState, useEffect } from 'react';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { useSystemState } from './useSystemState';
 const Login = lazy(() => import('./components/Login'));
 const Dashboard = lazy(() => import('./components/Dashboard'));
@@ -37,11 +37,20 @@ import {
 export default function App() {
   const {
     isLoading,
+    bootstrapError,
     isLoggedIn,
     login,
     logout,
-    accessPin,
-    setAccessPin,
+    isAuthenticatingAccess,
+    accessFeedback,
+    clearAccessFeedback,
+    setupInitialPassword,
+    changeAccessPassword,
+    configuracao,
+    isSavingConfiguracao,
+    configuracaoFeedback,
+    clearConfiguracaoFeedback,
+    saveConfiguracao,
     products,
     categories,
     addCategory,
@@ -78,24 +87,8 @@ export default function App() {
   // Active module tab
   const [activeTab, setActiveTab] = useState('dashboard');
 
-  // Bar Custom brand name state
-  const [barName, setBarName] = useState('Area Verde - Balcão Principal');
-
   // Real-time dynamic clock tracking state
   const [time, setTime] = useState(new Date());
-
-  // Load bar name from localStorage on mount
-  useEffect(() => {
-    const savedName = localStorage.getItem('av_bar_name');
-    if (savedName) {
-      setBarName(savedName);
-    }
-  }, []);
-
-  const handleChangeBarName = (name: string) => {
-    setBarName(name);
-    localStorage.setItem('av_bar_name', name);
-  };
 
   // Clock runner
   useEffect(() => {
@@ -123,11 +116,43 @@ export default function App() {
     );
   }
 
+  if (!configuracao && bootstrapError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#090d13] p-6">
+        <div className="w-full max-w-md rounded-3xl border border-rose-900 bg-slate-900 p-8 text-center shadow-2xl">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-rose-800/60 bg-rose-950/40 text-rose-500">
+            <Lock size={20} />
+          </div>
+          <h1 className="text-2xl font-display font-bold text-slate-50">
+            Nao foi possivel iniciar o sistema
+          </h1>
+          <p className="mt-3 text-sm text-slate-400">
+            {bootstrapError}
+          </p>
+          <button
+            type="button"
+            onClick={() => void refreshState()}
+            className="mt-6 inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-emerald-500"
+          >
+            Tentar novamente
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // Guard login checkpoint
   if (!isLoggedIn) {
     return (
       <Suspense fallback={moduleFallback}>
-        <Login onLogin={login} />
+        <Login
+          onLogin={login}
+          onSetupInitialPassword={setupInitialPassword}
+          isLoading={isAuthenticatingAccess}
+          senhaConfigurada={configuracao?.senhaConfigurada ?? true}
+          feedback={accessFeedback}
+          onClearFeedback={clearAccessFeedback}
+        />
       </Suspense>
     );
   }
@@ -163,7 +188,9 @@ export default function App() {
           </div>
           <div>
             <span className="text-[10px] uppercase font-mono text-emerald-500 font-bold block leading-normal">Boteco Familiar S.O.</span>
-            <h1 className="text-lg font-display font-bold text-slate-50 tracking-tight">{barName}</h1>
+            <h1 className="text-lg font-display font-bold text-slate-50 tracking-tight">
+              {configuracao?.nomeBar || 'Area Verde - Balcao Principal'}
+            </h1>
           </div>
         </div>
 
@@ -369,13 +396,18 @@ export default function App() {
 
               {activeTab === 'configuracoes' && (
                 <Configuracoes 
-                  accessPin={accessPin}
-                  onChangePin={setAccessPin}
+                  configuracao={configuracao}
+                  isSavingConfiguracao={isSavingConfiguracao}
+                  configuracaoFeedback={configuracaoFeedback}
+                  onSaveConfiguracao={saveConfiguracao}
+                  onClearConfiguracaoFeedback={clearConfiguracaoFeedback}
+                  onChangePassword={changeAccessPassword}
+                  accessFeedback={accessFeedback}
+                  onClearAccessFeedback={clearAccessFeedback}
+                  isUpdatingPassword={isAuthenticatingAccess}
                   onResetAllData={resetAllData}
                   onImportBackup={importBackup}
                   onExportBackup={exportBackup}
-                  barName={barName}
-                  onChangeBarName={handleChangeBarName}
                 />
               )}
               </Suspense>

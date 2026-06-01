@@ -1,11 +1,13 @@
 import {useCallback, useEffect, useState} from 'react';
-import {ApiError} from '../../../lib/api';
 import {fetchCaixaAtual, fetchCaixasHistory} from '../../caixa/services/caixaService';
 import {fetchCategories} from '../../categories/services/categoriesService';
 import {fetchComandas} from '../../comandas/services/comandasService';
+import {fetchConfiguracao} from '../../configuracoes/services/configuracoesService';
+import type {Configuracao} from '../../configuracoes/types';
 import {fetchCustomers} from '../../customers/services/customersService';
 import {fetchFiados} from '../../fiados/services/fiadosService';
 import {fetchProducts} from '../../products/services/productsService';
+import {getApiErrorMessage} from '../../shared/utils/getApiErrorMessage';
 import type {
   Cashier,
   Category,
@@ -24,10 +26,12 @@ type BootstrapSetters = {
   setFiados: (value: Fiado[]) => void;
   setCaixa: (value: Cashier) => void;
   setCaixasHistory: (value: ClosedCashier[]) => void;
+  setConfiguracao: (value: Configuracao) => void;
 };
 
 export function useRemoteBootstrap(setters: BootstrapSetters) {
   const [isLoading, setIsLoading] = useState(true);
+  const [bootstrapError, setBootstrapError] = useState<string | null>(null);
   const {
     setCategories,
     setProducts,
@@ -36,10 +40,12 @@ export function useRemoteBootstrap(setters: BootstrapSetters) {
     setFiados,
     setCaixa,
     setCaixasHistory,
+    setConfiguracao,
   } = setters;
 
   const loadRemoteState = useCallback(async () => {
     const [
+      loadedConfiguracao,
       loadedCategories,
       loadedProducts,
       loadedCustomers,
@@ -48,6 +54,7 @@ export function useRemoteBootstrap(setters: BootstrapSetters) {
       loadedCaixa,
       loadedHistory,
     ] = await Promise.all([
+      fetchConfiguracao(),
       fetchCategories(),
       fetchProducts(),
       fetchCustomers(),
@@ -57,6 +64,7 @@ export function useRemoteBootstrap(setters: BootstrapSetters) {
       fetchCaixasHistory(),
     ]);
 
+    setConfiguracao(loadedConfiguracao);
     setCategories(loadedCategories);
     setProducts(loadedProducts);
     setCustomers(loadedCustomers);
@@ -65,6 +73,7 @@ export function useRemoteBootstrap(setters: BootstrapSetters) {
     setCaixa(loadedCaixa);
     setCaixasHistory(loadedHistory);
   }, [
+    setConfiguracao,
     setCategories,
     setProducts,
     setCustomers,
@@ -77,24 +86,31 @@ export function useRemoteBootstrap(setters: BootstrapSetters) {
   const refreshState = useCallback(async () => {
     try {
       await loadRemoteState();
+      setBootstrapError(null);
     } catch (error) {
-      console.error('Erro ao carregar dados da API', error);
-      if (error instanceof ApiError) {
-        console.error(error.payload);
-      }
+      setBootstrapError(
+        getApiErrorMessage(
+          error,
+          'Nao foi possivel carregar os dados do sistema agora.',
+        ),
+      );
     }
   }, [loadRemoteState]);
 
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-      await refreshState();
-      setIsLoading(false);
+      try {
+        await refreshState();
+      } finally {
+        setIsLoading(false);
+      }
     })();
   }, [refreshState]);
 
   return {
     isLoading,
+    bootstrapError,
     refreshState,
   };
 }
