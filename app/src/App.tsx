@@ -3,18 +3,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { lazy, Suspense, useState, useEffect } from 'react';
 import { useSystemState } from './useSystemState';
-import Login from './components/Login';
-import Dashboard from './components/Dashboard';
-import Comandas from './components/Comandas';
-import Caixa from './components/Caixa';
-import Produtos from './components/Produtos';
-import Estoque from './components/Estoque';
-import Clientes from './components/Clientes';
-import Fiados from './components/Fiados';
-import Relatorios from './components/Relatorios';
-import Configuracoes from './components/Configuracoes';
+const Login = lazy(() => import('./components/Login'));
+const Dashboard = lazy(() => import('./components/Dashboard'));
+const Comandas = lazy(() => import('./components/Comandas'));
+const Caixa = lazy(() => import('./components/Caixa'));
+const Produtos = lazy(() => import('./components/Produtos'));
+const Estoque = lazy(() => import('./components/Estoque'));
+const Clientes = lazy(() => import('./components/Clientes'));
+const Fiados = lazy(() => import('./components/Fiados'));
+const Relatorios = lazy(() => import('./components/Relatorios'));
+const Configuracoes = lazy(() => import('./components/Configuracoes'));
 
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -71,7 +71,8 @@ export default function App() {
     pagarComanda,
     resetAllData,
     importBackup,
-    exportBackup
+    exportBackup,
+    refreshState,
   } = useSystemState();
 
   // Active module tab
@@ -102,6 +103,15 @@ export default function App() {
     return () => clearInterval(timer);
   }, []);
 
+  const moduleFallback = (
+    <div className="min-h-[400px] flex items-center justify-center">
+      <div className="text-center space-y-3">
+        <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto" />
+        <span className="text-xs font-mono text-slate-500">Carregando módulo...</span>
+      </div>
+    </div>
+  );
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#090d13]">
@@ -115,7 +125,11 @@ export default function App() {
 
   // Guard login checkpoint
   if (!isLoggedIn) {
-    return <Login onLogin={login} />;
+    return (
+      <Suspense fallback={moduleFallback}>
+        <Login onLogin={login} />
+      </Suspense>
+    );
   }
 
   // Tab switching animations specs
@@ -259,6 +273,7 @@ export default function App() {
               variants={tabVariants}
               className="min-h-[400px]"
             >
+              <Suspense fallback={moduleFallback}>
               {activeTab === 'dashboard' && (
                 <Dashboard 
                   products={products}
@@ -307,6 +322,7 @@ export default function App() {
                   products={products}
                   categories={categories}
                   onUpdateProduct={updateProduct}
+                  onRefreshState={refreshState}
                 />
               )}
 
@@ -362,6 +378,7 @@ export default function App() {
                   onChangeBarName={handleChangeBarName}
                 />
               )}
+              </Suspense>
             </motion.div>
           </AnimatePresence>
         </main>
