@@ -60,8 +60,12 @@ export default function Relatorios({
   const [bestSelling, setBestSelling] = useState<BestSellingProduct[]>([]);
   const [fiados, setFiados] = useState<FiadoReportItem[]>([]);
   const [stock, setStock] = useState<StockReportItem[]>([]);
-  const [consumedStock, setConsumedStock] = useState<ConsumedStockReportItem[]>([]);
-  const [commandasReport, setCommandasReport] = useState<CommandaReportItem[]>([]);
+  const [consumedStock, setConsumedStock] = useState<ConsumedStockReportItem[]>(
+    [],
+  );
+  const [commandasReport, setCommandasReport] = useState<CommandaReportItem[]>(
+    [],
+  );
 
   // Helper formatting
   const fmt = (v: number | undefined | null) =>
@@ -83,7 +87,7 @@ export default function Relatorios({
 
     const formatDate = (d: Date) => {
       const offset = d.getTimezoneOffset();
-      const adjusted = new Date(d.getTime() - (offset*60*1000));
+      const adjusted = new Date(d.getTime() - offset * 60 * 1000);
       return adjusted.toISOString().split('T')[0];
     };
 
@@ -145,14 +149,21 @@ export default function Relatorios({
     }
     loadData();
   }, [activeTab, period]);
-  
+
   // 1. DIÁRIO
   const renderDiario = () => {
     if (loading) return <div className="text-slate-400">Carregando...</div>;
-    if (!dailyReport) return renderEmptyState('Não há dados para a data informada.');
+    if (!dailyReport)
+      return renderEmptyState('Não há dados para a data informada.');
 
     const tableData = [
-      { label: 'Vendas Brutas (Din + Pix + Cartão)', value: (dailyReport.payments.dinheiro || 0) + (dailyReport.payments.pix || 0) + (dailyReport.payments.cartao || 0) },
+      {
+        label: 'Vendas Brutas (Din + Pix + Cartão)',
+        value:
+          (dailyReport.payments.dinheiro || 0) +
+          (dailyReport.payments.pix || 0) +
+          (dailyReport.payments.cartao || 0),
+      },
       { label: 'Fiado Gerado', value: dailyReport.totalFiadoGenerated || 0 },
       { label: 'Dinheiro', value: dailyReport.payments.dinheiro || 0 },
       { label: 'Pix', value: dailyReport.payments.pix || 0 },
@@ -209,7 +220,9 @@ export default function Relatorios({
   const renderProdutos = () => {
     if (loading) return <div className="text-slate-400">Carregando...</div>;
     if (bestSelling.length === 0)
-      return renderEmptyState('Nenhum produto foi vendido no período selecionado.');
+      return renderEmptyState(
+        'Nenhum produto foi vendido no período selecionado.',
+      );
 
     return (
       <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
@@ -227,7 +240,7 @@ export default function Relatorios({
               <tr key={i} className="hover:bg-slate-800/50">
                 <td className="px-5 py-3 font-bold text-slate-200">{p.name}</td>
                 <td className="px-5 py-3 uppercase text-[10px] text-slate-500 font-mono">
-                  {p.category || "---"}
+                  {p.category || '---'}
                 </td>
                 <td className="px-5 py-3 text-right font-mono font-black text-emerald-400">
                   {p.quantity}
@@ -270,10 +283,16 @@ export default function Relatorios({
                   {c.customerName || 'Não identificado'}
                 </td>
                 <td className="px-5 py-3 gap-1 flex items-center justify-center">
-                  <span className={`px-2 py-0.5 rounded text-[9px] uppercase font-bold font-mono border ${c.status === 'FECHADA' ? 'bg-emerald-950/40 text-emerald-400 border-emerald-800/60' : 'bg-amber-950/40 text-amber-400 border-amber-800/60'}`}>
+                  <span
+                    className={`px-2 py-0.5 rounded text-[9px] uppercase font-bold font-mono border ${c.status === 'FECHADA' ? 'bg-emerald-950/40 text-emerald-400 border-emerald-800/60' : 'bg-amber-950/40 text-amber-400 border-amber-800/60'}`}
+                  >
                     {c.status}
                   </span>
-                  {c.overdue && <span className="px-2 py-0.5 rounded text-[9px] uppercase font-bold font-mono border bg-rose-950/40 text-rose-400 border-rose-800/60">Vencido</span>}
+                  {c.overdue && (
+                    <span className="px-2 py-0.5 rounded text-[9px] uppercase font-bold font-mono border bg-rose-950/40 text-rose-400 border-rose-800/60">
+                      Vencido
+                    </span>
+                  )}
                 </td>
                 <td className="px-5 py-3 text-right font-mono font-black text-rose-500">
                   {fmt(c.total)}
@@ -290,7 +309,9 @@ export default function Relatorios({
   const renderEstoque = () => {
     if (loading) return <div className="text-slate-400">Carregando...</div>;
     if (stock.length === 0)
-      return renderEmptyState('Todos os produtos estão com estoque normal e acima do mínimo.');
+      return renderEmptyState(
+        'Todos os produtos estão com estoque normal e acima do mínimo.',
+      );
 
     return (
       <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
@@ -306,10 +327,18 @@ export default function Relatorios({
           <tbody className="divide-y divide-slate-100">
             {stock.map((p, i) => (
               <tr key={i} className="hover:bg-slate-800/50 bg-amber-950/40/20">
-                <td className="px-5 py-3 font-bold text-slate-200">{p.productName}</td>
-                <td className="px-5 py-3 text-center font-mono text-slate-500 uppercase">{p.unit}</td>
-                <td className="px-5 py-3 text-center font-mono text-slate-500">{p.minStock}</td>
-                <td className="px-5 py-3 text-right font-mono font-black text-rose-500">{p.stock}</td>
+                <td className="px-5 py-3 font-bold text-slate-200">
+                  {p.productName}
+                </td>
+                <td className="px-5 py-3 text-center font-mono text-slate-500 uppercase">
+                  {p.unit}
+                </td>
+                <td className="px-5 py-3 text-center font-mono text-slate-500">
+                  {p.minStock}
+                </td>
+                <td className="px-5 py-3 text-right font-mono font-black text-rose-500">
+                  {p.stock}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -322,7 +351,9 @@ export default function Relatorios({
   const renderEstoqueConsumido = () => {
     if (loading) return <div className="text-slate-400">Carregando...</div>;
     if (consumedStock.length === 0)
-      return renderEmptyState('Nenhum item consumido do estoque físico no período.');
+      return renderEmptyState(
+        'Nenhum item consumido do estoque físico no período.',
+      );
 
     return (
       <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
@@ -337,9 +368,15 @@ export default function Relatorios({
           <tbody className="divide-y divide-slate-100">
             {consumedStock.map((entry, i) => (
               <tr key={i} className="hover:bg-slate-800/50">
-                <td className="px-5 py-3 font-bold text-slate-200">{entry.productName}</td>
-                <td className="px-5 py-3 text-center font-mono text-slate-500 uppercase">{entry.unit}</td>
-                <td className="px-5 py-3 text-right font-mono font-black text-rose-500">{entry.consumed}</td>
+                <td className="px-5 py-3 font-bold text-slate-200">
+                  {entry.productName}
+                </td>
+                <td className="px-5 py-3 text-center font-mono text-slate-500 uppercase">
+                  {entry.unit}
+                </td>
+                <td className="px-5 py-3 text-right font-mono font-black text-rose-500">
+                  {entry.consumed}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -370,7 +407,8 @@ export default function Relatorios({
               if (c.status === 'ABERTA')
                 badge = 'bg-amber-950/40 text-amber-400 border-amber-800/60';
               if (c.status === 'FECHADA')
-                badge = 'bg-emerald-950/40 text-emerald-400 border-emerald-800/60';
+                badge =
+                  'bg-emerald-950/40 text-emerald-400 border-emerald-800/60';
               if (c.status === 'CANCELADA')
                 badge = 'bg-rose-950/40 text-rose-400 border-rose-800/60';
               if (c.status === 'PENDENTE')
@@ -379,7 +417,9 @@ export default function Relatorios({
               return (
                 <tr key={i} className="hover:bg-slate-800/50">
                   <td className="px-5 py-3 text-center">
-                    <span className={`px-2 py-0.5 rounded text-[9px] uppercase font-bold font-mono border ${badge}`}>
+                    <span
+                      className={`px-2 py-0.5 rounded text-[9px] uppercase font-bold font-mono border ${badge}`}
+                    >
                       {c.status}
                     </span>
                   </td>
