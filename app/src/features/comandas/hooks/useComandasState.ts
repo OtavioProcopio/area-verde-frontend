@@ -10,6 +10,7 @@ import {
   linkCustomerToComanda,
   markComandaAsFiado,
 } from '../services/comandasService';
+import { getApiErrorMessage } from '../../shared/utils/getApiErrorMessage';
 import type { Comanda, TabItem } from '../../../types';
 
 type RefreshRef = {
@@ -114,14 +115,31 @@ export function useComandasState(refreshRef: RefreshRef) {
         };
       }
 
-      await markComandaAsFiado(comandaId, customerId);
-      await refreshRef.current();
-      return { success: true, msg: 'Comanda marcada como fiado.' };
+      try {
+        await markComandaAsFiado(comandaId, customerId);
+        await refreshRef.current();
+        return { success: true, msg: 'Comanda marcada como fiado.' };
+      } catch (error) {
+        return {
+          success: false,
+          msg: getApiErrorMessage(
+            error,
+            'Não foi possível marcar a comanda como fiado.',
+          ),
+        };
+      }
     }
 
-    await closeComanda(comandaId, metodo, total);
-    await refreshRef.current();
-    return { success: true, msg: 'Comanda finalizada com sucesso.' };
+    try {
+      await closeComanda(comandaId, metodo, total);
+      await refreshRef.current();
+      return { success: true, msg: 'Comanda finalizada com sucesso.' };
+    } catch (error) {
+      return {
+        success: false,
+        msg: getApiErrorMessage(error, 'Não foi possível fechar a comanda.'),
+      };
+    }
   };
 
   const reativarComanda = async () => {
