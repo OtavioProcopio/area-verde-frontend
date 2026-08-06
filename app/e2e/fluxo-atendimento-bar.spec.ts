@@ -27,12 +27,6 @@ test.describe.serial('Fluxo completo de atendimento no bar', () => {
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage();
     page.on('dialog', (dialog) => dialog.accept());
-    page.on('console', (msg) => console.log('BROWSER CONSOLE:', msg.text()));
-    page.on('response', (res) => {
-      if (res.url().includes('/api/')) {
-        console.log('API', res.status(), res.url());
-      }
-    });
     await page.goto('/');
   });
 
@@ -111,12 +105,8 @@ test.describe.serial('Fluxo completo de atendimento no bar', () => {
   });
 
   test('bloqueia o pagamento de uma comanda sem itens', async () => {
-    // NOTA: o botão "PAGAMENTO & FECHAMENTO" abre o modal de checkout direto
-    // (setShowCheckoutModal(true) no onClick), sem passar pela validação de
-    // handleLaunchCheckout — essa função existe no componente (Comandas.tsx)
-    // mas não é chamada por nenhum botão, é dead code. Por isso o bloqueio
-    // real de "comanda vazia" acontece no backend (400 comanda_sem_consumo),
-    // e aparece como erro inline no modal, não como alert() do navegador.
+    // handleLaunchCheckout valida "comanda vazia" / "caixa fechado" antes de
+    // abrir o modal de checkout (ver bugfix/comandas-checkout-erro-silencioso).
     await page.locator('#nav-link-comandas').click();
     await page.locator('#btn-spawn-comanda-list').click();
 
@@ -127,19 +117,18 @@ test.describe.serial('Fluxo completo de atendimento no bar', () => {
       timeout: 10_000,
     });
 
+    const dialogPromise = page.waitForEvent('dialog');
     await page
       .getByRole('button', { name: /PAGAMENTO & FECHAMENTO/ })
       .click();
-    await page.locator('#btn-confirm-pos-payment').click();
+    const dialog = await dialogPromise;
 
-    await expect(page.getByText('Comanda sem consumo')).toBeVisible({
-      timeout: 10_000,
-    });
-
-    await page.getByRole('button', { name: 'Cancelar' }).click();
+    expect(dialog.message()).toContain('vazia');
+    await expect(page.getByRole('heading', { name: 'Finalização Balcão' })).toHaveCount(0);
   });
 
   test('adiciona item na comanda e fecha com pagamento em dinheiro', async () => {
+    await page.getByRole('button', { name: 'Tudo', exact: true }).click();
     await page.getByPlaceholder('Ex: Skol').fill(PRODUTO_NOME);
     await page.getByRole('button', { name: PRODUTO_NOME }).first().click();
 
@@ -156,10 +145,12 @@ test.describe.serial('Fluxo completo de atendimento no bar', () => {
   });
 
   test('cria nova comanda e lança no caderno de fiado com cliente novo', async () => {
+    await page.getByRole('button', { name: '← Voltar' }).click();
     await page.locator('#btn-spawn-comanda-list').click();
     await page.getByTestId('comanda-nome-input').fill(COMANDA_FIADO_NOME);
     await page.getByRole('button', { name: 'Abrir Comanda' }).click();
 
+    await page.getByRole('button', { name: 'Tudo', exact: true }).click();
     await page.getByPlaceholder('Ex: Skol').fill(PRODUTO_NOME);
     await page.getByRole('button', { name: PRODUTO_NOME }).first().click();
 
@@ -170,9 +161,11 @@ test.describe.serial('Fluxo completo de atendimento no bar', () => {
     await page.getByPlaceholder('Telefone').fill('11999998888');
     await page.getByRole('button', { name: 'Salvar', exact: true }).click();
 
-    await page
-      .getByTestId('checkout-cliente-select')
-      .selectOption({ label: new RegExp(CLIENTE_NOME) });
+    const clienteSelect = page.getByTestId('checkout-cliente-select');
+    const clienteOptionValue = await clienteSelect
+      .locator('option', { hasText: CLIENTE_NOME })
+      .getAttribute('value');
+    await clienteSelect.selectOption(clienteOptionValue!);
     await page.locator('#btn-confirm-pos-payment').click();
 
     await expect(
