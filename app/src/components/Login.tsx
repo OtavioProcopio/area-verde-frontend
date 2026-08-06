@@ -130,6 +130,7 @@ export default function Login({
                   disabled={isLoading}
                   className="w-full rounded-xl border border-slate-800 bg-slate-800/50 py-3 pl-11 pr-4 text-center text-xl font-mono font-bold tracking-widest text-slate-100 outline-none transition focus:border-emerald-500"
                   placeholder="****"
+                  data-testid="login-senha-input"
                   autoFocus
                 />
               </div>
@@ -176,6 +177,7 @@ export default function Login({
                   disabled={isLoading}
                   className="w-full rounded-xl border border-slate-800 bg-slate-800/50 py-3 pl-11 pr-4 text-center text-lg font-mono font-bold tracking-widest text-slate-100 outline-none transition focus:border-emerald-500"
                   placeholder="****"
+                  data-testid="setup-nova-senha-input"
                   autoFocus
                 />
               </div>
@@ -200,6 +202,7 @@ export default function Login({
                   disabled={isLoading}
                   className="w-full rounded-xl border border-slate-800 bg-slate-800/50 py-3 pl-11 pr-4 text-center text-lg font-mono font-bold tracking-widest text-slate-100 outline-none transition focus:border-emerald-500"
                   placeholder="****"
+                  data-testid="setup-confirmar-senha-input"
                 />
               </div>
             </div>

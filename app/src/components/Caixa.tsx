@@ -595,6 +595,7 @@ export default function Caixa({
                     value={aberturaValor}
                     onChange={(e) => setAberturaValor(e.target.value)}
                     className="w-full bg-slate-800/50 border border-slate-800 focus:bg-slate-900 focus:border-emerald-600 py-2.5 pl-9 pr-3 rounded-xl font-mono text-base outline-none transition"
+                    data-testid="caixa-valor-inicial-input"
                     required
                   />
                 </div>

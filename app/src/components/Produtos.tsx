@@ -938,6 +938,7 @@ export default function Produtos({
                   value={catName}
                   onChange={(e) => setCatName(e.target.value)}
                   className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2 text-sm text-slate-200 rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900"
+                  data-testid="categoria-nome-input"
                   required
                 />
               </div>
@@ -993,6 +994,7 @@ export default function Produtos({
                       placeholder="Ex: Bohemia Long Neck 355ml"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
+                      data-testid="produto-nome-input"
                       required
                     />
                   </div>
@@ -1006,6 +1008,7 @@ export default function Produtos({
                         className="w-full bg-slate-800/50 border border-slate-800 px-2 py-2 text-xs text-slate-200 rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900 cursor-pointer"
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
+                        data-testid="produto-categoria-select"
                         required
                       >
                         {categories.map((c) => (
@@ -1043,6 +1046,7 @@ export default function Produtos({
                         className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2 text-xs font-mono text-slate-200 rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900"
                         value={costPrice}
                         onChange={(e) => setCostPrice(e.target.value)}
+                        data-testid="produto-preco-custo-input"
                         required
                       />
                     </div>
@@ -1058,6 +1062,7 @@ export default function Produtos({
                         className="w-full bg-emerald-950/40 border border-emerald-800/60 px-3 py-2 text-sm font-mono text-emerald-200 rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900 font-bold"
                         value={price}
                         onChange={(e) => setPrice(e.target.value)}
+                        data-testid="produto-preco-venda-input"
                         required
                       />
                     </div>
@@ -1115,6 +1120,7 @@ export default function Produtos({
                           className="w-full bg-slate-800/50 border border-slate-800 px-2 py-1.5 text-xs font-mono text-slate-200 rounded-lg outline-none focus:border-emerald-600"
                           value={stock}
                           onChange={(e) => setStock(e.target.value)}
+                          data-testid="produto-estoque-input"
                         />
                       </div>
 
