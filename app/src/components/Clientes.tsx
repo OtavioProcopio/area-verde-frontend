@@ -14,6 +14,9 @@ import {
   ArrowLeft,
   Coins,
 } from 'lucide-react';
+import { InlineFeedback } from '../features/shared/components/InlineFeedback';
+
+type OperationResult = { success: boolean; msg: string };
 
 interface ClientesProps {
   customers: Customer[];
@@ -24,8 +27,8 @@ interface ClientesProps {
     phone: string;
     notes?: string;
     active: boolean;
-  }) => void | Promise<void>;
-  onUpdateCustomer: (c: Customer) => void | Promise<void>;
+  }) => Promise<OperationResult>;
+  onUpdateCustomer: (c: Customer) => Promise<OperationResult>;
   onDeleteCustomer: (id: string) => void | Promise<void>;
   onPagarFiado: (
     customerId: string,
@@ -55,6 +58,12 @@ export default function Clientes({
   // Form modal state
   const [showForm, setShowForm] = useState(false);
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
+  const [editingCustomerId, setEditingCustomerId] = useState<string | null>(
+    null,
+  );
+  const [customerFormError, setCustomerFormError] = useState<string | null>(
+    null,
+  );
 
   // Customer form fields
   const [name, setName] = useState('');
@@ -88,7 +97,9 @@ export default function Clientes({
   });
 
   const handleAddNewTrigger = () => {
+    setCustomerFormError(null);
     setFormMode('create');
+    setEditingCustomerId(null);
     setName('');
     setNickname('');
     setPhone('');
@@ -98,7 +109,9 @@ export default function Clientes({
   };
 
   const handleEditTrigger = (c: Customer) => {
+    setCustomerFormError(null);
     setFormMode('edit');
+    setEditingCustomerId(c.id);
     setName(c.name);
     setNickname(c.nickname || '');
     setPhone(c.phone);
@@ -111,24 +124,31 @@ export default function Clientes({
     onUpdateCustomer({ ...c, active: !(c.active ?? true) });
   };
 
-  const handleSaveCustomer = (e: React.FormEvent) => {
+  const handleSaveCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim() === '') return;
 
-    if (formMode === 'create') {
-      onAddCustomer({ name, nickname, phone, notes, active });
-    } else if (formMode === 'edit' && selectedCustomer) {
-      onUpdateCustomer({
-        ...selectedCustomer,
-        name,
-        nickname,
-        phone,
-        notes,
-        active,
-      });
-      // also if selectedCustomerId is same, it updates via context map.
-    }
+    const editingCustomer = customers.find((c) => c.id === editingCustomerId);
 
+    setCustomerFormError(null);
+    const res =
+      formMode === 'create'
+        ? await onAddCustomer({ name, nickname, phone, notes, active })
+        : editingCustomer
+          ? await onUpdateCustomer({
+              ...editingCustomer,
+              name,
+              nickname,
+              phone,
+              notes,
+              active,
+            })
+          : null;
+
+    if (res && !res.success) {
+      setCustomerFormError(res.msg);
+      return;
+    }
     setShowForm(false);
   };
 
@@ -532,6 +552,12 @@ export default function Clientes({
             <p className="text-[10px] font-mono text-slate-500 mb-4 block">
               Cadastro operacional de clientes e acompanhamento de pendências.
             </p>
+
+            {customerFormError && (
+              <div className="mb-4">
+                <InlineFeedback tone="error" message={customerFormError} />
+              </div>
+            )}
 
             <form onSubmit={handleSaveCustomer} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
