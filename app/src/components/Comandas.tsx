@@ -200,7 +200,7 @@ export default function Comandas({
   };
 
   // Trigger Finalize Checkout
-  const handleLaunchCheckout = () => {
+  const handleLaunchCheckout = (metodo: 'dinheiro' | 'fiado' = 'dinheiro') => {
     if (!selectedComanda) return;
     if (selectedComanda.items.length === 0) {
       alert('Impossível fechar uma comanda vazia!');
@@ -215,7 +215,7 @@ export default function Comandas({
 
     // Attempt default customer selection from comanda bindings
     setCheckoutCustomerId(selectedComanda.customerId || '');
-    setCheckoutPaymentMethod(selectedComanda.customerId ? 'fiado' : 'dinheiro');
+    setCheckoutPaymentMethod(metodo);
     setCheckoutError(null);
     setShowCheckoutModal(true);
   };
@@ -831,22 +831,14 @@ export default function Comandas({
                           {activeComanda.status === 'active' && (
                             <div className="flex gap-2">
                               <button
-                                onClick={() => {
-                                  setCheckoutPaymentMethod('fiado');
-                                  setCheckoutError(null);
-                                  setShowCheckoutModal(true);
-                                }}
+                                onClick={() => handleLaunchCheckout('fiado')}
                                 className="flex-[1] bg-amber-950/40 rounded-xl border border-amber-800/60 hover:bg-amber-900/50 text-amber-400 font-bold text-[11px] py-4 flex flex-col items-center justify-center transition shadow-2xs leading-tight cursor-pointer"
                               >
                                 LANÇAR NO
                                 <span className="text-sm">CADERNO</span>
                               </button>
                               <button
-                                onClick={() => {
-                                  setCheckoutPaymentMethod('dinheiro');
-                                  setCheckoutError(null);
-                                  setShowCheckoutModal(true);
-                                }}
+                                onClick={() => handleLaunchCheckout('dinheiro')}
                                 className="flex-[2] bg-emerald-600 text-white rounded-xl hover:bg-emerald-950/400 font-bold text-sm py-4 flex flex-col items-center justify-center transition shadow-md shadow-emerald-500/20 leading-tight cursor-pointer"
                               >
                                 PAGAMENTO & FECHAMENTO
