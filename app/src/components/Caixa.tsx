@@ -15,14 +15,17 @@ import {
   AlertTriangle,
   X,
 } from 'lucide-react';
+import { InlineFeedback } from '../features/shared/components/InlineFeedback';
+
+type OperationResult = { success: boolean; msg: string };
 
 interface CaixaProps {
   caixa: Cashier;
   caixasHistory?: ClosedCashier[];
-  onAbrirCaixa: (valor: number, observacao?: string) => void;
-  onFecharCaixa: (observacaoFechamento?: string) => void;
-  onAdicionarSuprimento: (valor: number, desc: string) => void;
-  onRealizarSangria: (valor: number, desc: string) => void;
+  onAbrirCaixa: (valor: number, observacao?: string) => Promise<OperationResult>;
+  onFecharCaixa: (observacaoFechamento?: string) => Promise<OperationResult>;
+  onAdicionarSuprimento: (valor: number, desc: string) => Promise<OperationResult>;
+  onRealizarSangria: (valor: number, desc: string) => Promise<OperationResult>;
 }
 
 export default function Caixa({
@@ -54,6 +57,9 @@ export default function Caixa({
   // Form local values for Fechamento
   const [fechamentoObs, setFechamentoObs] = useState('');
 
+  // Feedback de erro do formulário atualmente aberto
+  const [formError, setFormError] = useState<string | null>(null);
+
   // Log filter state inside cashier
   const [logFilter, setLogFilter] = useState<
     'all' | 'venda' | 'suprimento' | 'sangria'
@@ -63,22 +69,32 @@ export default function Caixa({
     `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   // Form submissions
-  const handleAberturaSubmit = (e: React.FormEvent) => {
+  const handleAberturaSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const val = parseFloat(aberturaValor);
     if (!isNaN(val) && val >= 0) {
-      onAbrirCaixa(val, aberturaObs);
+      setFormError(null);
+      const res = await onAbrirCaixa(val, aberturaObs);
+      if (!res.success) {
+        setFormError(res.msg);
+        return;
+      }
       // Reset & close
       setAberturaObs('');
       setIsAbrirModalOpen(false);
     }
   };
 
-  const handleReforcoSubmit = (e: React.FormEvent) => {
+  const handleReforcoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const val = parseFloat(reforcoValor);
     if (!isNaN(val) && val > 0 && reforcoDesc.trim() !== '') {
-      onAdicionarSuprimento(val, reforcoDesc);
+      setFormError(null);
+      const res = await onAdicionarSuprimento(val, reforcoDesc);
+      if (!res.success) {
+        setFormError(res.msg);
+        return;
+      }
       // Reset & close
       setReforcoValor('');
       setReforcoDesc('');
@@ -86,7 +102,7 @@ export default function Caixa({
     }
   };
 
-  const handleSangriaSubmit = (e: React.FormEvent) => {
+  const handleSangriaSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const val = parseFloat(sangriaValor);
     if (!isNaN(val) && val > 0 && sangriaDesc.trim() !== '') {
@@ -97,7 +113,12 @@ export default function Caixa({
         );
         return;
       }
-      onRealizarSangria(val, sangriaDesc);
+      setFormError(null);
+      const res = await onRealizarSangria(val, sangriaDesc);
+      if (!res.success) {
+        setFormError(res.msg);
+        return;
+      }
       // Reset & close
       setSangriaValor('');
       setSangriaDesc('');
@@ -105,9 +126,14 @@ export default function Caixa({
     }
   };
 
-  const handleFechamentoConfirm = (e: React.FormEvent) => {
+  const handleFechamentoConfirm = async (e: React.FormEvent) => {
     e.preventDefault();
-    onFecharCaixa(fechamentoObs);
+    setFormError(null);
+    const res = await onFecharCaixa(fechamentoObs);
+    if (!res.success) {
+      setFormError(res.msg);
+      return;
+    }
     // Reset & close
     setFechamentoObs('');
     setIsFecharModalOpen(false);
@@ -206,7 +232,10 @@ export default function Caixa({
           </p>
           <button
             id="btn-open-abertura-modal"
-            onClick={() => setIsAbrirModalOpen(true)}
+            onClick={() => {
+              setFormError(null);
+              setIsAbrirModalOpen(true);
+            }}
             className="px-6 py-3 bg-emerald-600 hover:bg-emerald-950/400 text-white font-bold rounded-xl text-sm shadow-md shadow-emerald-500/15 cursor-pointer hover:shadow-emerald-500/20 active:scale-[0.98] transition-all flex items-center gap-2"
           >
             <Unlock size={16} />
@@ -300,7 +329,10 @@ export default function Caixa({
             <div className="flex gap-2.5">
               <button
                 id="btn-reforco-trigger"
-                onClick={() => setIsReforcoModalOpen(true)}
+                onClick={() => {
+                  setFormError(null);
+                  setIsReforcoModalOpen(true);
+                }}
                 className="px-4 py-2.5 rounded-xl bg-slate-800/50 hover:bg-emerald-950/40 text-slate-300 hover:text-emerald-400 border border-slate-800 hover:border-emerald-300 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
               >
                 <Plus size={14} className="text-emerald-500" />
@@ -309,7 +341,10 @@ export default function Caixa({
 
               <button
                 id="btn-sangria-trigger"
-                onClick={() => setIsSangriaModalOpen(true)}
+                onClick={() => {
+                  setFormError(null);
+                  setIsSangriaModalOpen(true);
+                }}
                 className="px-4 py-2.5 rounded-xl bg-slate-800/50 hover:bg-rose-950/40 text-slate-300 hover:text-rose-500 border border-slate-800 hover:border-rose-300 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
               >
                 <Minus size={14} className="text-rose-500" />
@@ -319,7 +354,10 @@ export default function Caixa({
 
             <button
               id="btn-fechar-trigger"
-              onClick={() => setIsFecharModalOpen(true)}
+              onClick={() => {
+                setFormError(null);
+                setIsFecharModalOpen(true);
+              }}
               className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-950/400 text-white text-xs font-bold transition cursor-pointer shadow-md shadow-rose-500/10 flex items-center gap-1.5"
             >
               <Lock size={13} />
@@ -578,6 +616,12 @@ export default function Caixa({
               </div>
             </div>
 
+            {formError && (
+              <div className="mb-4">
+                <InlineFeedback tone="error" message={formError} />
+              </div>
+            )}
+
             <form onSubmit={handleAberturaSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs uppercase font-mono text-slate-500 font-bold mb-1.5">
@@ -678,6 +722,12 @@ export default function Caixa({
               </div>
             </div>
 
+            {formError && (
+              <div className="mb-4">
+                <InlineFeedback tone="error" message={formError} />
+              </div>
+            )}
+
             <form onSubmit={handleReforcoSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs uppercase font-mono text-slate-500 font-bold mb-1">
@@ -758,6 +808,12 @@ export default function Caixa({
                 </p>
               </div>
             </div>
+
+            {formError && (
+              <div className="mb-4">
+                <InlineFeedback tone="error" message={formError} />
+              </div>
+            )}
 
             <form onSubmit={handleSangriaSubmit} className="space-y-4">
               <div>
@@ -843,6 +899,12 @@ export default function Caixa({
                 </p>
               </div>
             </div>
+
+            {formError && (
+              <div className="mb-4">
+                <InlineFeedback tone="error" message={formError} />
+              </div>
+            )}
 
             <form onSubmit={handleFechamentoConfirm} className="space-y-4">
               <div className="bg-slate-800/50 border border-slate-700 p-3.5 rounded-xl space-y-2 text-xs">

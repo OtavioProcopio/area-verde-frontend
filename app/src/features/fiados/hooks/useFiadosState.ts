@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { settleFiado } from '../services/fiadosService';
+import { getApiErrorMessage } from '../../shared/utils/getApiErrorMessage';
 import type { Fiado } from '../../../types';
 
 type RefreshRef = {
@@ -39,7 +40,15 @@ export function useFiadosState(refreshRef: RefreshRef) {
         };
       }
 
-      await settleFiado(pendencia.comandaId || '', saldo, metodo);
+      try {
+        await settleFiado(pendencia.comandaId || '', saldo, metodo);
+      } catch (error) {
+        await refreshRef.current();
+        return {
+          success: false,
+          msg: getApiErrorMessage(error, 'Não foi possível quitar o fiado.'),
+        };
+      }
       restante = Number((restante - saldo).toFixed(2));
     }
 
