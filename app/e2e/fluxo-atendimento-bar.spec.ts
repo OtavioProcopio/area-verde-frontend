@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { apiCaixaAberto, apiFecharCaixaForcado, apiSetupSenha } from './helpers';
 
 /**
  * Simula o fluxo completo de atendimento de um bar no Area Verde:
@@ -8,8 +9,9 @@ import { test, expect, type Page } from '@playwright/test';
  *
  * Roda em série sobre a MESMA página/sessão (ver test.describe.serial),
  * porque o app não usa token persistido: cada reload volta pra tela de
- * login. Pré-condição assumida: nenhum caixa aberto no início da suíte
- * (o último teste fecha o caixa, então reruns ficam consistentes).
+ * login. O beforeAll garante caixa fechado e senha definida via API antes
+ * de começar, pra funcionar mesmo depois de outros arquivos de teste
+ * rodarem primeiro na mesma execução (banco compartilhado).
  */
 
 const RUN_ID = Date.now().toString(36);
@@ -25,6 +27,10 @@ test.describe.serial('Fluxo completo de atendimento no bar', () => {
   let page: Page;
 
   test.beforeAll(async ({ browser }) => {
+    await apiSetupSenha(SENHA);
+    const aberto = await apiCaixaAberto();
+    if (aberto) await apiFecharCaixaForcado(aberto.id);
+
     page = await browser.newPage();
     page.on('dialog', (dialog) => dialog.accept());
     await page.goto('/');
