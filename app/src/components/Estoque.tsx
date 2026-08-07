@@ -5,6 +5,8 @@ import {
   createStockEntry,
   fetchStockMovements,
 } from '../features/estoque/services/estoqueService';
+import { getApiErrorMessage } from '../features/shared/utils/getApiErrorMessage';
+import { InlineFeedback } from '../features/shared/components/InlineFeedback';
 import {
   Package,
   ArrowDownToLine,
@@ -81,10 +83,13 @@ export default function Estoque({
     };
   };
 
+  const [formError, setFormError] = useState<string | null>(null);
+
   const openEntrada = (p: Product) => {
     setSelectedProduct(p);
     setQty('');
     setNote('');
+    setFormError(null);
     setActiveModal('entrada');
   };
 
@@ -92,6 +97,7 @@ export default function Estoque({
     setSelectedProduct(p);
     setQty(p.stock.toString());
     setNote('');
+    setFormError(null);
     setActiveModal('ajuste');
   };
 
@@ -108,9 +114,16 @@ export default function Estoque({
     const parsedQty = parseFloat(qty);
     if (isNaN(parsedQty) || parsedQty <= 0) return;
 
-    await createStockEntry(selectedProduct.id, parsedQty, note || undefined);
-    await onRefreshState();
-    setActiveModal(null);
+    setFormError(null);
+    try {
+      await createStockEntry(selectedProduct.id, parsedQty, note || undefined);
+      await onRefreshState();
+      setActiveModal(null);
+    } catch (error) {
+      setFormError(
+        getApiErrorMessage(error, 'Não foi possível registrar a entrada.'),
+      );
+    }
   };
 
   const handleSaveAjuste = async (e: React.FormEvent) => {
@@ -121,13 +134,20 @@ export default function Estoque({
 
     if (!window.confirm('Confirmar o ajuste de estoque?')) return;
 
-    await createStockAdjustment(
-      selectedProduct.id,
-      parsedNewBalance,
-      note || undefined,
-    );
-    await onRefreshState();
-    setActiveModal(null);
+    setFormError(null);
+    try {
+      await createStockAdjustment(
+        selectedProduct.id,
+        parsedNewBalance,
+        note || undefined,
+      );
+      await onRefreshState();
+      setActiveModal(null);
+    } catch (error) {
+      setFormError(
+        getApiErrorMessage(error, 'Não foi possível salvar o ajuste.'),
+      );
+    }
   };
 
   const productMovements = selectedProduct
@@ -306,6 +326,12 @@ export default function Estoque({
               </div>
             </div>
 
+            {formError && (
+              <div className="mb-4">
+                <InlineFeedback tone="error" message={formError} />
+              </div>
+            )}
+
             <form onSubmit={handleSaveEntrada} className="space-y-4">
               <div>
                 <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
@@ -377,6 +403,12 @@ export default function Estoque({
                 Pode ser para mais ou para menos.
               </div>
             </div>
+
+            {formError && (
+              <div className="mb-4">
+                <InlineFeedback tone="error" message={formError} />
+              </div>
+            )}
 
             <form onSubmit={handleSaveAjuste} className="space-y-4">
               <div>

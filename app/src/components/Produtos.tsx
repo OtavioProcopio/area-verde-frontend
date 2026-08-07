@@ -18,15 +18,18 @@ import {
   CheckCircle2,
   XCircle,
 } from 'lucide-react';
+import { InlineFeedback } from '../features/shared/components/InlineFeedback';
+
+type OperationResult = { success: boolean; msg: string };
 
 interface ProdutosProps {
   products: Product[];
   categories: Category[];
-  onAddProduct: (p: Omit<Product, 'id'>) => void;
-  onUpdateProduct: (p: Product) => void;
+  onAddProduct: (p: Omit<Product, 'id'>) => Promise<OperationResult>;
+  onUpdateProduct: (p: Product) => Promise<OperationResult>;
   onDeleteProduct: (id: string) => void;
-  onAddCategory: (name: string) => void;
-  onUpdateCategory: (c: Category) => void;
+  onAddCategory: (name: string) => Promise<OperationResult>;
+  onUpdateCategory: (c: Category) => Promise<OperationResult>;
 }
 
 export default function Produtos({
@@ -91,8 +94,13 @@ export default function Produtos({
   const [catEditingId, setCatEditingId] = useState<string | null>(null);
   const [catName, setCatName] = useState('');
 
+  // Feedback de erro dos formulários
+  const [productFormError, setProductFormError] = useState<string | null>(null);
+  const [catFormError, setCatFormError] = useState<string | null>(null);
+
   // ----- HANDLERS: PRODUCTS -----
   const handleStartEdit = (p: Product) => {
+    setProductFormError(null);
     setFormMode('edit');
     setEditingProductId(p.id);
     setName(p.name);
@@ -113,6 +121,7 @@ export default function Produtos({
   };
 
   const handleStartCreate = () => {
+    setProductFormError(null);
     setFormMode('create');
     setEditingProductId(null);
     setName('');
@@ -132,7 +141,7 @@ export default function Produtos({
     setShowProductForm(true);
   };
 
-  const handleSaveProduct = (e: React.FormEvent) => {
+  const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim() === '') return;
 
@@ -154,13 +163,17 @@ export default function Produtos({
       recipe: isComposite ? recipe : undefined,
     };
 
-    if (formMode === 'create') {
-      onAddProduct(productPayload);
-    } else if (formMode === 'edit' && editingProductId) {
-      onUpdateProduct({
-        ...productPayload,
-        id: editingProductId,
-      });
+    setProductFormError(null);
+    const res =
+      formMode === 'create'
+        ? await onAddProduct(productPayload)
+        : editingProductId
+          ? await onUpdateProduct({ ...productPayload, id: editingProductId })
+          : null;
+
+    if (res && !res.success) {
+      setProductFormError(res.msg);
+      return;
     }
     setShowProductForm(false);
   };
@@ -297,6 +310,7 @@ export default function Produtos({
 
   // ----- HANDLERS: CATEGORIES -----
   const handleStartCreateCat = () => {
+    setCatFormError(null);
     setCatFormMode('create');
     setCatEditingId(null);
     setCatName('');
@@ -304,23 +318,32 @@ export default function Produtos({
   };
 
   const handleStartEditCat = (c: Category) => {
+    setCatFormError(null);
     setCatFormMode('edit');
     setCatEditingId(c.id);
     setCatName(c.name);
     setShowCatForm(true);
   };
 
-  const handleSaveCat = (e: React.FormEvent) => {
+  const handleSaveCat = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!catName.trim()) return;
 
+    setCatFormError(null);
+    let res: OperationResult | null = null;
+
     if (catFormMode === 'create') {
-      onAddCategory(catName);
+      res = await onAddCategory(catName);
     } else if (catFormMode === 'edit' && catEditingId) {
       const c = categories.find((x) => x.id === catEditingId);
       if (c) {
-        onUpdateCategory({ ...c, name: catName });
+        res = await onUpdateCategory({ ...c, name: catName });
       }
+    }
+
+    if (res && !res.success) {
+      setCatFormError(res.msg);
+      return;
     }
     setShowCatForm(false);
   };
@@ -928,6 +951,12 @@ export default function Produtos({
                 : 'Renomear Categoria'}
             </h3>
 
+            {catFormError && (
+              <div className="mb-4">
+                <InlineFeedback tone="error" message={catFormError} />
+              </div>
+            )}
+
             <form onSubmit={handleSaveCat} className="space-y-4">
               <div>
                 <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
@@ -975,6 +1004,12 @@ export default function Produtos({
                 <X size={18} />
               </button>
             </div>
+
+            {productFormError && (
+              <div className="mb-4 shrink-0">
+                <InlineFeedback tone="error" message={productFormError} />
+              </div>
+            )}
 
             <form
               onSubmit={handleSaveProduct}
