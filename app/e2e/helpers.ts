@@ -186,3 +186,14 @@ export async function loginUI(page: Page, senha: string) {
     timeout: 10_000,
   });
 }
+
+/**
+ * Fecha o modal de recibo que aparece após um pagamento de comanda
+ * confirmado. Necessário antes de navegar pra outra aba, senão o modal
+ * (ainda aberto) intercepta os cliques.
+ */
+export async function fecharRecibo(page: Page) {
+  const botao = page.getByRole('button', { name: 'Fechar e Prosseguir' });
+  await expect(botao).toBeVisible({ timeout: 10_000 });
+  await botao.click();
+}

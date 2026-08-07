@@ -46,8 +46,8 @@ export function mapBestSellingProduct(
 ): BestSellingProduct {
   return {
     id: item.produtoId === null ? 'unknown' : String(item.produtoId),
-    name: item.produtoNome,
-    category: item.categoriaNome || 'Sem categoria',
+    name: item.nomeProduto,
+    category: 'Sem categoria',
     quantity: toNumber(item.quantidadeVendida),
     total: toNumber(item.valorTotal),
   };
@@ -56,23 +56,25 @@ export function mapBestSellingProduct(
 export function mapFiadoReportItem(item: ApiFiadoReportItem): FiadoReportItem {
   return {
     comandaId: String(item.comandaId),
-    customerName: item.clienteNome || 'Cliente não identificado',
+    customerName: item.nomeExibicao || 'Cliente não identificado',
     total: toNumber(item.total),
-    status: item.status,
     overdue: item.vencida,
-    openedAt: item.abertaEm,
+    pendenteEm: item.pendenteEm || '',
     dueDate: item.vencimentoEm || undefined,
   };
 }
 
-export function mapStockReportItem(item: ApiStockReportItem): StockReportItem {
+export function mapStockReportItem(
+  item: ApiStockReportItem,
+  type: 'baixo' | 'negativo',
+): StockReportItem {
   return {
     productId: String(item.produtoId),
-    productName: item.produtoNome,
+    productName: item.nome,
     unit: mapUnit(item.unidadeEstoque),
     stock: toNumber(item.quantidadeEstoque),
     minStock: toNumber(item.estoqueMinimo),
-    type: item.tipo,
+    type,
   };
 }
 
@@ -81,7 +83,7 @@ export function mapConsumedStockReportItem(
 ): ConsumedStockReportItem {
   return {
     productId: String(item.produtoId),
-    productName: item.produtoNome,
+    productName: item.nome,
     unit: mapUnit(item.unidadeEstoque),
     consumed: toNumber(item.quantidadeConsumida),
   };
@@ -93,6 +95,6 @@ export function mapCommandaReportItem(
   return {
     status: item.status,
     quantity: item.quantidade,
-    total: toNumber(item.total),
+    total: toNumber(item.valorTotal),
   };
 }

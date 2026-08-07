@@ -277,16 +277,16 @@ export default function Relatorios({
             {fiados.map((c, i) => (
               <tr key={i} className="hover:bg-slate-800/50">
                 <td className="px-5 py-3 font-mono text-[10px] text-slate-400">
-                  {new Date(c.openedAt).toLocaleDateString()}
+                  {c.pendenteEm
+                    ? new Date(c.pendenteEm).toLocaleDateString()
+                    : '-'}
                 </td>
                 <td className="px-5 py-3 font-bold text-slate-200">
                   {c.customerName || 'Não identificado'}
                 </td>
                 <td className="px-5 py-3 gap-1 flex items-center justify-center">
-                  <span
-                    className={`px-2 py-0.5 rounded text-[9px] uppercase font-bold font-mono border ${c.status === 'FECHADA' ? 'bg-emerald-950/40 text-emerald-400 border-emerald-800/60' : 'bg-amber-950/40 text-amber-400 border-amber-800/60'}`}
-                  >
-                    {c.status}
+                  <span className="px-2 py-0.5 rounded text-[9px] uppercase font-bold font-mono border bg-amber-950/40 text-amber-400 border-amber-800/60">
+                    PENDENTE
                   </span>
                   {c.overdue && (
                     <span className="px-2 py-0.5 rounded text-[9px] uppercase font-bold font-mono border bg-rose-950/40 text-rose-400 border-rose-800/60">
