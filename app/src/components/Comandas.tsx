@@ -997,6 +997,7 @@ export default function Comandas({
                   value={newComandaName}
                   onChange={(e) => setNewComandaName(e.target.value)}
                   className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2.5 rounded-lg text-xs text-slate-200 outline-none focus:bg-slate-900 focus:border-emerald-600"
+                  data-testid="comanda-nome-input"
                   required
                   autoFocus
                 />
@@ -1135,6 +1136,7 @@ export default function Comandas({
                           setCheckoutError(null);
                         }}
                         className="w-full bg-slate-800/50 border border-slate-800 px-2.5 py-1.5 text-xs text-slate-200 rounded-lg outline-none"
+                        data-testid="checkout-cliente-select"
                         required
                       >
                         <option value="">-- Escolha o Cliente --</option>

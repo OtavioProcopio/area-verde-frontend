@@ -16,6 +16,9 @@ export default defineConfig(() => {
       globals: true,
       setupFiles: './src/test/setup.ts',
       css: true,
+      // e2e/ tem as specs do Playwright, que usam um test runner próprio
+      // (não o Vitest) e não devem entrar na varredura de testes unitários.
+      exclude: ['**/node_modules/**', 'e2e/**'],
       coverage: {
         provider: 'v8',
         reporter: ['text', 'html'],
