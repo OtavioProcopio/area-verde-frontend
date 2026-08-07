@@ -35,9 +35,7 @@ export function useCustomersState(refreshRef: RefreshRef) {
     updated: Customer,
   ): Promise<OperationResult> => {
     try {
-      const original = customers.find(
-        (customer) => customer.id === updated.id,
-      );
+      const original = customers.find((customer) => customer.id === updated.id);
       await saveCustomer(
         updated,
         original && (original.active ?? true) !== (updated.active ?? true)

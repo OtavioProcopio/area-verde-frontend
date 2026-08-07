@@ -22,9 +22,15 @@ type OperationResult = { success: boolean; msg: string };
 interface CaixaProps {
   caixa: Cashier;
   caixasHistory?: ClosedCashier[];
-  onAbrirCaixa: (valor: number, observacao?: string) => Promise<OperationResult>;
+  onAbrirCaixa: (
+    valor: number,
+    observacao?: string,
+  ) => Promise<OperationResult>;
   onFecharCaixa: (observacaoFechamento?: string) => Promise<OperationResult>;
-  onAdicionarSuprimento: (valor: number, desc: string) => Promise<OperationResult>;
+  onAdicionarSuprimento: (
+    valor: number,
+    desc: string,
+  ) => Promise<OperationResult>;
   onRealizarSangria: (valor: number, desc: string) => Promise<OperationResult>;
 }
 
