@@ -95,9 +95,7 @@ export default function Produtos({
   const [catName, setCatName] = useState('');
 
   // Feedback de erro dos formulários
-  const [productFormError, setProductFormError] = useState<string | null>(
-    null,
-  );
+  const [productFormError, setProductFormError] = useState<string | null>(null);
   const [catFormError, setCatFormError] = useState<string | null>(null);
 
   // ----- HANDLERS: PRODUCTS -----

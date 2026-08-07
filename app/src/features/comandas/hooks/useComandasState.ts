@@ -59,7 +59,9 @@ export function useComandasState(refreshRef: RefreshRef) {
     }
   };
 
-  const cancelarComanda = async (comandaId: string): Promise<OperationResult> => {
+  const cancelarComanda = async (
+    comandaId: string,
+  ): Promise<OperationResult> => {
     try {
       await cancelComanda(comandaId);
       await refreshRef.current();
@@ -87,7 +89,10 @@ export function useComandasState(refreshRef: RefreshRef) {
       await refreshRef.current();
       return { success: true, msg: 'Item adicionado com sucesso.' };
     } catch (error) {
-      const msg = getApiErrorMessage(error, 'Não foi possível adicionar o item.');
+      const msg = getApiErrorMessage(
+        error,
+        'Não foi possível adicionar o item.',
+      );
       window.alert(msg);
       return { success: false, msg };
     }
