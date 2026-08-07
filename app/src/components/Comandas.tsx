@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { Comanda, Product, Customer, TabItem, Category } from '../types';
+import { InlineFeedback } from '../features/shared/components/InlineFeedback';
 import {
   Plus,
   Minus,
@@ -31,7 +32,10 @@ interface ComandasProps {
   categories: Category[];
   customers: Customer[];
   caixaIsOpen: boolean;
-  onAddComanda: (code: string, customerId: string | null) => Promise<Comanda>;
+  onAddComanda: (
+    code: string,
+    customerId: string | null,
+  ) => Promise<{ comanda: Comanda | null; success: boolean; msg: string }>;
   onUpdateComanda: (
     id: string,
     updates: Partial<Comanda>,
@@ -101,6 +105,7 @@ export default function Comandas({
   const [showNewComandaModal, setShowNewComandaModal] = useState(false);
   const [newComandaName, setNewComandaName] = useState('');
   const [newComandaCustomerId, setNewComandaCustomerId] = useState<string>('');
+  const [newComandaError, setNewComandaError] = useState<string | null>(null);
 
   // Manual Custom item fields
   // Checkout payment modal
@@ -150,9 +155,15 @@ export default function Comandas({
 
     const mappedCustId =
       newComandaCustomerId === '' ? null : newComandaCustomerId;
-    const newCom = await onAddComanda(newComandaName, mappedCustId);
+    setNewComandaError(null);
+    const res = await onAddComanda(newComandaName, mappedCustId);
 
-    setSelectedComandaId(newCom.id);
+    if (!res.success || !res.comanda) {
+      setNewComandaError(res.msg);
+      return;
+    }
+
+    setSelectedComandaId(res.comanda.id);
     setViewMode('pos');
     setNewComandaName('');
     setNewComandaCustomerId('');
@@ -316,6 +327,7 @@ export default function Comandas({
               id="btn-spawn-comanda-list"
               onClick={() => {
                 setCheckoutError(null);
+                setNewComandaError(null);
                 setShowNewComandaModal(true);
               }}
               className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-950/400 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md transition"
@@ -967,6 +979,12 @@ export default function Comandas({
               <PlusCircle className="text-emerald-500" size={18} />
               Abrir Nova Comanda
             </h3>
+
+            {newComandaError && (
+              <div className="mb-4">
+                <InlineFeedback tone="error" message={newComandaError} />
+              </div>
+            )}
 
             <form onSubmit={handleCreateComanda} className="space-y-4">
               <div>
