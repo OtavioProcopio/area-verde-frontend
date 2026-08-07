@@ -17,71 +17,133 @@ type RefreshRef = {
   current: () => Promise<void>;
 };
 
+type OperationResult = { success: boolean; msg: string };
+
 export function useComandasState(refreshRef: RefreshRef) {
   const [comandas, setComandas] = useState<Comanda[]>([]);
 
   const addComanda = async (
     code: string,
     customerId: string | null = null,
-  ): Promise<Comanda> => {
-    const created = await createComanda(code, customerId);
-    await refreshRef.current();
-    return created;
-  };
-
-  const updateComanda = async (updated: Comanda) => {
-    const original = comandas.find((comanda) => comanda.id === updated.id);
-    if (original?.customerId !== updated.customerId && updated.customerId) {
-      await linkCustomerToComanda(updated.id, updated.customerId);
+  ): Promise<{ comanda: Comanda | null } & OperationResult> => {
+    try {
+      const created = await createComanda(code, customerId);
       await refreshRef.current();
+      return {
+        comanda: created,
+        success: true,
+        msg: 'Comanda criada com sucesso.',
+      };
+    } catch (error) {
+      return {
+        comanda: null,
+        success: false,
+        msg: getApiErrorMessage(error, 'Não foi possível criar a comanda.'),
+      };
     }
   };
 
-  const cancelarComanda = async (comandaId: string) => {
-    await cancelComanda(comandaId);
-    await refreshRef.current();
+  const updateComanda = async (updated: Comanda): Promise<OperationResult> => {
+    try {
+      const original = comandas.find((comanda) => comanda.id === updated.id);
+      if (original?.customerId !== updated.customerId && updated.customerId) {
+        await linkCustomerToComanda(updated.id, updated.customerId);
+        await refreshRef.current();
+      }
+      return { success: true, msg: 'Comanda atualizada com sucesso.' };
+    } catch (error) {
+      return {
+        success: false,
+        msg: getApiErrorMessage(error, 'Não foi possível atualizar a comanda.'),
+      };
+    }
+  };
+
+  const cancelarComanda = async (
+    comandaId: string,
+  ): Promise<OperationResult> => {
+    try {
+      await cancelComanda(comandaId);
+      await refreshRef.current();
+      return { success: true, msg: 'Comanda cancelada com sucesso.' };
+    } catch (error) {
+      return {
+        success: false,
+        msg: getApiErrorMessage(error, 'Não foi possível cancelar a comanda.'),
+      };
+    }
   };
 
   const addItemToComanda = async (
     comandaId: string,
     item: Omit<TabItem, 'id'>,
-  ) => {
+  ): Promise<OperationResult> => {
     const productId = Number(item.productId);
     if (!Number.isFinite(productId)) {
       window.alert('Itens manuais ainda não são suportados pela API real.');
-      return;
+      return { success: false, msg: 'Item manual não suportado.' };
     }
 
-    await createComandaItem(comandaId, item);
-    await refreshRef.current();
+    try {
+      await createComandaItem(comandaId, item);
+      await refreshRef.current();
+      return { success: true, msg: 'Item adicionado com sucesso.' };
+    } catch (error) {
+      const msg = getApiErrorMessage(
+        error,
+        'Não foi possível adicionar o item.',
+      );
+      window.alert(msg);
+      return { success: false, msg };
+    }
   };
 
   const updateComandaItemQty = async (
     comandaId: string,
     itemId: string,
     quantity: number,
-  ) => {
+  ): Promise<OperationResult> => {
     const comanda = comandas.find((item) => item.id === comandaId);
     const currentItem = comanda?.items.find((item) => item.id === itemId);
-    if (!currentItem) return;
+    if (!currentItem) return { success: false, msg: 'Item não encontrado.' };
 
     const delta = quantity - currentItem.quantity;
-    if (delta === 0) return;
+    if (delta === 0) return { success: true, msg: 'Nenhuma alteração.' };
 
-    if (quantity <= 0) {
-      await deleteComandaItem(comandaId, itemId);
-    } else if (delta > 0) {
-      await incrementComandaItem(comandaId, itemId, delta);
-    } else {
-      await decrementComandaItem(comandaId, itemId, Math.abs(delta));
+    try {
+      if (quantity <= 0) {
+        await deleteComandaItem(comandaId, itemId);
+      } else if (delta > 0) {
+        await incrementComandaItem(comandaId, itemId, delta);
+      } else {
+        await decrementComandaItem(comandaId, itemId, Math.abs(delta));
+      }
+
+      await refreshRef.current();
+      return { success: true, msg: 'Quantidade atualizada com sucesso.' };
+    } catch (error) {
+      const msg = getApiErrorMessage(
+        error,
+        'Não foi possível atualizar a quantidade do item.',
+      );
+      window.alert(msg);
+      return { success: false, msg };
     }
-
-    await refreshRef.current();
   };
 
-  const removeItemFromComanda = async (comandaId: string, itemId: string) => {
-    await deleteComandaItem(comandaId, itemId);
-    await refreshRef.current();
+  const removeItemFromComanda = async (
+    comandaId: string,
+    itemId: string,
+  ): Promise<OperationResult> => {
+    try {
+      await deleteComandaItem(comandaId, itemId);
+      await refreshRef.current();
+      return { success: true, msg: 'Item removido com sucesso.' };
+    } catch (error) {
+      const msg = getApiErrorMessage(error, 'Não foi possível remover o item.');
+      window.alert(msg);
+      return { success: false, msg };
+    }
   };
 
   const pagarComanda = async (
