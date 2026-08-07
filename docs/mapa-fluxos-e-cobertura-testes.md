@@ -53,7 +53,7 @@ ponta-a-ponta mais críticos. Não é "ou/ou".
 | 4 | `abrirCaixa/fecharCaixa/adicionarSuprimento/realizarSangria`, `addProduct/updateProduct/deleteProduct`, `addCategory/updateCategory`, `addCustomer/updateCustomer/deleteCustomer`, `pagarFiado` (loop de quitação) sem try/catch | Caixa, Produtos, Categorias, Clientes, Fiado | **Corrigido** |
 | 5 | `handleSaveEntrada`/`handleSaveAjuste` sem try/catch | Estoque | **Corrigido** |
 | 6 | Editar cliente **direto da lista** não salvava nada — form usava `selectedCustomer` (só populado ao entrar no detalhe) em vez de rastrear o id em edição | Clientes | **Corrigido** |
-| 7 | Filtro "Histórico de Quitados" nunca mostra nada, pra nenhum cliente — `GET /api/fiados` filtra no banco só `status == PENDENTE` (`comanda_repository.py list_pendencias`), então o front nunca recebe um registro com status `FECHADA` pra mapear como `'quitado'`. Existe histórico real em `/api/relatorios/fiados`, mas essa tela não usa | Fiado / Pendências | **Não corrigido** — decisão consciente, ver `AskUserQuestion` na sessão: requer mudar fonte de dados, maior escopo. Documentado no código (`fiados-fluxos.spec.ts`) |
+| 7 | Filtro "Histórico de Quitados" nunca mostrava nada, pra nenhum cliente — `GET /api/fiados` filtrava no banco só `status == PENDENTE` (`comanda_repository.py list_pendencias`) | Fiado / Pendências | **Corrigido** — backend `feature/fiados-historico-quitados` (novo parâmetro `quitados`) + frontend `bugfix/fiados-historico-quitados` (`fiadosService.ts` busca abertos e quitados juntos) |
 
 Branches: `bugfix/comandas-checkout-erro-silencioso` (#1, #2),
 `bugfix/tratamento-erro-crud-caixa-produtos-clientes-fiados` (#4),
@@ -158,7 +158,7 @@ está no commit de testes junto com o Clientes).
 | Quitar — valor não corresponde à soma exata (pagamento parcial, API não suporta) | ✅ | |
 | Quitar — valor maior que o saldo devedor | ✅ | |
 | Filtro — "Apenas vencidos" | ❌ | Precisa manipular data de vencimento, não testado |
-| Filtro — "Histórico de quitados" | ❌🐛 | **Bug #7, não corrigido** — o filtro é estruturalmente inoperante, ver acima |
+| Filtro — "Histórico de quitados" | ✅ | Bug #7 corrigido + testado |
 | Quitar — caixa fechado bloqueando pagamento em dinheiro | ❌ | |
 
 ## 8. Relatórios
@@ -188,15 +188,13 @@ Só navegação e visão geral — baixa prioridade para E2E.
 
 1. **Vitest unitário** para os 6 hooks corrigidos nesta sessão (checklist da
    política do projeto pede isso pra qualquer lógica extraída/alterada).
-2. **Bug #7** (histórico de fiados quitados) — decidir: reaproveitar
-   `/api/relatorios/fiados` na tela, ou criar endpoint dedicado.
-3. Estoque: nenhum fluxo testado ainda (entrada, ajuste, histórico).
-4. Relatórios: pelo menos 1 asserção por aba.
-5. Configurações: salvar config, trocar senha, backup.
-6. Validações negativas restantes: login com senha errada, setup com senha
+2. Estoque: nenhum fluxo testado ainda (entrada, ajuste, histórico).
+3. Relatórios: pelo menos 1 asserção por aba.
+4. Configurações: salvar config, trocar senha, backup.
+5. Validações negativas restantes: login com senha errada, setup com senha
    curta, ativar/inativar categoria, filtros de listagem em geral, remover
    item de comanda, editar/remover componente de produto composto.
-7. Estabilidade: ao rodar a suíte completa localmente em sessão headed muito
+6. Estabilidade: ao rodar a suíte completa localmente em sessão headed muito
    longa (30+ testes seguidos), houve uma falha ambiental pontual (browser
    fechou sozinho) sempre no mesmo teste por posição — não reproduz isolado.
    CI já tem `retries: 1` configurado, o que deve absorver esse tipo de
