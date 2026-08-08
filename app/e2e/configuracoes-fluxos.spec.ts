@@ -1,5 +1,9 @@
 import { test, expect } from '@playwright/test';
-import { apiSetupSenha, loginUI } from './helpers';
+import {
+  apiSetPermitirEstoqueNegativo,
+  apiSetupSenha,
+  loginUI,
+} from './helpers';
 
 const SENHA = 'senha1234';
 
@@ -36,6 +40,12 @@ test('salva as configurações gerais do sistema', async ({ page }) => {
   await expect(page.locator('#input-bar-name')).toHaveValue(
     `Boteco E2E ${runId}`,
   );
+
+  // O toggle de estoque negativo é global e afeta outros testes (ex: o
+  // picker de produto sem estoque em comandas-fluxos.spec.ts) — sempre
+  // restaura pro padrão sensato (permitido) em vez de deixar no estado
+  // que esse teste calhou de deixar.
+  await apiSetPermitirEstoqueNegativo(true);
 });
 
 test('troca a senha de acesso com sucesso e permite login com a nova senha', async ({

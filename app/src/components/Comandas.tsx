@@ -32,6 +32,7 @@ interface ComandasProps {
   categories: Category[];
   customers: Customer[];
   caixaIsOpen: boolean;
+  permitirEstoqueNegativo: boolean;
   onAddComanda: (
     code: string,
     customerId: string | null,
@@ -74,6 +75,7 @@ export default function Comandas({
   categories,
   customers,
   caixaIsOpen,
+  permitirEstoqueNegativo,
   onAddComanda,
   onUpdateComanda,
   onAddItemToComanda,
@@ -908,7 +910,10 @@ export default function Comandas({
                         {/* Grid de Produtos Rápido */}
                         <div className="flex-1 overflow-y-auto grid grid-cols-2 gap-2 pr-1 content-start">
                           {filteredProducts.map((p) => {
-                            const outOfStock = !p.isComposite && p.stock <= 0;
+                            const outOfStock =
+                              !p.isComposite &&
+                              p.stock <= 0 &&
+                              !permitirEstoqueNegativo;
                             return (
                               <button
                                 key={p.id}
