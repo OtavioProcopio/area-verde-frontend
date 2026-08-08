@@ -137,6 +137,14 @@ export default function Comandas({
       prod.category === selectedCategory || selectedCategory === 'Tudo';
     return matchesSearch && matchesCat;
   });
+  // Sem termo de busca, um catálogo grande vira uma grade pesada de
+  // renderizar (cada botão do picker é um card, não uma linha simples).
+  // Corta a exibição e pede pra buscar em vez de listar tudo de uma vez.
+  const PRODUCT_GRID_LIMIT = 60;
+  const visibleProducts = searchTerm
+    ? filteredProducts
+    : filteredProducts.slice(0, PRODUCT_GRID_LIMIT);
+  const hiddenProductsCount = filteredProducts.length - visibleProducts.length;
 
   // Calculate totals of selected comanda
   const subtotalSelected = selectedComanda
@@ -907,7 +915,7 @@ export default function Comandas({
 
                         {/* Grid de Produtos Rápido */}
                         <div className="flex-1 overflow-y-auto grid grid-cols-2 gap-2 pr-1 content-start">
-                          {filteredProducts.map((p) => {
+                          {visibleProducts.map((p) => {
                             const outOfStock = !p.isComposite && p.stock <= 0;
                             return (
                               <button
@@ -944,6 +952,14 @@ export default function Comandas({
                             );
                           })}
                         </div>
+
+                        {hiddenProductsCount > 0 && (
+                          <p className="text-[10px] text-slate-500 font-mono text-center py-2 shrink-0">
+                            Mostrando {visibleProducts.length} de{' '}
+                            {filteredProducts.length} produtos — digite pra
+                            buscar os outros {hiddenProductsCount}.
+                          </p>
+                        )}
 
                         <div className="mt-4 border-t border-slate-800 pt-4 shrink-0 bg-slate-800/50/50 -mx-4 -mb-4 p-4 rounded-b-xl border-dashed">
                           <span className="text-[10px] text-slate-500 uppercase font-mono font-bold block mb-2 flex items-center gap-1">

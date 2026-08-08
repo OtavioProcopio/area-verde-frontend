@@ -3,7 +3,9 @@ import {
   apiAbrirCaixa,
   apiAdicionarItem,
   apiCaixaAberto,
+  apiCriarCategoria,
   apiCriarComanda,
+  apiCriarProdutoSimples,
   apiFecharCaixaForcado,
   apiSetupProdutoUnico,
   apiSetupSenha,
@@ -192,4 +194,53 @@ test('remove um item decrementando a quantidade até 0 (com confirmação)', asy
   await itemRow.locator('button').nth(0).click();
 
   await expect(page.getByText(`Produto E2E ${runId}`)).toHaveCount(0);
+});
+
+test('picker de produtos limita a grade quando o catálogo é grande', async ({
+  page,
+}) => {
+  test.setTimeout(60_000);
+  const runId = Date.now().toString(36);
+  await apiAbrirCaixa();
+  const categoria = await apiCriarCategoria(`Categoria Grande ${runId}`);
+  // Backend ordena produtos por nome — "Zzz" garante que este fique
+  // depois de todos os "Bulk NN" (2 dígitos) na ordem alfabética, ficando
+  // de fora dos 60 primeiros do corte.
+  const alvo = `Produto Zzz Alvo ${runId}`;
+
+  for (let i = 0; i < 60; i++) {
+    await apiCriarProdutoSimples({
+      nome: `Produto Bulk ${runId} ${String(i).padStart(2, '0')}`,
+      categoriaId: categoria.id,
+      precoVenda: 5,
+    });
+  }
+  await apiCriarProdutoSimples({
+    nome: alvo,
+    categoriaId: categoria.id,
+    precoVenda: 5,
+  });
+  const comanda = await apiCriarComanda(`Comanda Catalogo Grande ${runId}`);
+
+  await loginUI(page, SENHA);
+  await page.locator('#nav-link-comandas').click();
+  await page
+    .locator('tr', { hasText: `Comanda Catalogo Grande ${runId}` })
+    .getByRole('button', { name: 'Abrir' })
+    .click();
+
+  await page
+    .getByRole('button', { name: `Categoria Grande ${runId}` })
+    .click();
+
+  await expect(page.getByText(/Mostrando 60 de 61 produtos/)).toBeVisible({
+    timeout: 10_000,
+  });
+  // O produto 61º não renderiza até buscar por ele.
+  await expect(page.getByRole('button', { name: alvo })).toHaveCount(0);
+
+  await page.getByPlaceholder('Ex: Skol').fill(alvo);
+  await expect(
+    page.getByRole('button', { name: alvo }).first(),
+  ).toBeVisible({ timeout: 10_000 });
 });
