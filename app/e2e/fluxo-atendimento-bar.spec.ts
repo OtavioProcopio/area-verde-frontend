@@ -164,7 +164,11 @@ test.describe.serial('Fluxo completo de atendimento no bar', () => {
     await page.getByRole('button', { name: '+ Novo' }).click();
 
     await page.getByPlaceholder('Nome Completo').fill(CLIENTE_NOME);
-    await page.getByPlaceholder('Telefone').fill('11999998888');
+    // Telefone fixo colidiria com o mesmo cliente de uma execução anterior
+    // (backend bloqueia telefone duplicado entre clientes ativos).
+    await page
+      .getByPlaceholder('Telefone')
+      .fill(`11${Date.now().toString().slice(-9)}`);
     await page.getByRole('button', { name: 'Salvar', exact: true }).click();
 
     const clienteSelect = page.getByTestId('checkout-cliente-select');
