@@ -120,9 +120,14 @@ test('bloqueia quitação com valor maior que o saldo devedor', async ({
   await expect(row).toBeVisible();
 });
 
-test('quitar remove o fiado da lista de pendências em aberto', async ({
+test('quitar remove o fiado da lista de abertos e mostra no histórico de quitados', async ({
   page,
 }) => {
+  // Regressão do bug #7 (docs/mapa-fluxos-e-cobertura-testes.md): GET
+  // /api/fiados só retornava pendências em aberto, então o filtro
+  // "Histórico de Quitados" nunca mostrava nada. Corrigido em
+  // fiadosService.ts (busca /fiados + /fiados?quitados=true) e no backend
+  // (comanda_repository.list_pendencias aceita quitados=true).
   const runId = `${Date.now().toString(36)}-historico`;
   const { cliente } = await criarFiadoDe(runId);
 
@@ -136,12 +141,12 @@ test('quitar remove o fiado da lista de pendências em aberto', async ({
   await page.getByRole('button', { name: 'COMFIRMAR PAGAMENTO' }).click();
   await expect(row).toHaveCount(0, { timeout: 10_000 });
 
-  // NOTA (bug conhecido, ver docs/mapa-fluxos-e-cobertura-testes.md): o
-  // filtro "Histórico de Quitados" nunca mostra nada, pra nenhum cliente.
-  // GET /api/fiados filtra no banco só status == PENDENTE
-  // (comanda_repository.py list_pendencias), então o registro que acabou
-  // de ser quitado nunca chega no frontend com status FECHADA — o mapper
-  // (fiadoMapper.ts) não tem como produzir status:'quitado', e o filtro
-  // fica estruturalmente vazio. Existe histórico real em
-  // /api/relatorios/fiados, mas essa tela não usa esse endpoint.
+  await page
+    .locator('select')
+    .filter({ hasText: 'Pendências em Aberto' })
+    .selectOption({ label: 'Histórico de Quitados' });
+
+  await expect(
+    page.locator('tr', { hasText: cliente.nome }),
+  ).toBeVisible({ timeout: 10_000 });
 });

@@ -5,8 +5,16 @@ import { mapFiado } from '../mappers/fiadoMapper';
 import type { ApiPendenciaResumo } from '../types';
 
 export async function fetchFiados(): Promise<Fiado[]> {
-  const fiados = await apiRequest<ApiPendenciaResumo[]>('/fiados');
-  return fiados.filter((fiado) => fiado.cliente?.id).map(mapFiado);
+  // /fiados sozinho so traz pendencias em aberto (status PENDENTE); o
+  // historico de quitados precisa do parametro quitados=true, ver
+  // GET /api/fiados no backend (comanda_repository.list_pendencias).
+  const [abertos, quitados] = await Promise.all([
+    apiRequest<ApiPendenciaResumo[]>('/fiados'),
+    apiRequest<ApiPendenciaResumo[]>('/fiados?quitados=true'),
+  ]);
+  return [...abertos, ...quitados]
+    .filter((fiado) => fiado.cliente?.id)
+    .map(mapFiado);
 }
 
 export async function settleFiado(
