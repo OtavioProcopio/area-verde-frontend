@@ -9,24 +9,30 @@ MVP validado para deploy real no bar. Lista todo módulo, todo fluxo de uso
 **Atualização:** a cobertura E2E saiu de ~10% (um caminho por tela) pra cobrir
 a maioria dos fluxos de negócio críticos — pagamentos em todas as formas,
 bloqueios de regra de negócio, produto composto, CRUD completo de produtos/
-categorias/clientes, fiado. Ver seção "O que ainda falta" pro que ficou de
-fora conscientemente.
+categorias/clientes, fiado, estoque, todas as 6 abas de Relatórios e
+Configurações (salvar config/trocar senha/redefinir sessão). Ver seção "O que
+ainda falta" pro que ficou de fora conscientemente.
 
 ## Nota sobre convenção de testes do projeto
 
 `docs/policies/frontend-agent-policy.md` (seção 13) define a stack oficial de
 testes como **Vitest + Testing Library + jsdom, com mocks de `fetch`/services**,
 não testes end-to-end contra a API real. A suíte Playwright que criamos é
-complementar a isso, não substitui — ela já provou valor real: achou **5
+complementar a isso, não substitui — ela já provou valor real: achou **12
 bugs reais** que mock nenhum revelaria, porque mock não expõe divergência de
 contrato entre front e back nem lacunas na fonte de dados. Ver lista de bugs
-abaixo.
+abaixo — os últimos 5 (#8 a #12) foram achados escrevendo os testes E2E de
+Relatórios: cada aba menos "Diário" consumia o endpoint errado (array plano
+vs. objeto `{resumo, ...}`) ou um nome de campo errado (`produtoNome` vs.
+`nome`/`nomeProduto`, `total` vs. `valorTotal`), sempre engolido pelo
+`catch (e) { console.error(...) }` genérico da tela — silêncio total pro
+usuário.
 
 - Os hooks corrigidos (`useCaixaState`, `useProductsState`,
   `useCategoriesState`, `useCustomersState`, `useFiadosState`,
-  `useComandasState`) **não ganharam teste unitário Vitest**, que é o que o
-  checklist da própria política pede ("Criar ou ajustar testes quando houver
-  lógica extraída"). Ainda pendente.
+  `useComandasState`) ganharam teste unitário Vitest
+  (`test/hooks-tratamento-erro-vitest`), fechando o item que a política
+  cobra ("Criar ou ajustar testes quando houver lógica extraída").
 - A política (seção 12) já classifica `window.alert()` como "dívida
   temporária" e diz que a direção correta é feedback contextual na tela —
   então os `alert()` que sobraram (guards de comanda vazia/caixa fechado,
@@ -54,11 +60,18 @@ ponta-a-ponta mais críticos. Não é "ou/ou".
 | 5 | `handleSaveEntrada`/`handleSaveAjuste` sem try/catch | Estoque | **Corrigido** |
 | 6 | Editar cliente **direto da lista** não salvava nada — form usava `selectedCustomer` (só populado ao entrar no detalhe) em vez de rastrear o id em edição | Clientes | **Corrigido** |
 | 7 | Filtro "Histórico de Quitados" nunca mostrava nada, pra nenhum cliente — `GET /api/fiados` filtrava no banco só `status == PENDENTE` (`comanda_repository.py list_pendencias`) | Fiado / Pendências | **Corrigido** — backend `feature/fiados-historico-quitados` (novo parâmetro `quitados`) + frontend `bugfix/fiados-historico-quitados` (`fiadosService.ts` busca abertos e quitados juntos) |
+| 8 | `fetchStockReport` (aba Alerta de Estoque) esperava um array plano; `/relatorios/estoque` retorna `{resumo, baixo, negativo}`, e o campo de nome do produto é `nome`, não `produtoNome` — `.map()` estourava e a tela sempre mostrava "Relatório Vazio" | Relatórios | **Corrigido** |
+| 9 | `fetchBestSellingProducts` (aba Produtos Vendidos) usava `item.produtoNome`; o campo real do backend é `nomeProduto` — nome do produto sempre em branco na tabela | Relatórios | **Corrigido** |
+| 10 | `fetchConsumedStockReport` (aba Estoque Consumido) usava `item.produtoNome`; o campo real é `nome` — mesmo sintoma do #9 | Relatórios | **Corrigido** |
+| 11 | `fetchFiadosReport` (aba Inadimplência/Fiados) esperava array plano com campos `clienteNome`/`status`/`abertaEm` que não existem; `/relatorios/fiados` retorna `{resumo, pendencias}` com `nomeExibicao`/`pendenteEm` — aba sempre vazia | Relatórios | **Corrigido** |
+| 12 | `fetchCommandasReport` (aba Comandas) esperava array plano e campo `total`; `/relatorios/comandas` retorna `{resumo, porStatus}` com campo `valorTotal` — aba sempre vazia | Relatórios | **Corrigido** |
 
 Branches: `bugfix/comandas-checkout-erro-silencioso` (#1, #2),
 `bugfix/tratamento-erro-crud-caixa-produtos-clientes-fiados` (#4),
 `bugfix/comandas-criar-cancelar-alterar-item-erro-silencioso` (#3, e o #6
-está no commit de testes junto com o Clientes).
+está no commit de testes junto com o Clientes), `bugfix/fiados-historico-
+quitados` (#7, PR aberta), `test/e2e-estoque-relatorios-configuracoes`
+(#8–#12).
 
 ## Legenda
 
@@ -114,9 +127,9 @@ está no commit de testes junto com o Clientes).
 
 | Fluxo | Status | Observações |
 |---|---|---|
-| Entrada de estoque | ❌ | |
-| Ajuste manual de estoque | ❌ | |
-| Histórico de movimentações por produto | ❌ | |
+| Entrada de estoque | ✅ | |
+| Ajuste manual de estoque | ✅ | |
+| Histórico de movimentações por produto | ✅ | |
 | Filtros | ❌ | Bug de erro silencioso já corrigido (#5), mas sem teste E2E ainda |
 
 ## 5. Comandas (POS)
@@ -158,25 +171,30 @@ está no commit de testes junto com o Clientes).
 | Quitar — valor não corresponde à soma exata (pagamento parcial, API não suporta) | ✅ | |
 | Quitar — valor maior que o saldo devedor | ✅ | |
 | Filtro — "Apenas vencidos" | ❌ | Precisa manipular data de vencimento, não testado |
-| Filtro — "Histórico de quitados" | ✅ | Bug #7 corrigido + testado |
+| Filtro — "Histórico de quitados" | ✅ | Bug #7 corrigido; `fiados-fluxos.spec.ts` cobre o fluxo real (quitar → aparece no histórico) |
 | Quitar — caixa fechado bloqueando pagamento em dinheiro | ❌ | |
 
 ## 8. Relatórios
 
 | Fluxo | Status | Observações |
 |---|---|---|
-| Todas as 6 abas (Diário, Produtos, Fiados, Estoque, Consumido, Comandas) | ❌ | Nenhuma testada |
-| Filtro de período | ❌ | |
-| Falha ao carregar relatório só loga `console.error`, sem feedback na tela | ❌🐛 | Não corrigido, severidade baixa (tela read-only) |
+| Aba Diário Operacional | ✅ | |
+| Aba Produtos Mais Vendidos | ✅ | Achou e corrigiu bug #9 (`nomeProduto`) |
+| Aba Alerta de Estoque | ✅ | Achou e corrigiu bug #8 (shape do endpoint) |
+| Aba Estoque Consumido | ✅ | Achou e corrigiu bug #10 (`nome`) |
+| Aba Inadimplência / Fiados | ✅ | Achou e corrigiu bug #11 (shape + campos do endpoint) |
+| Aba Comandas | ✅ | Achou e corrigiu bug #12 (`valorTotal`) |
+| Filtro de período | ✅ | Smoke test — troca o período e a tela não quebra |
+| Falha ao carregar relatório só loga `console.error`, sem feedback na tela | ❌🐛 | Não corrigido, severidade baixa (tela read-only). Foi o motivo dos bugs #8–#12 passarem despercebidos até agora — vale trocar por um `InlineFeedback` de erro |
 
 ## 9. Configurações
 
 | Fluxo | Status | Observações |
 |---|---|---|
-| Salvar configurações gerais | ❌ | Já tem tratamento de erro correto no código (bom exemplo, não precisou de fix) |
-| Trocar senha | ❌ | |
-| Backup (exportar/importar) | ❌ | |
-| Redefinir sessão | ❌ | |
+| Salvar configurações gerais | ✅ | Nome, estoque negativo, dias de alerta — persiste após reload |
+| Trocar senha | ✅ | Sucesso + senha atual incorreta (erro tratado) |
+| Backup (exportar/importar) | ⚠️ | Import é um stub proposital (`useBackupState.importBackup` sempre retorna "não suportado enquanto usa API real") — não há feature real pra testar. Export usa clipboard, não coberto por depender de permissão de browser |
+| Redefinir sessão | ✅ | Confirma dialog, encerra sessão, volta pro login |
 
 ## 10. Dashboard
 
@@ -186,15 +204,13 @@ Só navegação e visão geral — baixa prioridade para E2E.
 
 ## O que ainda falta (nesta ordem de prioridade)
 
-1. **Vitest unitário** para os 6 hooks corrigidos nesta sessão (checklist da
-   política do projeto pede isso pra qualquer lógica extraída/alterada).
-2. Estoque: nenhum fluxo testado ainda (entrada, ajuste, histórico).
-3. Relatórios: pelo menos 1 asserção por aba.
-4. Configurações: salvar config, trocar senha, backup.
-5. Validações negativas restantes: login com senha errada, setup com senha
+1. Trocar o `catch (e) { console.error(...) }` genérico de `Relatorios.tsx`
+   por um `InlineFeedback` de erro — é o motivo dos bugs #8–#12 terem ficado
+   invisíveis pro usuário (tela real, não só teste).
+2. Validações negativas restantes: login com senha errada, setup com senha
    curta, ativar/inativar categoria, filtros de listagem em geral, remover
    item de comanda, editar/remover componente de produto composto.
-6. Estabilidade: ao rodar a suíte completa localmente em sessão headed muito
+3. Estabilidade: ao rodar a suíte completa localmente em sessão headed muito
    longa (30+ testes seguidos), houve uma falha ambiental pontual (browser
    fechou sozinho) sempre no mesmo teste por posição — não reproduz isolado.
    CI já tem `retries: 1` configurado, o que deve absorver esse tipo de

@@ -9,11 +9,11 @@ import {
 } from '../mappers/reportMapper';
 import type {
   ApiBestSellingProduct,
-  ApiCommandaReportItem,
+  ApiCommandasReportResponse,
   ApiConsumedStockReportItem,
   ApiDailyReport,
-  ApiFiadoReportItem,
-  ApiStockReportItem,
+  ApiFiadosReportResponse,
+  ApiStockReportResponse,
 } from '../types';
 
 type PeriodFilter = {
@@ -59,19 +59,26 @@ export async function fetchFiadosReport(
     clienteId?: string;
   } = {},
 ) {
-  const response = await apiRequest<ApiFiadoReportItem[]>(
+  const response = await apiRequest<ApiFiadosReportResponse>(
     withQuery('/relatorios/fiados', filters),
   );
-  return response.map(mapFiadoReportItem);
+  return response.pendencias.map(mapFiadoReportItem);
 }
 
 export async function fetchStockReport(
   tipo: 'baixo' | 'negativo' | 'todos' = 'todos',
 ) {
-  const response = await apiRequest<ApiStockReportItem[]>(
+  const response = await apiRequest<ApiStockReportResponse>(
     withQuery('/relatorios/estoque', { tipo }),
   );
-  return response.map(mapStockReportItem);
+  const baixo = response.baixo.map((item) => mapStockReportItem(item, 'baixo'));
+  const negativo = response.negativo.map((item) =>
+    mapStockReportItem(item, 'negativo'),
+  );
+
+  if (tipo === 'baixo') return baixo;
+  if (tipo === 'negativo') return negativo;
+  return [...baixo, ...negativo];
 }
 
 export async function fetchConsumedStockReport(filters: PeriodFilter = {}) {
@@ -86,8 +93,8 @@ export async function fetchCommandasReport(
     status?: 'ABERTA' | 'FECHADA' | 'PENDENTE' | 'CANCELADA';
   } = {},
 ) {
-  const response = await apiRequest<ApiCommandaReportItem[]>(
+  const response = await apiRequest<ApiCommandasReportResponse>(
     withQuery('/relatorios/comandas', filters),
   );
-  return response.map(mapCommandaReportItem);
+  return response.porStatus.map(mapCommandaReportItem);
 }

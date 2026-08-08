@@ -32,35 +32,54 @@ export type ApiDailyReport = {
 
 export type ApiBestSellingProduct = {
   produtoId: number | null;
-  produtoNome: string;
-  categoriaNome?: string | null;
+  nomeProduto: string;
   quantidadeVendida: string | number;
   valorTotal: string | number;
+  quantidadeComandas?: number | null;
 };
 
 export type ApiFiadoReportItem = {
   comandaId: number;
-  clienteNome?: string | null;
+  clienteId?: number | null;
+  nomeExibicao: string;
   total: string | number;
-  status: 'PENDENTE' | 'FECHADA';
-  vencida: boolean;
-  abertaEm: string;
   pendenteEm?: string | null;
   vencimentoEm?: string | null;
+  vencida: boolean;
+};
+
+export type ApiFiadosReportResponse = {
+  resumo: {
+    totalPendente: string | number;
+    totalVencido: string | number;
+    totalQuitadoPeriodo: string | number;
+    quantidadePendencias: number;
+    quantidadeVencidas: number;
+  };
+  pendencias: ApiFiadoReportItem[];
 };
 
 export type ApiStockReportItem = {
   produtoId: number;
-  produtoNome: string;
+  nome: string;
   unidadeEstoque: 'UNIDADE' | 'ML';
   quantidadeEstoque: string | number;
   estoqueMinimo: string | number;
-  tipo: 'baixo' | 'negativo';
+};
+
+export type ApiStockReportResponse = {
+  resumo: {
+    produtosControlados?: number | null;
+    produtosComEstoqueBaixo: number;
+    produtosComEstoqueNegativo: number;
+  };
+  baixo: ApiStockReportItem[];
+  negativo: ApiStockReportItem[];
 };
 
 export type ApiConsumedStockReportItem = {
   produtoId: number;
-  produtoNome: string;
+  nome: string;
   unidadeEstoque: 'UNIDADE' | 'ML';
   quantidadeConsumida: string | number;
 };
@@ -68,7 +87,12 @@ export type ApiConsumedStockReportItem = {
 export type ApiCommandaReportItem = {
   status: 'ABERTA' | 'FECHADA' | 'PENDENTE' | 'CANCELADA';
   quantidade: number;
-  total: string | number;
+  valorTotal: string | number;
+};
+
+export type ApiCommandasReportResponse = {
+  resumo: unknown;
+  porStatus: ApiCommandaReportItem[];
 };
 
 export type DailyReport = {
@@ -112,9 +136,8 @@ export type FiadoReportItem = {
   comandaId: string;
   customerName: string;
   total: number;
-  status: 'PENDENTE' | 'FECHADA';
   overdue: boolean;
-  openedAt: string;
+  pendenteEm: string;
   dueDate?: string;
 };
 
