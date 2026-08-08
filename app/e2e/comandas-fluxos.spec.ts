@@ -141,3 +141,55 @@ test('incrementa e decrementa a quantidade de um item na comanda', async ({
     timeout: 10_000,
   });
 });
+
+test('remove um item da comanda pelo ícone de lixeira', async ({ page }) => {
+  const runId = Date.now().toString(36);
+  await apiAbrirCaixa();
+  const { produto } = await apiSetupProdutoUnico(runId);
+  const comanda = await apiCriarComanda(`Comanda Trash ${runId}`);
+  await apiAdicionarItem(comanda.id, produto.id, 2);
+
+  await loginUI(page, SENHA);
+  await page.locator('#nav-link-comandas').click();
+  await page
+    .locator('tr', { hasText: `Comanda Trash ${runId}` })
+    .getByRole('button', { name: 'Abrir' })
+    .click();
+
+  const itemRow = page.locator('div.rounded-lg.p-3.flex', {
+    hasText: `Produto E2E ${runId}`,
+  });
+  await expect(itemRow).toBeVisible({ timeout: 10_000 });
+
+  page.once('dialog', (dialog) => dialog.accept());
+  await itemRow.locator('button').nth(2).click();
+
+  await expect(page.getByText(`Produto E2E ${runId}`)).toHaveCount(0);
+});
+
+test('remove um item decrementando a quantidade até 0 (com confirmação)', async ({
+  page,
+}) => {
+  const runId = Date.now().toString(36);
+  await apiAbrirCaixa();
+  const { produto } = await apiSetupProdutoUnico(runId);
+  const comanda = await apiCriarComanda(`Comanda Zero ${runId}`);
+  await apiAdicionarItem(comanda.id, produto.id, 1);
+
+  await loginUI(page, SENHA);
+  await page.locator('#nav-link-comandas').click();
+  await page
+    .locator('tr', { hasText: `Comanda Zero ${runId}` })
+    .getByRole('button', { name: 'Abrir' })
+    .click();
+
+  const itemRow = page.locator('div.rounded-lg.p-3.flex', {
+    hasText: `Produto E2E ${runId}`,
+  });
+  await expect(itemRow).toBeVisible({ timeout: 10_000 });
+
+  page.once('dialog', (dialog) => dialog.accept());
+  await itemRow.locator('button').nth(0).click();
+
+  await expect(page.getByText(`Produto E2E ${runId}`)).toHaveCount(0);
+});

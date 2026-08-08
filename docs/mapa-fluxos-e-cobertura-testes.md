@@ -8,10 +8,13 @@ MVP validado para deploy real no bar. Lista todo módulo, todo fluxo de uso
 
 **Atualização:** a cobertura E2E saiu de ~10% (um caminho por tela) pra cobrir
 a maioria dos fluxos de negócio críticos — pagamentos em todas as formas,
-bloqueios de regra de negócio, produto composto, CRUD completo de produtos/
-categorias/clientes, fiado, estoque, todas as 6 abas de Relatórios e
-Configurações (salvar config/trocar senha/redefinir sessão). Ver seção "O que
-ainda falta" pro que ficou de fora conscientemente.
+bloqueios de regra de negócio, produto composto (incluindo editar/remover
+componente), CRUD completo de produtos/categorias/clientes, fiado, estoque,
+todas as 6 abas de Relatórios e Configurações (salvar config/trocar
+senha/redefinir sessão), filtros de listagem de produtos, remoção de item de
+comanda, e as validações negativas de acesso (login errado, setup de senha
+curta/senhas divergentes). Ver seção "O que ainda falta" pro que ficou de
+fora conscientemente.
 
 ## Nota sobre convenção de testes do projeto
 
@@ -87,9 +90,9 @@ quitados` (#7, PR aberta), `test/e2e-estoque-relatorios-configuracoes`
 |---|---|---|
 | Primeiro acesso — definir senha inicial | ✅ | |
 | Login normal — senha correta | ✅ | |
-| Login — senha inválida | ❌ | Mensagem de erro existe no código, não testada |
-| Setup — senha < 4 caracteres / senhas não coincidem | ❌ | Validação client-side existe, não testada |
-| Trocar senha (em Configurações) | ❌ | |
+| Login — senha inválida | ✅ | Backend rejeita com `senha_invalida`; a tela mostra a mensagem própria da API |
+| Setup — senha < 4 caracteres / senhas não coincidem | ✅ | Validação client-side. Só é alcançável com banco sem senha configurada (num dev DB de sessão longa isso só existe uma vez — testado isoladamente com reset do volume local; roda normal em CI, que sempre sobe com banco novo) |
+| Trocar senha (em Configurações) | ✅ | Ver seção 9 — sucesso + senha atual incorreta |
 | Logout | ❌ | `window.confirm` antes de sair, não testado |
 
 ## 2. Caixa Diário
@@ -113,15 +116,15 @@ quitados` (#7, PR aberta), `test/e2e-estoque-relatorios-configuracoes`
 | Criar categoria | ✅ | |
 | Criar categoria — nome duplicado (deve bloquear com mensagem) | ✅ | |
 | Renomear categoria | ✅ | |
-| Ativar/inativar categoria | ❌ | |
+| Ativar/inativar categoria | ✅ | |
 | Criar produto simples | ✅ | |
 | Editar produto existente | ✅ | |
 | Ativar/inativar produto (toggle na lista) | ✅ | |
 | Criar produto **composto** + adicionar componente na composição | ✅ | Fluxo mais complexo do domínio, coberto |
-| Gerenciar composição — editar/remover componente | ❌ | Só "adicionar" está coberto |
+| Gerenciar composição — editar/remover componente | ✅ | |
 | Restock rápido (botão "+" na listagem) | ❌ | |
 | Composição — validações (componente duplicado, produto conter a si mesmo) | ❌ | |
-| Filtros de listagem (busca, categoria, status, tipo) | ❌ | |
+| Filtros de listagem (busca, categoria, status, tipo) | ✅ | |
 
 ## 4. Estoque
 
@@ -140,7 +143,7 @@ quitados` (#7, PR aberta), `test/e2e-estoque-relatorios-configuracoes`
 | Criar comanda vinculada a cliente já cadastrado | ✅ | Indireto, via `fiados-fluxos.spec.ts`/`clientes-fluxos.spec.ts` |
 | Adicionar item ao carrinho | ✅ | |
 | Incrementar/decrementar quantidade de item | ✅ | |
-| Remover item inteiro (ícone lixeira, decrementar até 0) | ❌ | |
+| Remover item inteiro (ícone lixeira, decrementar até 0) | ✅ | Ambos os caminhos: ícone de lixeira direto e decrementar quantidade até 0 (com confirmação) |
 | Cancelar comanda | ✅ | |
 | Fechar comanda — pagamento **Dinheiro / Pix / Cartão** | ✅ | Todas as 3 formas testadas |
 | Bloqueio — comanda vazia | ✅ | |
@@ -207,9 +210,14 @@ Só navegação e visão geral — baixa prioridade para E2E.
 1. Trocar o `catch (e) { console.error(...) }` genérico de `Relatorios.tsx`
    por um `InlineFeedback` de erro — é o motivo dos bugs #8–#12 terem ficado
    invisíveis pro usuário (tela real, não só teste).
-2. Validações negativas restantes: login com senha errada, setup com senha
-   curta, ativar/inativar categoria, filtros de listagem em geral, remover
-   item de comanda, editar/remover componente de produto composto.
+2. Gaps residuais, baixa prioridade: abrir caixa com presets de valor
+   (50/100/150/200); fechar caixa com comanda **PENDENTE** (deve permitir,
+   só o caso ABERTA-bloqueia está coberto); adicionar item de produto sem
+   estoque (`window.confirm` de aviso); comandas — filtro de listagem por
+   status; fiados — filtro "apenas vencidos" e quitação com caixa fechado
+   bloqueando pagamento em dinheiro; restock rápido (botão "+" na
+   listagem); composição — validações de componente duplicado / produto
+   conter a si mesmo; logout (`window.confirm` antes de sair).
 3. Estabilidade: ao rodar a suíte completa localmente em sessão headed muito
    longa (30+ testes seguidos), houve uma falha ambiental pontual (browser
    fechou sozinho) sempre no mesmo teste por posição — não reproduz isolado.
