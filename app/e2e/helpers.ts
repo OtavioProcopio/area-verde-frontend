@@ -119,10 +119,14 @@ export async function apiCriarComanda(
   });
 }
 
-export async function apiMarcarComoFiado(comandaId: number, clienteId: number) {
+export async function apiMarcarComoFiado(
+  comandaId: number,
+  clienteId: number,
+  vencimentoEm?: string,
+) {
   return api(`/comandas/${comandaId}/fiado`, {
     method: 'POST',
-    body: JSON.stringify({ clienteId }),
+    body: JSON.stringify({ clienteId, vencimentoEm }),
   });
 }
 
