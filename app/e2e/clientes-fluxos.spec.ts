@@ -23,7 +23,13 @@ test('cria um cliente pela tela própria de Clientes', async ({ page }) => {
   await page.getByRole('button', { name: 'Novo Cliente' }).click();
 
   await page.getByPlaceholder('Ex: João Silva').fill(`Cliente Novo ${runId}`);
-  await page.getByPlaceholder('(31) 90000-0000').fill('11988887777');
+  // Telefone precisa variar por execução: o backend bloqueia criação de
+  // cliente com telefone já usado por outro cliente ativo (mesma regra que
+  // bloqueia nome duplicado), então um número fixo passaria só na primeira
+  // vez que este teste rodasse contra um banco de dev persistente.
+  await page
+    .getByPlaceholder('(31) 90000-0000')
+    .fill(`11${Date.now().toString().slice(-9)}`);
   await page.getByRole('button', { name: 'Salvar Cliente' }).click();
 
   // filtra pela busca pra não depender de paginação/ordenação da lista

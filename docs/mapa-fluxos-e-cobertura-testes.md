@@ -218,8 +218,25 @@ Só navegação e visão geral — baixa prioridade para E2E.
    bloqueando pagamento em dinheiro; restock rápido (botão "+" na
    listagem); composição — validações de componente duplicado / produto
    conter a si mesmo; logout (`window.confirm` antes de sair).
-3. Estabilidade: ao rodar a suíte completa localmente em sessão headed muito
-   longa (30+ testes seguidos), houve uma falha ambiental pontual (browser
-   fechou sozinho) sempre no mesmo teste por posição — não reproduz isolado.
-   CI já tem `retries: 1` configurado, o que deve absorver esse tipo de
-   flake; vale confirmar quando rodar em CI de verdade.
+3. **Causa raiz encontrada** pra falha pontual sempre no mesmo teste
+   (`fluxo-atendimento-bar.spec.ts` › "adiciona item na comanda e fecha com
+   pagamento em dinheiro") ao rodar a suíte completa: não é crash de
+   browser — é o seletor de categorias no picker de produtos (Comandas)
+   renderizando **um botão por categoria sem paginação/busca**. Cada
+   arquivo de teste cria categoria(s) via API com nome único e nunca
+   limpa, então numa suíte de 55 testes o picker já tem 35+ botões de
+   categoria por essa altura; combinado com `slowMo: 250` local (headed),
+   a interação fica lenta o suficiente pra estourar o timeout de 30s.
+   Confirmado isolando a variável: com banco resetado, o arquivo sozinho
+   roda em ~20s sem falha; rodando a suíte inteira do zero, a mesma
+   categoria de erro reaparece na mesma posição, porque as 34 categorias
+   criadas pelos testes anteriores já bastam pra pesar o picker. Isso é
+   principalmente um problema de higiene do banco de dev local (nunca
+   resetado nesta sessão) — mas também aponta um gap de UX/performance
+   real: um bar de verdade com muitas categorias cadastradas teria esse
+   mesmo picker pesado. Não corrigido no app (fora de escopo desta
+   rodada); mitigação local: resetar o volume (`docker compose down -v`)
+   antes de rodar a suíte completa. Em CI isso deve incomodar menos —
+   roda headless e sem `slowMo` — mas o crescimento do picker por
+   posição na suíte é o mesmo, então vale monitorar se aparecer lá
+   também.
