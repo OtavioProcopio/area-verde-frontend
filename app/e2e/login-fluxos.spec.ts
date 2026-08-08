@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { apiConfiguracoes, apiSetupSenha } from './helpers';
+import { apiConfiguracoes, apiSetupSenha, loginUI } from './helpers';
 
 const SENHA = 'senha1234';
 
@@ -75,5 +75,25 @@ test('configuração inicial bloqueia senhas que não coincidem', async ({
   await expect(
     page.getByText('As senhas informadas nao coincidem.'),
   ).toBeVisible({ timeout: 10_000 });
+  await expect(page.locator('#nav-link-dashboard')).toHaveCount(0);
+});
+
+test('logout pede confirmação e volta pra tela de acesso', async ({
+  page,
+}) => {
+  await apiSetupSenha(SENHA);
+  await loginUI(page, SENHA);
+
+  // Cancelar a confirmação mantém a sessão logada.
+  page.once('dialog', (dialog) => void dialog.dismiss());
+  await page.getByRole('button', { name: 'Sair' }).click();
+  await expect(page.locator('#nav-link-dashboard')).toBeVisible();
+
+  // Aceitar a confirmação encerra a sessão.
+  page.once('dialog', (dialog) => void dialog.accept());
+  await page.getByRole('button', { name: 'Sair' }).click();
+  await expect(page.getByText('Acesso Restrito')).toBeVisible({
+    timeout: 10_000,
+  });
   await expect(page.locator('#nav-link-dashboard')).toHaveCount(0);
 });
