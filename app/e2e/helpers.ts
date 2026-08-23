@@ -27,7 +27,16 @@ async function api<T = unknown>(
  */
 
 export async function apiConfiguracoes() {
-  return api<{ senhaConfigurada: boolean }>('/configuracoes');
+  return api<{ senhaConfigurada: boolean; permitirEstoqueNegativo: boolean }>(
+    '/configuracoes',
+  );
+}
+
+export async function apiSetPermitirEstoqueNegativo(permitir: boolean) {
+  return api('/configuracoes', {
+    method: 'PATCH',
+    body: JSON.stringify({ permitirEstoqueNegativo: permitir }),
+  });
 }
 
 export async function apiSetupSenha(senha: string) {
@@ -64,13 +73,17 @@ export async function apiFecharCaixa(caixaId: number, dinheiroInformado = 0) {
   });
 }
 
+export async function apiCancelarComanda(comandaId: number) {
+  return api(`/comandas/${comandaId}/cancelar`, { method: 'PATCH' });
+}
+
 /** Cancela toda comanda ABERTA (deixada por um teste anterior, ex: os que
  * validam o bloqueio de fechamento de caixa), pra não travar o setup dos
  * testes seguintes. */
 export async function apiCancelarComandasAbertas() {
   const abertas = await api<Array<{ id: number }>>('/comandas/abertas');
   for (const comanda of abertas) {
-    await api(`/comandas/${comanda.id}/cancelar`, { method: 'PATCH' });
+    await apiCancelarComanda(comanda.id);
   }
 }
 
@@ -119,10 +132,14 @@ export async function apiCriarComanda(
   });
 }
 
-export async function apiMarcarComoFiado(comandaId: number, clienteId: number) {
+export async function apiMarcarComoFiado(
+  comandaId: number,
+  clienteId: number,
+  vencimentoEm?: string,
+) {
   return api(`/comandas/${comandaId}/fiado`, {
     method: 'POST',
-    body: JSON.stringify({ clienteId }),
+    body: JSON.stringify({ clienteId, vencimentoEm }),
   });
 }
 

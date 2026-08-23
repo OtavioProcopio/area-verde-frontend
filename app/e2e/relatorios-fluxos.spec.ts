@@ -192,3 +192,25 @@ test('troca o filtro de período sem quebrar a tela', async ({ page }) => {
     timeout: 10_000,
   });
 });
+
+test('mostra feedback de erro quando o relatório falha ao carregar', async ({
+  page,
+}) => {
+  await loginUI(page, SENHA);
+
+  await page.route('**/api/relatorios/diario**', (route) =>
+    route.fulfill({
+      status: 500,
+      contentType: 'application/json',
+      body: JSON.stringify({ message: 'Erro interno ao gerar relatório' }),
+    }),
+  );
+
+  await page.locator('#nav-link-relatorios').click();
+
+  await expect(
+    page.getByText('Erro interno ao gerar relatório'),
+  ).toBeVisible({ timeout: 10_000 });
+  // A tela não mostra dados velhos/parciais quando o load falha.
+  await expect(page.getByText('Total Vendido')).toHaveCount(0);
+});

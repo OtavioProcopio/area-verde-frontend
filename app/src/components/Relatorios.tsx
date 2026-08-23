@@ -29,6 +29,8 @@ import type {
   ConsumedStockReportItem,
   CommandaReportItem,
 } from '../features/relatorios/types';
+import { InlineFeedback } from '../features/shared/components/InlineFeedback';
+import { getApiErrorMessage } from '../features/shared/utils/getApiErrorMessage';
 
 interface RelatoriosProps {
   products: Product[];
@@ -56,6 +58,7 @@ export default function Relatorios({
 
   // States for API data
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [dailyReport, setDailyReport] = useState<DailyReport | null>(null);
   const [bestSelling, setBestSelling] = useState<BestSellingProduct[]>([]);
   const [fiados, setFiados] = useState<FiadoReportItem[]>([]);
@@ -119,6 +122,7 @@ export default function Relatorios({
   useEffect(() => {
     async function loadData() {
       setLoading(true);
+      setError(null);
       try {
         const { dataInicio, dataFim, data } = getPeriodFilter();
 
@@ -142,7 +146,9 @@ export default function Relatorios({
           setCommandasReport(res);
         }
       } catch (e) {
-        console.error('Failed to load report data', e);
+        setError(
+          getApiErrorMessage(e, 'Não foi possível carregar este relatório.'),
+        );
       } finally {
         setLoading(false);
       }
@@ -489,13 +495,15 @@ export default function Relatorios({
         ))}
       </div>
 
+      {error && <InlineFeedback tone="error" message={error} />}
+
       <div className="pt-2">
-        {activeTab === 'diario' && renderDiario()}
-        {activeTab === 'produtos' && renderProdutos()}
-        {activeTab === 'fiados' && renderFiados()}
-        {activeTab === 'estoque' && renderEstoque()}
-        {activeTab === 'consumido' && renderEstoqueConsumido()}
-        {activeTab === 'comandas' && renderComandas()}
+        {!error && activeTab === 'diario' && renderDiario()}
+        {!error && activeTab === 'produtos' && renderProdutos()}
+        {!error && activeTab === 'fiados' && renderFiados()}
+        {!error && activeTab === 'estoque' && renderEstoque()}
+        {!error && activeTab === 'consumido' && renderEstoqueConsumido()}
+        {!error && activeTab === 'comandas' && renderComandas()}
       </div>
     </div>
   );

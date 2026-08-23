@@ -3,10 +3,12 @@ import {
   apiAbrirCaixa,
   apiAdicionarItem,
   apiCaixaAberto,
+  apiCancelarComanda,
   apiCriarCategoria,
   apiCriarComanda,
   apiCriarProdutoSimples,
   apiFecharCaixaForcado,
+  apiSetPermitirEstoqueNegativo,
   apiSetupProdutoUnico,
   apiSetupSenha,
   loginUI,
@@ -243,4 +245,122 @@ test('picker de produtos limita a grade quando o catálogo é grande', async ({
   await expect(
     page.getByRole('button', { name: alvo }).first(),
   ).toBeVisible({ timeout: 10_000 });
+});
+
+test('adicionar produto com estoque zerado avisa com confirm antes de lançar', async ({
+  page,
+}) => {
+  const runId = Date.now().toString(36);
+  await apiAbrirCaixa();
+  // Precisa que a config permita estoque negativo (senão o picker desabilita
+  // o produto de propósito, ver teste de bloqueio no arquivo de config).
+  await apiSetPermitirEstoqueNegativo(true);
+  const categoria = await apiCriarCategoria(`Categoria Zerado ${runId}`);
+  await apiCriarProdutoSimples({
+    nome: `Produto Zerado ${runId}`,
+    categoriaId: categoria.id,
+    precoVenda: 10,
+    quantidadeEstoque: 0,
+  });
+  const comanda = await apiCriarComanda(`Comanda Estoque Zero ${runId}`);
+
+  await loginUI(page, SENHA);
+  await page.locator('#nav-link-comandas').click();
+  await page
+    .locator('tr', { hasText: `Comanda Estoque Zero ${runId}` })
+    .getByRole('button', { name: 'Abrir' })
+    .click();
+
+  await page.getByRole('button', { name: 'Tudo', exact: true }).click();
+  await page
+    .getByPlaceholder('Ex: Skol')
+    .fill(`Produto Zerado ${runId}`);
+
+  let message = '';
+  page.once('dialog', (dialog) => {
+    message = dialog.message();
+    void dialog.accept();
+  });
+  await page
+    .getByRole('button', { name: `Produto Zerado ${runId}` })
+    .first()
+    .click();
+  await expect.poll(() => message, { timeout: 10_000 }).not.toBe('');
+  expect(message.toLowerCase()).toContain('estoque zerado');
+
+  const itemRow = page.locator('div.rounded-lg.p-3.flex', {
+    hasText: `Produto Zerado ${runId}`,
+  });
+  await expect(itemRow).toBeVisible({ timeout: 10_000 });
+});
+
+test('produto com estoque zerado fica bloqueado quando a config não permite estoque negativo', async ({
+  page,
+}) => {
+  const runId = Date.now().toString(36);
+  await apiAbrirCaixa();
+  await apiSetPermitirEstoqueNegativo(false);
+  const categoria = await apiCriarCategoria(`Categoria Bloq ${runId}`);
+  await apiCriarProdutoSimples({
+    nome: `Produto Bloqueado ${runId}`,
+    categoriaId: categoria.id,
+    precoVenda: 10,
+    quantidadeEstoque: 0,
+  });
+  await apiCriarComanda(`Comanda Estoque Bloq ${runId}`);
+
+  await loginUI(page, SENHA);
+  await page.locator('#nav-link-comandas').click();
+  await page
+    .locator('tr', { hasText: `Comanda Estoque Bloq ${runId}` })
+    .getByRole('button', { name: 'Abrir' })
+    .click();
+
+  await page.getByRole('button', { name: 'Tudo', exact: true }).click();
+  await page
+    .getByPlaceholder('Ex: Skol')
+    .fill(`Produto Bloqueado ${runId}`);
+
+  await expect(
+    page.getByRole('button', { name: `Produto Bloqueado ${runId}` }).first(),
+  ).toBeDisabled();
+
+  await apiSetPermitirEstoqueNegativo(true);
+});
+
+test('filtra a lista de comandas por status', async ({ page }) => {
+  const runId = Date.now().toString(36);
+  await apiAbrirCaixa();
+  const comandaAberta = await apiCriarComanda(`Comanda Aberta ${runId}`);
+  const comandaCancelada = await apiCriarComanda(
+    `Comanda Cancelada ${runId}`,
+  );
+  await apiCancelarComanda(comandaCancelada.id);
+  void comandaAberta;
+
+  await loginUI(page, SENHA);
+  await page.locator('#nav-link-comandas').click();
+
+  await expect(
+    page.getByText(`Comanda Aberta ${runId}`),
+  ).toBeVisible({ timeout: 10_000 });
+  await expect(
+    page.getByText(`Comanda Cancelada ${runId}`),
+  ).toBeVisible();
+
+  await page.getByRole('button', { name: 'Canceladas' }).click();
+  await expect(
+    page.getByText(`Comanda Cancelada ${runId}`),
+  ).toBeVisible({ timeout: 10_000 });
+  await expect(
+    page.getByText(`Comanda Aberta ${runId}`),
+  ).toHaveCount(0);
+
+  await page.getByRole('button', { name: 'Abertas' }).click();
+  await expect(
+    page.getByText(`Comanda Aberta ${runId}`),
+  ).toBeVisible({ timeout: 10_000 });
+  await expect(
+    page.getByText(`Comanda Cancelada ${runId}`),
+  ).toHaveCount(0);
 });

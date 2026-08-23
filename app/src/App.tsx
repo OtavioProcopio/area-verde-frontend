@@ -346,6 +346,9 @@ export default function App() {
                     categories={categories}
                     customers={customers}
                     caixaIsOpen={caixa.isOpen}
+                    permitirEstoqueNegativo={
+                      configuracao?.permitirEstoqueNegativo ?? false
+                    }
                     onAddComanda={addComanda}
                     onUpdateComanda={(id, updates) => {
                       const c = comandas.find((com) => com.id === id);
@@ -389,6 +392,7 @@ export default function App() {
                     onDeleteProduct={deleteProduct}
                     onAddCategory={addCategory}
                     onUpdateCategory={updateCategory}
+                    onRefreshState={refreshState}
                   />
                 )}
 

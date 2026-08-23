@@ -19,6 +19,8 @@ import {
   XCircle,
 } from 'lucide-react';
 import { InlineFeedback } from '../features/shared/components/InlineFeedback';
+import { createStockEntry } from '../features/estoque/services/estoqueService';
+import { getApiErrorMessage } from '../features/shared/utils/getApiErrorMessage';
 
 type OperationResult = { success: boolean; msg: string };
 
@@ -30,6 +32,7 @@ interface ProdutosProps {
   onDeleteProduct: (id: string) => void;
   onAddCategory: (name: string) => Promise<OperationResult>;
   onUpdateCategory: (c: Category) => Promise<OperationResult>;
+  onRefreshState: () => Promise<void>;
 }
 
 export default function Produtos({
@@ -40,6 +43,7 @@ export default function Produtos({
   onDeleteProduct,
   onAddCategory,
   onUpdateCategory,
+  onRefreshState,
 }: ProdutosProps) {
   const [activeTab, setActiveTab] = useState<
     'produtos' | 'categorias' | 'composicao'
@@ -211,13 +215,15 @@ export default function Produtos({
     setRecipe(recipe.filter((item) => item.ingredientId !== ingredientId));
   };
 
-  const handleQuickRestock = (productId: string, amount: number) => {
-    const prod = products.find((p) => p.id === productId);
-    if (!prod) return;
-    onUpdateProduct({
-      ...prod,
-      stock: Number((prod.stock + amount).toFixed(2)),
-    });
+  const handleQuickRestock = async (productId: string, amount: number) => {
+    try {
+      await createStockEntry(productId, amount, 'Restock rápido');
+      await onRefreshState();
+    } catch (error) {
+      window.alert(
+        getApiErrorMessage(error, 'Não foi possível registrar a entrada.'),
+      );
+    }
   };
 
   const handleToggleProductStatus = (p: Product) => {
@@ -614,7 +620,7 @@ export default function Produtos({
                                 />
                                 <button
                                   onClick={() =>
-                                    handleQuickRestock(
+                                    void handleQuickRestock(
                                       p.id,
                                       parseFloat(quickRestockAmount) || 12,
                                     )
