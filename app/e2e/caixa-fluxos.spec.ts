@@ -1,9 +1,13 @@
 import { test, expect } from '@playwright/test';
 import {
   apiAbrirCaixa,
+  apiAdicionarItem,
   apiCaixaAberto,
+  apiCriarCliente,
   apiCriarComanda,
   apiFecharCaixaForcado,
+  apiMarcarComoFiado,
+  apiSetupProdutoUnico,
   apiSetupSenha,
   loginUI,
 } from './helpers';
@@ -33,6 +37,50 @@ test('bloqueia fechar o caixa com uma comanda aberta', async ({ page }) => {
   ).toBeVisible({ timeout: 10_000 });
   // continua aberto
   await expect(page.locator('#state-caixa-aberto-container')).toBeVisible();
+});
+
+test('abre o caixa usando um preset de valor', async ({ page }) => {
+  await loginUI(page, SENHA);
+  await page.locator('#nav-link-caixa').click();
+  await page.locator('#btn-open-abertura-modal').click();
+
+  await page.getByRole('button', { name: 'R$ 100,00' }).click();
+  await expect(page.getByTestId('caixa-valor-inicial-input')).toHaveValue(
+    '100.00',
+  );
+
+  await page.getByRole('button', { name: 'Confirmar Abertura' }).click();
+
+  await expect(page.locator('#state-caixa-aberto-container')).toBeVisible({
+    timeout: 10_000,
+  });
+  await expect(page.getByText('R$ 100,00').first()).toBeVisible();
+});
+
+test('fecha o caixa com uma comanda PENDENTE (fiado) — deve permitir', async ({
+  page,
+}) => {
+  const runId = Date.now().toString(36);
+  await apiAbrirCaixa(200);
+  const { produto } = await apiSetupProdutoUnico(runId);
+  const cliente = await apiCriarCliente({ nome: `Cliente Fiado Caixa ${runId}` });
+  const comanda = await apiCriarComanda(
+    `Comanda Fiado Caixa ${runId}`,
+    cliente.id,
+  );
+  await apiAdicionarItem(comanda.id, produto.id, 1);
+  await apiMarcarComoFiado(comanda.id, cliente.id);
+
+  await loginUI(page, SENHA);
+  await page.locator('#nav-link-caixa').click();
+  await page.locator('#btn-fechar-trigger').click();
+  await page
+    .getByRole('button', { name: 'Fechar Caixa Operativo' })
+    .click();
+
+  await expect(page.locator('#state-caixa-fechado-card')).toBeVisible({
+    timeout: 10_000,
+  });
 });
 
 test('registra um reforço (suprimento) no caixa aberto', async ({ page }) => {
