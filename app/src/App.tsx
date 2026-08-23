@@ -389,6 +389,7 @@ export default function App() {
                     onDeleteProduct={deleteProduct}
                     onAddCategory={addCategory}
                     onUpdateCategory={updateCategory}
+                    onRefreshState={refreshState}
                   />
                 )}
 

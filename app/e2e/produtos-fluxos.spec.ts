@@ -275,6 +275,114 @@ test('filtra produtos por busca, categoria, tipo e status', async ({
   ).toHaveCount(0);
 });
 
+test('restock rápido registra uma entrada de estoque auditável', async ({
+  page,
+}) => {
+  const runId = Date.now().toString(36);
+  const categoria = await apiCriarCategoria(`Categoria Restock ${runId}`);
+  await apiCriarProdutoSimples({
+    nome: `Produto Restock ${runId}`,
+    categoriaId: categoria.id,
+    precoVenda: 10,
+    quantidadeEstoque: 20,
+  });
+
+  await loginUI(page, SENHA);
+  await page.locator('#nav-link-produtos').click();
+
+  const row = page.locator('tr', { hasText: `Produto Restock ${runId}` });
+  await row.locator('input[type="number"]').fill('7');
+  await row.getByRole('button', { name: '+', exact: true }).click();
+
+  await expect(row.getByText('27', { exact: true })).toBeVisible({
+    timeout: 10_000,
+  });
+
+  // O restock rápido precisa criar um movimento de estoque de verdade
+  // (não só sobrescrever o saldo direto no produto), senão o extrato de
+  // estoque não bate com o histórico real.
+  await page.locator('#nav-link-estoque').click();
+  const estoqueRow = page.locator('tr', {
+    hasText: `Produto Restock ${runId}`,
+  });
+  await estoqueRow.getByTitle('Histórico').click();
+  await expect(page.getByText('Extrato de Estoque')).toBeVisible({
+    timeout: 10_000,
+  });
+  await expect(page.getByText('Restock rápido')).toBeVisible();
+});
+
+test('bloqueia adicionar o mesmo componente duas vezes na composição', async ({
+  page,
+}) => {
+  const runId = Date.now().toString(36);
+  const categoria = await apiCriarCategoria(`Categoria Dup ${runId}`);
+  await apiCriarProdutoSimples({
+    nome: `Gelo E2E ${runId}`,
+    categoriaId: categoria.id,
+    precoVenda: 2,
+    quantidadeEstoque: 100,
+  });
+
+  await loginUI(page, SENHA);
+  await page.locator('#nav-link-produtos').click();
+  await page.getByRole('button', { name: 'Novo Produto' }).click();
+
+  await page
+    .getByTestId('produto-nome-input')
+    .fill(`Drink Dup E2E ${runId}`);
+  await page
+    .getByTestId('produto-categoria-select')
+    .selectOption({ label: `Categoria Dup ${runId}` });
+  await page.getByTestId('produto-preco-venda-input').fill('12.00');
+  await page.locator('#checkbox-is-composite').check();
+  await page.getByRole('button', { name: 'Salvar Ficha' }).click();
+
+  await expect(page.getByText(`Drink Dup E2E ${runId}`)).toBeVisible({
+    timeout: 10_000,
+  });
+  await page
+    .locator('tr', { hasText: `Drink Dup E2E ${runId}` })
+    .getByRole('button', { name: 'Gerenciar Composição' })
+    .click();
+
+  await page.getByRole('button', { name: 'Adicionar Componente' }).click();
+  await page
+    .locator('form')
+    .filter({ hasText: 'Insumo Físico' })
+    .locator('select')
+    .selectOption({ label: `Gelo E2E ${runId}` });
+  await page.getByPlaceholder('Ex: 50').fill('0.1');
+  await page.getByRole('button', { name: 'Salvar Componente' }).click();
+  await expect(page.getByText(`Gelo E2E ${runId}`)).toBeVisible({
+    timeout: 10_000,
+  });
+
+  // Tenta adicionar o mesmo insumo de novo.
+  await page.getByRole('button', { name: 'Adicionar Componente' }).click();
+  await page
+    .locator('form')
+    .filter({ hasText: 'Insumo Físico' })
+    .locator('select')
+    .selectOption({ label: `Gelo E2E ${runId}` });
+  await page.getByPlaceholder('Ex: 50').fill('0.2');
+
+  let message = '';
+  page.once('dialog', (dialog) => {
+    message = dialog.message();
+    void dialog.accept();
+  });
+  await page.getByRole('button', { name: 'Salvar Componente' }).click();
+  await expect.poll(() => message, { timeout: 10_000 }).not.toBe('');
+  expect(message.toLowerCase()).toContain('já está na receita');
+
+  // continua com um único componente na lista (0.1, não duplicado nem
+  // sobrescrito pra 0.2)
+  await expect(
+    page.locator('tr', { hasText: `Gelo E2E ${runId}` }),
+  ).toHaveCount(1);
+});
+
 test('renomeia uma categoria existente', async ({ page }) => {
   const runId = Date.now().toString(36);
   await apiCriarCategoria(`Categoria Renomear ${runId}`);
