@@ -70,16 +70,16 @@ export default function Estoque({
     if (p.stock <= 0)
       return {
         label: 'Negativo/Zerado',
-        color: 'bg-rose-950/40 text-rose-400 border-rose-800/60',
+        color: 'bg-rose-50 text-rose-700 border-rose-200',
       };
     if (p.stock <= p.minStock)
       return {
         label: 'Baixo',
-        color: 'bg-amber-950/40 text-amber-400 border-amber-800/60',
+        color: 'bg-amber-50 text-amber-700 border-amber-200',
       };
     return {
       label: 'Normal',
-      color: 'bg-emerald-950/40 text-emerald-400 border-emerald-800/60',
+      color: 'bg-emerald-50 text-emerald-700 border-emerald-200',
     };
   };
 
@@ -156,18 +156,7 @@ export default function Estoque({
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <span className="text-xs uppercase tracking-widest font-mono text-blue-500 font-semibold block mb-1">
-            Controle de Inventário
-          </span>
-          <h2 className="text-3xl font-display font-bold text-slate-50 tracking-tight">
-            Gestão de <span className="text-blue-500 font-bold">Estoque</span>
-          </h2>
-        </div>
-      </div>
-
-      <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-sm flex flex-col xl:flex-row gap-4 justify-between">
+      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col xl:flex-row gap-4 justify-between">
         <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-3 gap-3">
           <div className="relative">
             <Search
@@ -177,14 +166,14 @@ export default function Estoque({
             <input
               type="text"
               placeholder="Buscar produto..."
-              className="w-full pl-9 pr-3 py-2 bg-slate-800/50 border border-slate-800 rounded-xl text-xs outline-none focus:border-blue-500"
+              className="w-full pl-9 pr-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-400"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
 
           <select
-            className="w-full px-3 py-2 bg-slate-800/50 border border-slate-800 rounded-xl text-xs outline-none focus:border-blue-500 cursor-pointer appearance-none text-slate-300 font-bold"
+            className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-400 cursor-pointer appearance-none text-slate-600 font-bold"
             value={filterType}
             onChange={(e) => setFilterType(e.target.value as any)}
           >
@@ -195,7 +184,7 @@ export default function Estoque({
           </select>
 
           <select
-            className="w-full px-3 py-2 bg-slate-800/50 border border-slate-800 rounded-xl text-xs outline-none focus:border-blue-500 cursor-pointer appearance-none text-slate-300"
+            className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-400 cursor-pointer appearance-none text-slate-600"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
@@ -209,11 +198,11 @@ export default function Estoque({
         </div>
       </div>
 
-      <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-sm">
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse leading-normal text-xs text-slate-300">
+          <table className="w-full text-left border-collapse leading-normal text-xs text-slate-600">
             <thead>
-              <tr className="border-b border-slate-800 text-[10px] uppercase font-mono tracking-wider text-slate-500 bg-slate-800/50">
+              <tr className="border-b border-slate-200 text-[11px] uppercase font-mono tracking-wider text-slate-500 bg-slate-100">
                 <th className="px-5 py-3">Produto</th>
                 <th className="px-4 py-3 text-center">Unidade</th>
                 <th className="px-5 py-3 text-right">Saldo Atual</th>
@@ -222,28 +211,28 @@ export default function Estoque({
                 <th className="px-5 py-3 text-right">Ações</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-200">
               {filteredProducts.map((p) => {
                 const status = getStockStatus(p);
                 return (
                   <tr
                     key={p.id}
-                    className="hover:bg-slate-800/50/80 transition duration-150"
+                    className="hover:bg-slate-100/80 transition duration-150"
                   >
                     <td className="px-5 py-3">
-                      <span className="font-bold text-slate-200 block">
+                      <span className="font-bold text-slate-700 block">
                         {p.name}
                       </span>
-                      <span className="text-[10px] text-slate-500 font-mono uppercase">
+                      <span className="text-[11px] text-slate-500 font-mono uppercase">
                         {p.category}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-center font-mono font-bold text-slate-500 bg-slate-800/50/30">
+                    <td className="px-4 py-3 text-center font-mono font-bold text-slate-500 bg-slate-100/30">
                       {p.unit.toUpperCase()}
                     </td>
                     <td className="px-5 py-3 text-right">
                       <span
-                        className={`font-mono text-sm font-black ${p.stock <= p.minStock ? 'text-rose-500' : 'text-slate-200'}`}
+                        className={`font-mono text-sm font-black ${p.stock <= p.minStock ? 'text-rose-600' : 'text-slate-700'}`}
                       >
                         {p.stock}
                       </span>
@@ -253,7 +242,7 @@ export default function Estoque({
                     </td>
                     <td className="px-4 py-3 text-center">
                       <span
-                        className={`px-2 py-0.5 rounded text-[9px] uppercase font-bold font-mono border ${status.color}`}
+                        className={`px-2 py-0.5 rounded text-[11px] uppercase font-bold font-mono border ${status.color}`}
                       >
                         {status.label}
                       </span>
@@ -262,21 +251,21 @@ export default function Estoque({
                       <div className="flex items-center justify-end gap-1.5 inline-flex">
                         <button
                           onClick={() => openEntrada(p)}
-                          className="px-2 py-1 flex items-center gap-1 bg-emerald-950/40 hover:bg-emerald-900/50 text-emerald-400 border border-emerald-800/60 rounded transition cursor-pointer font-bold text-[10px] uppercase"
+                          className="px-2 py-1 flex items-center gap-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded transition cursor-pointer font-bold text-[11px] uppercase"
                           title="Dar Entrada"
                         >
                           <ArrowDownToLine size={12} /> Entrar
                         </button>
                         <button
                           onClick={() => openAjuste(p)}
-                          className="px-2 py-1 flex items-center gap-1 bg-slate-800/50 hover:bg-slate-800 text-slate-500 border border-slate-800 rounded transition cursor-pointer font-bold text-[10px] uppercase"
+                          className="px-2 py-1 flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-500 border border-slate-200 rounded transition cursor-pointer font-bold text-[11px] uppercase"
                           title="Ajuste Manual"
                         >
                           <Settings2 size={12} /> Ajst
                         </button>
                         <button
                           onClick={() => openHistory(p)}
-                          className="px-2 py-1 flex items-center gap-1 bg-blue-950/40 hover:bg-blue-900/50 text-blue-400 border border-blue-800/60 rounded transition cursor-pointer font-bold text-[10px] uppercase"
+                          className="px-2 py-1 flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded transition cursor-pointer font-bold text-[11px] uppercase"
                           title="Histórico"
                         >
                           <History size={12} />
@@ -290,7 +279,7 @@ export default function Estoque({
                 <tr>
                   <td
                     colSpan={6}
-                    className="text-center py-12 text-slate-500 italic text-xs bg-slate-800/50/30"
+                    className="text-center py-12 text-slate-500 italic text-xs bg-slate-100/30"
                   >
                     Nenhum produto atende aos filtros atuais.
                   </td>
@@ -303,25 +292,25 @@ export default function Estoque({
 
       {/* MODAL: Entrada */}
       {activeModal === 'entrada' && selectedProduct && (
-        <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
-          <div className="w-full max-w-sm bg-slate-900 border border-emerald-800/60 rounded-2xl p-6 shadow-2xl relative">
+        <div className="fixed inset-0 bg-slate-50 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
+          <div className="w-full max-w-sm bg-white border border-emerald-200 rounded-2xl p-6 shadow-2xl relative">
             <button
               type="button"
               onClick={() => setActiveModal(null)}
-              className="absolute top-4 right-4 text-slate-500 hover:text-slate-200 cursor-pointer"
+              className="absolute top-4 right-4 text-slate-500 hover:text-slate-900 cursor-pointer"
             >
               <X size={18} />
             </button>
-            <h3 className="text-lg font-display font-bold text-slate-200 flex items-center gap-2 mb-4">
-              <ArrowDownToLine className="text-emerald-500" size={20} />
+            <h3 className="text-lg font-display font-bold text-slate-700 flex items-center gap-2 mb-4">
+              <ArrowDownToLine className="text-emerald-600" size={20} />
               Entrada de Estoque
             </h3>
 
-            <div className="mb-4 p-3 bg-emerald-950/40 border border-emerald-900 rounded-xl">
-              <div className="font-bold text-emerald-200">
+            <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+              <div className="font-bold text-emerald-800">
                 {selectedProduct.name}
               </div>
-              <div className="text-[10px] font-mono text-emerald-400 mt-1 uppercase">
+              <div className="text-[11px] font-mono text-emerald-700 mt-1 uppercase">
                 Saldo atual: {selectedProduct.stock} {selectedProduct.unit}
               </div>
             </div>
@@ -334,9 +323,9 @@ export default function Estoque({
 
             <form onSubmit={handleSaveEntrada} className="space-y-4">
               <div>
-                <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
+                <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
                   Quantidade a adicionar{' '}
-                  <span className="text-rose-500">*</span>
+                  <span className="text-rose-600">*</span>
                 </label>
                 <div className="flex relative">
                   <input
@@ -345,32 +334,32 @@ export default function Estoque({
                     min="0.001"
                     value={qty}
                     onChange={(e) => setQty(e.target.value)}
-                    className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2 pr-12 text-sm text-slate-200 font-mono rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900 font-bold"
+                    className="w-full bg-slate-100 border border-slate-200 px-3 py-2 pr-12 text-sm text-slate-700 font-mono rounded-lg outline-none focus:border-emerald-500 focus:bg-white font-bold"
                     placeholder="Ex: 10"
                     required
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] uppercase font-mono font-bold text-slate-500">
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] uppercase font-mono font-bold text-slate-500">
                     {selectedProduct.unit}
                   </span>
                 </div>
               </div>
 
               <div>
-                <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
+                <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
                   Motivo / Observação
                 </label>
                 <input
                   type="text"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2 text-xs text-slate-200 rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900"
+                  className="w-full bg-slate-100 border border-slate-200 px-3 py-2 text-xs text-slate-700 rounded-lg outline-none focus:border-emerald-500 focus:bg-white"
                   placeholder="Ex: Nota fiscal 1234"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-950/400 text-white font-bold rounded-xl text-xs transition cursor-pointer"
+                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition cursor-pointer"
               >
                 Confirmar Entrada
               </button>
@@ -381,25 +370,25 @@ export default function Estoque({
 
       {/* MODAL: Ajuste */}
       {activeModal === 'ajuste' && selectedProduct && (
-        <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
-          <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl relative">
+        <div className="fixed inset-0 bg-slate-50 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
+          <div className="w-full max-w-sm bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl relative">
             <button
               type="button"
               onClick={() => setActiveModal(null)}
-              className="absolute top-4 right-4 text-slate-500 hover:text-slate-200 cursor-pointer"
+              className="absolute top-4 right-4 text-slate-500 hover:text-slate-900 cursor-pointer"
             >
               <X size={18} />
             </button>
-            <h3 className="text-lg font-display font-bold text-slate-200 flex items-center gap-2 mb-4">
+            <h3 className="text-lg font-display font-bold text-slate-700 flex items-center gap-2 mb-4">
               <Settings2 className="text-slate-500" size={20} />
               Ajuste Manual
             </h3>
 
-            <div className="mb-4 p-3 bg-slate-800/50 border border-slate-800 rounded-xl">
-              <div className="font-bold text-slate-50">
+            <div className="mb-4 p-3 bg-slate-100 border border-slate-200 rounded-xl">
+              <div className="font-bold text-slate-900">
                 {selectedProduct.name}
               </div>
-              <div className="text-[10px] font-mono text-slate-500 mt-1 uppercase">
+              <div className="text-[11px] font-mono text-slate-500 mt-1 uppercase">
                 Pode ser para mais ou para menos.
               </div>
             </div>
@@ -412,8 +401,8 @@ export default function Estoque({
 
             <form onSubmit={handleSaveAjuste} className="space-y-4">
               <div>
-                <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
-                  Novo Saldo Correto <span className="text-rose-500">*</span>
+                <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
+                  Novo Saldo Correto <span className="text-rose-600">*</span>
                 </label>
                 <div className="flex relative">
                   <input
@@ -421,24 +410,24 @@ export default function Estoque({
                     step="0.001"
                     value={qty}
                     onChange={(e) => setQty(e.target.value)}
-                    className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2 pr-12 text-sm text-slate-200 font-mono rounded-lg outline-none focus:border-blue-600 focus:bg-slate-900 font-bold"
+                    className="w-full bg-slate-100 border border-slate-200 px-3 py-2 pr-12 text-sm text-slate-700 font-mono rounded-lg outline-none focus:border-blue-500 focus:bg-white font-bold"
                     required
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] uppercase font-mono font-bold text-slate-500">
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] uppercase font-mono font-bold text-slate-500">
                     {selectedProduct.unit}
                   </span>
                 </div>
               </div>
 
               <div>
-                <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
-                  Motivo <span className="text-rose-500">*</span>
+                <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
+                  Motivo <span className="text-rose-600">*</span>
                 </label>
                 <input
                   type="text"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2 text-xs text-slate-200 rounded-lg outline-none focus:border-blue-600 focus:bg-slate-900"
+                  className="w-full bg-slate-100 border border-slate-200 px-3 py-2 text-xs text-slate-700 rounded-lg outline-none focus:border-blue-500 focus:bg-white"
                   placeholder="Ex: Quebra, Vencimento, Contagem"
                   required
                 />
@@ -446,7 +435,7 @@ export default function Estoque({
 
               <button
                 type="submit"
-                className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs transition cursor-pointer"
+                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition cursor-pointer"
               >
                 Salvar Ajuste
               </button>
@@ -457,12 +446,12 @@ export default function Estoque({
 
       {/* MODAL: History */}
       {activeModal === 'history' && selectedProduct && (
-        <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
-          <div className="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl relative max-h-[90vh] flex flex-col">
-            <div className="flex justify-between items-start mb-4 shrink-0 border-b border-slate-800 pb-4">
+        <div className="fixed inset-0 bg-slate-50 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
+          <div className="w-full max-w-2xl bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl relative max-h-[90vh] flex flex-col">
+            <div className="flex justify-between items-start mb-4 shrink-0 border-b border-slate-200 pb-4">
               <div>
-                <h3 className="text-xl font-display font-bold text-slate-200 flex items-center gap-2">
-                  <History className="text-blue-500" size={20} />
+                <h3 className="text-xl font-display font-bold text-slate-700 flex items-center gap-2">
+                  <History className="text-blue-600" size={20} />
                   Extrato de Estoque
                 </h3>
                 <p className="text-xs font-mono text-slate-500 mt-1">
@@ -472,7 +461,7 @@ export default function Estoque({
               <button
                 type="button"
                 onClick={() => setActiveModal(null)}
-                className="text-slate-500 hover:text-slate-200 bg-slate-800/50 p-2 rounded-lg cursor-pointer"
+                className="text-slate-500 hover:text-slate-900 bg-slate-100 p-2 rounded-lg cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -488,17 +477,17 @@ export default function Estoque({
                   {productMovements.map((m) => (
                     <div
                       key={m.id}
-                      className="flex flex-wrap items-center justify-between p-3 border border-slate-700 rounded-xl bg-slate-800/50"
+                      className="flex flex-wrap items-center justify-between p-3 border border-slate-300 rounded-xl bg-slate-100"
                     >
                       <div className="flex items-center gap-3">
                         {m.type === 'entrada' && (
                           <ArrowDownToLine
                             size={16}
-                            className="text-emerald-500"
+                            className="text-emerald-600"
                           />
                         )}
                         {m.type === 'saida' && (
-                          <TrendingDown size={16} className="text-rose-500" />
+                          <TrendingDown size={16} className="text-rose-600" />
                         )}
                         {m.type === 'ajuste' && (
                           <Settings2 size={16} className="text-slate-500" />
@@ -508,11 +497,11 @@ export default function Estoque({
                           <div className="font-bold text-xs font-mono capitalize">
                             {m.type}
                           </div>
-                          <div className="text-[10px] text-slate-500">
+                          <div className="text-[11px] text-slate-500">
                             {new Date(m.date).toLocaleString('pt-BR')}
                           </div>
                           {m.note && (
-                            <div className="text-[10px] text-slate-500 mt-0.5">
+                            <div className="text-[11px] text-slate-500 mt-0.5">
                               Motivo: {m.note}
                             </div>
                           )}
@@ -521,12 +510,12 @@ export default function Estoque({
 
                       <div className="text-right">
                         <div
-                          className={`font-mono text-sm font-bold ${m.quantity > 0 ? 'text-emerald-500' : 'text-slate-300'}`}
+                          className={`font-mono text-sm font-bold ${m.quantity > 0 ? 'text-emerald-600' : 'text-slate-600'}`}
                         >
                           {m.quantity > 0 ? '+' : ''}
                           {m.quantity} {selectedProduct.unit}
                         </div>
-                        <div className="text-[9px] font-mono text-slate-500">
+                        <div className="text-[11px] font-mono text-slate-500">
                           Saldo: {m.newBalance} {selectedProduct.unit}
                         </div>
                       </div>

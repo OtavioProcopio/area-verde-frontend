@@ -2,7 +2,11 @@ import { apiRequest } from '../../../lib/api';
 import type { Category, Product, RecipeItem } from '../../../types';
 import { toNumber } from '../../shared/utils/toNumber';
 import { mapProduct, mapUnitToApi } from '../mappers/productMapper';
-import type { ApiProduct, ApiProductComposition } from '../types';
+import type {
+  ApiProduct,
+  ApiProductComposition,
+  ApiProdutoCompostoResponse,
+} from '../types';
 
 function getCategoryIdByName(categories: Category[], categoryName: string) {
   const category = categories.find((item) => item.name === categoryName);
@@ -93,27 +97,54 @@ export async function createProduct(
   product: Omit<Product, 'id'>,
   categories: Category[],
 ) {
-  const created = await apiRequest<ApiProduct>('/produtos', {
-    method: 'POST',
-    body: {
-      nome: product.name,
-      categoriaId: getCategoryIdByName(categories, product.category),
-      precoVenda: product.price,
-      tipoProduto: product.isComposite ? 'COMPOSTO' : 'SIMPLES',
-      controlaEstoque: !product.isComposite,
-      unidadeEstoque: product.isComposite ? null : mapUnitToApi(product.unit),
-      quantidadeEstoque: product.isComposite ? 0 : product.stock,
-      quantidadeBaixaPorVenda: product.isComposite ? 0 : 1,
-      estoqueMinimo: product.isComposite ? 0 : product.minStock,
-    },
-  });
+  const categoriaId = getCategoryIdByName(categories, product.category);
+  let createdId: number;
 
-  if (product.isComposite && product.recipe?.length) {
-    await syncProductComposition(String(created.id), product.recipe);
+  if (product.isComposite) {
+    // Cria produto + composição numa única transação no backend
+    // (POST /produtos/compostos), evitando produto composto incompleto caso
+    // uma segunda chamada de composição falhasse no meio do caminho.
+    const created = await apiRequest<ApiProdutoCompostoResponse>(
+      '/produtos/compostos',
+      {
+        method: 'POST',
+        body: {
+          nome: product.name,
+          categoriaId,
+          precoVenda: product.price,
+          controlaEstoque: false,
+          unidadeEstoque: null,
+          quantidadeEstoque: 0,
+          quantidadeBaixaPorVenda: 0,
+          estoqueMinimo: 0,
+          componentes: (product.recipe ?? []).map((item) => ({
+            produtoComponenteId: Number(item.ingredientId),
+            quantidadeBaixa: item.quantity,
+          })),
+        },
+      },
+    );
+    createdId = created.produto.id;
+  } else {
+    const created = await apiRequest<ApiProduct>('/produtos', {
+      method: 'POST',
+      body: {
+        nome: product.name,
+        categoriaId,
+        precoVenda: product.price,
+        tipoProduto: 'SIMPLES',
+        controlaEstoque: true,
+        unidadeEstoque: mapUnitToApi(product.unit),
+        quantidadeEstoque: product.stock,
+        quantidadeBaixaPorVenda: 1,
+        estoqueMinimo: product.minStock,
+      },
+    });
+    createdId = created.id;
   }
 
   if (!product.active) {
-    await apiRequest(`/produtos/${created.id}/inativar`, { method: 'PATCH' });
+    await apiRequest(`/produtos/${createdId}/inativar`, { method: 'PATCH' });
   }
 }
 

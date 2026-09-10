@@ -19,8 +19,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { InlineFeedback } from '../features/shared/components/InlineFeedback';
-import { createStockEntry } from '../features/estoque/services/estoqueService';
-import { getApiErrorMessage } from '../features/shared/utils/getApiErrorMessage';
+import Estoque from './Estoque';
 
 type OperationResult = { success: boolean; msg: string };
 
@@ -46,7 +45,7 @@ export default function Produtos({
   onRefreshState,
 }: ProdutosProps) {
   const [activeTab, setActiveTab] = useState<
-    'produtos' | 'categorias' | 'composicao'
+    'produtos' | 'estoque' | 'categorias' | 'composicao'
   >('produtos');
   const [compositionProductId, setCompositionProductId] = useState<
     string | null
@@ -88,9 +87,6 @@ export default function Produtos({
   // Recipe Builder Help States
   const [selectedIngredientId, setSelectedIngredientId] = useState('');
   const [ingredientQty, setIngredientQty] = useState('');
-
-  // Quick Restock state
-  const [quickRestockAmount, setQuickRestockAmount] = useState<string>('12');
 
   // Category State
   const [showCatForm, setShowCatForm] = useState(false);
@@ -148,6 +144,13 @@ export default function Produtos({
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim() === '') return;
+
+    if (isComposite && recipe.length === 0) {
+      setProductFormError(
+        'Produto composto precisa de pelo menos um componente na composição antes de salvar.',
+      );
+      return;
+    }
 
     const parsedPrice = parseFloat(price) || 0;
     const parsedCostPrice = parseFloat(costPrice) || 0;
@@ -213,17 +216,6 @@ export default function Produtos({
 
   const handleRemoveRecipeIngredient = (ingredientId: string) => {
     setRecipe(recipe.filter((item) => item.ingredientId !== ingredientId));
-  };
-
-  const handleQuickRestock = async (productId: string, amount: number) => {
-    try {
-      await createStockEntry(productId, amount, 'Restock rápido');
-      await onRefreshState();
-    } catch (error) {
-      window.alert(
-        getApiErrorMessage(error, 'Não foi possível registrar a entrada.'),
-      );
-    }
   };
 
   const handleToggleProductStatus = (p: Product) => {
@@ -391,25 +383,34 @@ export default function Produtos({
     <div id="produtos-module" className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <span className="text-xs uppercase tracking-widest font-mono text-emerald-500 font-semibold block mb-1">
+          <span className="text-xs uppercase tracking-widest font-mono text-emerald-600 font-semibold block mb-1">
             Catálogo de Vendas
           </span>
-          <h2 className="text-3xl font-display font-bold text-slate-50 tracking-tight animate-fade-in">
+          <h2 className="text-3xl font-display font-bold text-slate-900 tracking-tight animate-fade-in">
             Estoque &{' '}
-            <span className="text-emerald-500 font-bold">Produtos</span>
+            <span className="text-emerald-600 font-bold">Produtos</span>
           </h2>
         </div>
 
-        <div className="flex bg-slate-700/60 p-1 rounded-xl shadow-inner border border-slate-800">
+        <div className="flex bg-slate-200/60 p-1 rounded-xl shadow-inner border border-slate-200">
           <button
+            id="produtos-subtab-produtos"
             onClick={() => setActiveTab('produtos')}
-            className={`px-4 py-2 text-xs font-bold font-mono uppercase tracking-wider rounded-lg transition-all ${activeTab === 'produtos' ? 'bg-slate-900 text-emerald-400 shadow-sm' : 'text-slate-500 hover:text-slate-300 cursor-pointer'}`}
+            className={`px-4 py-2 text-xs font-bold font-mono uppercase tracking-wider rounded-lg transition-all ${activeTab === 'produtos' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-900 cursor-pointer'}`}
           >
             Produtos
           </button>
           <button
+            id="produtos-subtab-estoque"
+            onClick={() => setActiveTab('estoque')}
+            className={`px-4 py-2 text-xs font-bold font-mono uppercase tracking-wider rounded-lg transition-all ${activeTab === 'estoque' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-900 cursor-pointer'}`}
+          >
+            Estoque
+          </button>
+          <button
+            id="produtos-subtab-categorias"
             onClick={() => setActiveTab('categorias')}
-            className={`px-4 py-2 text-xs font-bold font-mono uppercase tracking-wider rounded-lg transition-all ${activeTab === 'categorias' ? 'bg-slate-900 text-emerald-400 shadow-sm' : 'text-slate-500 hover:text-slate-300 cursor-pointer'}`}
+            className={`px-4 py-2 text-xs font-bold font-mono uppercase tracking-wider rounded-lg transition-all ${activeTab === 'categorias' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-900 cursor-pointer'}`}
           >
             Categorias
           </button>
@@ -419,7 +420,7 @@ export default function Produtos({
       {activeTab === 'produtos' && (
         <div className="space-y-4 animate-fade-in">
           {/* Action Bar & Filters */}
-          <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-sm flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between">
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between">
             <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-4 gap-3">
               <div className="relative">
                 <Search
@@ -429,7 +430,7 @@ export default function Produtos({
                 <input
                   type="text"
                   placeholder="Buscar pelo nome..."
-                  className="w-full pl-9 pr-3 py-2 bg-slate-800/50 border border-slate-800 rounded-xl text-xs outline-none focus:border-emerald-500"
+                  className="w-full pl-9 pr-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none focus:border-emerald-500"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -437,7 +438,7 @@ export default function Produtos({
 
               <div className="relative">
                 <select
-                  className="w-full px-3 py-2 bg-slate-800/50 border border-slate-800 rounded-xl text-xs outline-none focus:border-emerald-500 cursor-pointer appearance-none text-slate-300"
+                  className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none focus:border-emerald-500 cursor-pointer appearance-none text-slate-600"
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
                 >
@@ -456,7 +457,7 @@ export default function Produtos({
 
               <div className="relative">
                 <select
-                  className="w-full px-3 py-2 bg-slate-800/50 border border-slate-800 rounded-xl text-xs outline-none focus:border-emerald-500 cursor-pointer appearance-none text-slate-300"
+                  className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none focus:border-emerald-500 cursor-pointer appearance-none text-slate-600"
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value as any)}
                 >
@@ -472,7 +473,7 @@ export default function Produtos({
 
               <div className="relative">
                 <select
-                  className="w-full px-3 py-2 bg-slate-800/50 border border-slate-800 rounded-xl text-xs outline-none focus:border-emerald-500 cursor-pointer appearance-none text-slate-300"
+                  className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none focus:border-emerald-500 cursor-pointer appearance-none text-slate-600"
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value as any)}
                 >
@@ -489,7 +490,7 @@ export default function Produtos({
 
             <button
               onClick={handleStartCreate}
-              className="w-full xl:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-950/400 text-white font-bold rounded-xl text-xs flex justify-center items-center gap-1.5 cursor-pointer shadow-md transition shrink-0 whitespace-nowrap"
+              className="w-full xl:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex justify-center items-center gap-1.5 cursor-pointer shadow-md transition shrink-0 whitespace-nowrap"
             >
               <PlusCircle size={14} />
               Novo Produto
@@ -497,28 +498,28 @@ export default function Produtos({
           </div>
 
           {/* Products Table */}
-          <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-sm">
-            <div className="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50/50">
-              <h4 className="text-sm font-display font-bold text-slate-200 flex items-center gap-2">
-                <Package size={16} className="text-emerald-500" />
+          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+            <div className="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-100/50">
+              <h4 className="text-sm font-display font-bold text-slate-700 flex items-center gap-2">
+                <Package size={16} className="text-emerald-600" />
                 Destaque ({filteredProducts.length})
               </h4>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse leading-normal text-xs text-slate-300">
+              <table className="w-full text-left border-collapse leading-normal text-sm text-slate-600">
                 <thead>
-                  <tr className="border-b border-slate-800 text-[10px] uppercase font-mono tracking-wider text-slate-500 bg-slate-800/50">
-                    <th className="px-5 py-3">Nome & Categoria</th>
-                    <th className="px-3 py-3 text-center">Und</th>
-                    <th className="px-3 py-3 text-center">Tipo</th>
-                    <th className="px-4 py-3 text-center">Estoque</th>
-                    <th className="px-4 py-3 text-right">Preço</th>
-                    <th className="px-4 py-3 text-center">Status</th>
-                    <th className="px-5 py-3 text-right text-slate-300">#</th>
+                  <tr className="border-b border-slate-200 text-xs uppercase font-mono tracking-wider text-slate-500 bg-slate-100">
+                    <th className="px-5 py-3.5">Nome & Categoria</th>
+                    <th className="px-3 py-3.5 text-center">Und</th>
+                    <th className="px-3 py-3.5 text-center">Tipo</th>
+                    <th className="px-4 py-3.5 text-center">Estoque</th>
+                    <th className="px-4 py-3.5 text-right">Preço</th>
+                    <th className="px-4 py-3.5 text-center">Status</th>
+                    <th className="px-5 py-3.5 text-right text-slate-600">#</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 bg-slate-900">
+                <tbody className="divide-y divide-slate-200 bg-white">
                   {filteredProducts.map((p) => {
                     const isUnderMin = !p.isComposite && p.stock <= p.minStock;
                     const isOutOfStock = !p.isComposite && p.stock === 0;
@@ -527,35 +528,35 @@ export default function Produtos({
                     return (
                       <tr
                         key={p.id}
-                        className={`transition duration-150 ${!pActive ? 'bg-slate-800/50/50 opacity-60 grayscale-[30%]' : 'hover:bg-slate-800/50/80'}`}
+                        className={`transition duration-150 ${!pActive ? 'bg-slate-100/50 opacity-60 grayscale-[30%]' : 'hover:bg-slate-100/80'}`}
                       >
-                        <td className="px-5 py-3 align-middle max-w-[200px]">
+                        <td className="px-5 py-3.5 align-middle max-w-[220px]">
                           <div>
                             <span
-                              className="font-bold text-slate-200 block text-xs truncate"
+                              className="font-bold text-slate-700 block text-sm truncate"
                               title={p.name}
                             >
                               {p.name}
                             </span>
-                            <span className="text-[10px] text-slate-500 mt-0.5 inline-flex items-center gap-1 font-mono uppercase">
+                            <span className="text-xs text-slate-500 mt-0.5 inline-flex items-center gap-1 font-mono uppercase">
                               {p.category}
                             </span>
                           </div>
                         </td>
 
-                        <td className="px-3 py-3 text-center font-mono align-middle">
-                          <span className="text-[10px] font-bold text-slate-500">
+                        <td className="px-3 py-3.5 text-center font-mono align-middle">
+                          <span className="text-xs font-bold text-slate-500">
                             {p.unit.toUpperCase()}
                           </span>
                         </td>
 
                         <td className="px-3 py-3 text-center align-middle">
                           {p.isComposite ? (
-                            <span className="px-2 py-0.5 bg-blue-950/40 border border-blue-800/60 rounded text-[9px] font-bold font-mono text-blue-400">
+                            <span className="px-2 py-0.5 bg-blue-50 border border-blue-200 rounded text-[11px] font-bold font-mono text-blue-700">
                               COMP
                             </span>
                           ) : (
-                            <span className="px-2 py-0.5 bg-slate-800 border border-slate-800 rounded text-[9px] font-bold font-mono text-slate-500">
+                            <span className="px-2 py-0.5 bg-slate-200 border border-slate-200 rounded text-[11px] font-bold font-mono text-slate-500">
                               SIMPLES
                             </span>
                           )}
@@ -563,7 +564,7 @@ export default function Produtos({
 
                         <td className="px-4 py-3 text-center align-middle">
                           {p.isComposite ? (
-                            <span className="text-[10px] text-slate-500 font-mono">
+                            <span className="text-[11px] text-slate-500 font-mono">
                               --
                             </span>
                           ) : (
@@ -571,10 +572,10 @@ export default function Produtos({
                               <span
                                 className={`px-2 py-0.5 rounded font-mono font-bold text-xs ${
                                   isOutOfStock
-                                    ? 'bg-rose-950/40 text-rose-500 border border-rose-150'
+                                    ? 'bg-rose-50 text-rose-600 border border-rose-200'
                                     : isUnderMin
-                                      ? 'bg-amber-950/40 text-amber-800 border border-amber-800/60'
-                                      : 'bg-emerald-950/40 text-emerald-400 border border-emerald-150'
+                                      ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                                      : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                                 }`}
                               >
                                 {p.stock}
@@ -583,17 +584,17 @@ export default function Produtos({
                           )}
                         </td>
 
-                        <td className="px-4 py-3 text-right font-bold font-mono text-slate-200 align-middle">
+                        <td className="px-4 py-3 text-right font-bold font-mono text-slate-700 align-middle">
                           {fmt(p.price)}
                         </td>
 
                         <td className="px-4 py-3 text-center align-middle">
                           <button
                             onClick={() => handleToggleProductStatus(p)}
-                            className={`inline-flex items-center gap-1 font-mono text-[9px] uppercase font-bold px-2 py-1 rounded transition border cursor-pointer ${
+                            className={`inline-flex items-center gap-1 font-mono text-[11px] uppercase font-bold px-2 py-1 rounded transition border cursor-pointer ${
                               pActive
-                                ? 'bg-emerald-950/40 border-emerald-800/60 text-emerald-400 hover:bg-emerald-900/50 hover:border-emerald-300'
-                                : 'bg-slate-800 border-slate-800 text-slate-500 hover:bg-slate-700'
+                                ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-300'
+                                : 'bg-slate-200 border-slate-200 text-slate-500 hover:bg-slate-200'
                             }`}
                           >
                             {pActive ? (
@@ -607,35 +608,10 @@ export default function Produtos({
 
                         <td className="px-5 py-3 text-right align-middle">
                           <div className="flex items-center justify-end gap-1.5 flex-nowrap">
-                            {!p.isComposite && pActive && (
-                              <div className="flex items-center bg-slate-800/50 p-0.5 border border-slate-800 rounded-lg">
-                                <input
-                                  type="number"
-                                  value={quickRestockAmount}
-                                  onChange={(e) =>
-                                    setQuickRestockAmount(e.target.value)
-                                  }
-                                  className="w-8 shrink-0 bg-transparent text-center font-bold text-[10px] font-mono border-none outline-none text-slate-500"
-                                  title="Quantidade restoque"
-                                />
-                                <button
-                                  onClick={() =>
-                                    void handleQuickRestock(
-                                      p.id,
-                                      parseFloat(quickRestockAmount) || 12,
-                                    )
-                                  }
-                                  className="px-2 py-0.5 rounded bg-emerald-900/50 hover:bg-emerald-600 text-emerald-400 hover:text-white font-mono text-[9px] font-bold transition cursor-pointer"
-                                >
-                                  +
-                                </button>
-                              </div>
-                            )}
-
                             {p.isComposite && (
                               <button
                                 onClick={() => handleManageComposition(p)}
-                                className="w-7 h-7 flex items-center justify-center bg-blue-950/40 hover:bg-blue-900/50 border border-blue-800/60 hover:border-blue-300 text-blue-500 rounded transition cursor-pointer"
+                                className="w-7 h-7 flex items-center justify-center bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-400 text-blue-600 rounded transition cursor-pointer"
                                 title="Gerenciar Composição"
                               >
                                 <Layers size={13} />
@@ -643,7 +619,7 @@ export default function Produtos({
                             )}
                             <button
                               onClick={() => handleStartEdit(p)}
-                              className="w-7 h-7 flex items-center justify-center bg-slate-800/50 hover:bg-emerald-950/40 border border-slate-800 hover:border-emerald-800/60 text-slate-500 hover:text-emerald-400 rounded transition cursor-pointer"
+                              className="w-7 h-7 flex items-center justify-center bg-slate-100 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 text-slate-500 hover:text-emerald-700 rounded transition cursor-pointer"
                               title="Editar Produto"
                             >
                               <Edit3 size={13} />
@@ -657,7 +633,7 @@ export default function Produtos({
                     <tr>
                       <td
                         colSpan={7}
-                        className="text-center py-12 text-slate-500 italic text-xs bg-slate-800/50/30"
+                        className="text-center py-12 text-slate-500 italic text-xs bg-slate-100/30"
                       >
                         Nenhum produto atende aos filtros atuais.
                       </td>
@@ -670,11 +646,22 @@ export default function Produtos({
         </div>
       )}
 
+      {activeTab === 'estoque' && (
+        <div className="animate-fade-in -mt-2">
+          <Estoque
+            products={products}
+            categories={categories}
+            onUpdateProduct={onUpdateProduct}
+            onRefreshState={onRefreshState}
+          />
+        </div>
+      )}
+
       {activeTab === 'categorias' && (
         <div className="space-y-4 animate-fade-in">
-          <div className="flex justify-between items-center bg-slate-900 p-4 rounded-xl border border-slate-800 shadow-sm">
+          <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
             <div className="flex-1">
-              <h3 className="font-display font-bold text-slate-200">
+              <h3 className="font-display font-bold text-slate-700">
                 Categorias
               </h3>
               <p className="text-xs text-slate-500">
@@ -683,7 +670,7 @@ export default function Produtos({
             </div>
             <button
               onClick={handleStartCreateCat}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 cursor-pointer shadow-md transition"
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 cursor-pointer shadow-md transition"
             >
               <PlusCircle size={14} /> Nova
             </button>
@@ -693,21 +680,21 @@ export default function Produtos({
             {categories.map((c) => (
               <div
                 key={c.id}
-                className={`bg-slate-900 rounded-xl border p-4 shadow-2xs flex flex-col justify-between transition ${c.active ? 'border-slate-800' : 'border-slate-800 bg-slate-800/50/50 opacity-60'}`}
+                className={`bg-white rounded-xl border p-4 shadow-2xs flex flex-col justify-between transition ${c.active ? 'border-slate-200' : 'border-slate-200 bg-slate-100/50 opacity-60'}`}
               >
                 <div className="flex justify-between items-start mb-4">
-                  <div className="flex items-center gap-2 text-slate-200">
+                  <div className="flex items-center gap-2 text-slate-700">
                     <Tags
                       size={16}
                       className={
-                        c.active ? 'text-emerald-500' : 'text-slate-500'
+                        c.active ? 'text-emerald-600' : 'text-slate-500'
                       }
                     />
                     <h4 className="font-bold font-display">{c.name}</h4>
                   </div>
                   <button
                     onClick={() => handleToggleCatStatus(c)}
-                    className={`cursor-pointer ${c.active ? 'text-emerald-500 hover:text-emerald-500' : 'text-slate-500 hover:text-slate-500'}`}
+                    className={`cursor-pointer ${c.active ? 'text-emerald-600 hover:text-emerald-600' : 'text-slate-500 hover:text-slate-700'}`}
                   >
                     {c.active ? (
                       <ToggleRight size={20} />
@@ -719,7 +706,7 @@ export default function Produtos({
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleStartEditCat(c)}
-                    className="flex-1 py-1.5 text-[10px] font-bold font-mono uppercase bg-slate-800 hover:bg-slate-700 text-slate-500 rounded transition cursor-pointer border border-slate-800"
+                    className="flex-1 py-1.5 text-[11px] font-bold font-mono uppercase bg-slate-200 hover:bg-slate-200 text-slate-500 rounded transition cursor-pointer border border-slate-200"
                   >
                     Editar Nome
                   </button>
@@ -732,38 +719,38 @@ export default function Produtos({
 
       {activeTab === 'composicao' && activeComposite && (
         <div className="space-y-4 animate-fade-in pb-10">
-          <div className="flex justify-between items-center bg-slate-900 p-4 rounded-xl border border-blue-800/60 shadow-sm flex-wrap gap-2">
+          <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-blue-200 shadow-sm flex-wrap gap-2">
             <div>
               <button
                 onClick={() => setActiveTab('produtos')}
-                className="text-[10px] uppercase font-mono font-bold text-slate-500 hover:text-slate-200 transition block mb-1 cursor-pointer"
+                className="text-[11px] uppercase font-mono font-bold text-slate-500 hover:text-slate-900 transition block mb-1 cursor-pointer"
               >
                 &larr; Voltar
               </button>
-              <h3 className="font-display font-bold text-slate-200 text-xl flex items-center gap-2">
+              <h3 className="font-display font-bold text-slate-700 text-xl flex items-center gap-2">
                 {activeComposite.name}
-                <span className="text-[9px] uppercase font-mono font-bold bg-blue-900/50 text-blue-800 px-2 py-0.5 rounded border border-blue-800/60">
+                <span className="text-[11px] uppercase font-mono font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded border border-blue-200">
                   Produto Composto
                 </span>
               </h3>
             </div>
             <button
               onClick={startAddComp}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-950/400 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 cursor-pointer shadow-md transition"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 cursor-pointer shadow-md transition"
             >
               <PlusCircle size={14} /> Adicionar Componente
             </button>
           </div>
 
-          <div className="bg-blue-950/40/50 border border-blue-900 rounded-xl p-4 text-xs text-blue-800 shadow-sm flex items-start gap-4 mx-1">
-            <div className="hidden sm:flex w-10 h-10 rounded-full bg-blue-900/50 items-center justify-center shrink-0 border border-blue-800/60">
-              <Layers className="text-blue-500" size={18} />
+          <div className="bg-blue-50/50 border border-blue-200 rounded-xl p-4 text-xs text-blue-800 shadow-sm flex items-start gap-4 mx-1">
+            <div className="hidden sm:flex w-10 h-10 rounded-full bg-blue-100 items-center justify-center shrink-0 border border-blue-200">
+              <Layers className="text-blue-600" size={18} />
             </div>
             <div>
               <h4 className="font-bold mb-1 font-display">
                 Como funciona a composição da receita?
               </h4>
-              <p className="text-blue-400/80 leading-relaxed font-mono mt-2">
+              <p className="text-blue-700/80 leading-relaxed font-mono mt-2">
                 Ao vender{' '}
                 <strong className="text-blue-900 border-b border-blue-300 pb-0.5">
                   1 {activeComposite.unit}
@@ -779,9 +766,9 @@ export default function Produtos({
           </div>
 
           {!activeComposite.recipe || activeComposite.recipe.length === 0 ? (
-            <div className="text-center bg-slate-900 border border-slate-800 rounded-xl p-12 shadow-sm text-slate-500 mt-2 mx-1">
-              <Layers size={48} className="mx-auto text-slate-200 mb-4" />
-              <h5 className="font-bold text-slate-300 mb-2">
+            <div className="text-center bg-white border border-slate-200 rounded-xl p-12 shadow-sm text-slate-500 mt-2 mx-1">
+              <Layers size={48} className="mx-auto text-slate-700 mb-4" />
+              <h5 className="font-bold text-slate-600 mb-2">
                 Composição Vazia
               </h5>
               <p className="text-xs max-w-sm mx-auto">
@@ -791,11 +778,11 @@ export default function Produtos({
               </p>
             </div>
           ) : (
-            <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-sm mt-2 mx-1">
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm mt-2 mx-1">
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse leading-normal text-xs text-slate-300">
+                <table className="w-full text-left border-collapse leading-normal text-xs text-slate-600">
                   <thead>
-                    <tr className="border-b border-slate-800 text-[10px] uppercase font-mono tracking-wider text-slate-500 bg-slate-800/50">
+                    <tr className="border-b border-slate-200 text-[11px] uppercase font-mono tracking-wider text-slate-500 bg-slate-100">
                       <th className="px-5 py-3">Produto Componente</th>
                       <th className="px-4 py-3 text-center">Unidade</th>
                       <th className="px-4 py-3 text-right">Quantidade Baixa</th>
@@ -803,7 +790,7 @@ export default function Produtos({
                       <th className="px-5 py-3 text-right">Ações</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 bg-slate-900">
+                  <tbody className="divide-y divide-slate-200 bg-white">
                     {activeComposite.recipe.map((r, idx) => {
                       const ingr = products.find(
                         (p) => p.id === r.ingredientId,
@@ -811,27 +798,27 @@ export default function Produtos({
                       return (
                         <tr
                           key={idx}
-                          className="hover:bg-slate-800/50/50 transition duration-150"
+                          className="hover:bg-slate-100/50 transition duration-150"
                         >
                           <td className="px-5 py-3">
-                            <span className="font-bold text-slate-200">
+                            <span className="font-bold text-slate-700">
                               {ingr ? ingr.name : 'Desconhecido'}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-center font-mono font-bold text-slate-500 bg-slate-800/50/30">
+                          <td className="px-4 py-3 text-center font-mono font-bold text-slate-500 bg-slate-100/30">
                             {ingr ? ingr.unit.toUpperCase() : '--'}
                           </td>
-                          <td className="px-4 py-3 text-right font-mono font-black text-blue-400 text-sm bg-blue-950/40/10">
+                          <td className="px-4 py-3 text-right font-mono font-black text-blue-700 text-sm bg-blue-50/10">
                             {r.quantity}
                           </td>
                           <td className="px-4 py-3 text-center">
                             {ingr ? (
                               (ingr.active ?? true) ? (
-                                <span className="px-2 py-0.5 rounded text-[9px] uppercase font-bold font-mono bg-emerald-950/40 text-emerald-400 border border-emerald-800/60 shadow-2xs">
+                                <span className="px-2 py-0.5 rounded text-[11px] uppercase font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs">
                                   ATIVO
                                 </span>
                               ) : (
-                                <span className="px-2 py-0.5 rounded text-[9px] uppercase font-bold font-mono bg-rose-950/40 text-rose-400 border border-rose-800/60 shadow-2xs">
+                                <span className="px-2 py-0.5 rounded text-[11px] uppercase font-bold font-mono bg-rose-50 text-rose-700 border border-rose-200 shadow-2xs">
                                   INATIVO
                                 </span>
                               )
@@ -843,13 +830,13 @@ export default function Produtos({
                             <div className="flex items-center justify-end gap-2">
                               <button
                                 onClick={() => startEditComp(idx, r)}
-                                className="w-7 h-7 flex flex-col justify-center items-center bg-slate-800/50 hover:bg-slate-800 text-slate-500 rounded border border-slate-800 transition cursor-pointer"
+                                className="w-7 h-7 flex flex-col justify-center items-center bg-slate-100 hover:bg-slate-200 text-slate-500 rounded border border-slate-200 transition cursor-pointer"
                               >
                                 <Edit3 size={12} />
                               </button>
                               <button
                                 onClick={() => handleRemoveComp(idx)}
-                                className="w-7 h-7 flex flex-col justify-center items-center bg-slate-800/50 hover:bg-rose-950/40 border border-slate-800 hover:border-rose-800/60 text-slate-500 hover:text-rose-500 rounded transition cursor-pointer"
+                                className="w-7 h-7 flex flex-col justify-center items-center bg-slate-100 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 text-slate-500 hover:text-rose-600 rounded transition cursor-pointer"
                               >
                                 <Trash2 size={12} />
                               </button>
@@ -867,16 +854,16 @@ export default function Produtos({
       )}
 
       {showCompModal && (
-        <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
-          <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl relative">
+        <div className="fixed inset-0 bg-slate-50 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
+          <div className="w-full max-w-sm bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl relative">
             <button
               type="button"
               onClick={() => setShowCompModal(false)}
-              className="absolute top-4 right-4 text-slate-500 hover:text-slate-200 cursor-pointer"
+              className="absolute top-4 right-4 text-slate-500 hover:text-slate-900 cursor-pointer"
             >
               <X size={18} />
             </button>
-            <h3 className="text-lg font-display font-bold text-slate-200 mb-4">
+            <h3 className="text-lg font-display font-bold text-slate-700 mb-4">
               {compEditIndex !== null
                 ? 'Editar Componente'
                 : 'Adicionar Componente'}
@@ -884,13 +871,13 @@ export default function Produtos({
 
             <form onSubmit={handleSaveComp} className="space-y-4">
               <div>
-                <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
-                  Insumo Físico <span className="text-rose-500">*</span>
+                <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
+                  Insumo Físico <span className="text-rose-600">*</span>
                 </label>
                 <select
                   value={compIngrId}
                   onChange={(e) => setCompIngrId(e.target.value)}
-                  className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2 text-sm text-slate-200 rounded-lg outline-none focus:border-blue-600 focus:bg-slate-900 cursor-pointer font-bold"
+                  className="w-full bg-slate-100 border border-slate-200 px-3 py-2 text-sm text-slate-700 rounded-lg outline-none focus:border-blue-500 focus:bg-white cursor-pointer font-bold"
                   required
                 >
                   <option value="">Selecione um produto...</option>
@@ -902,14 +889,14 @@ export default function Produtos({
                       </option>
                     ))}
                 </select>
-                <span className="text-[9px] text-slate-500 block mt-1">
+                <span className="text-[11px] text-slate-500 block mt-1">
                   Apenas produtos simples e ativos.
                 </span>
               </div>
 
               <div>
-                <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
-                  Quantidade a Baixar <span className="text-rose-500">*</span>
+                <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
+                  Quantidade a Baixar <span className="text-rose-600">*</span>
                 </label>
                 <div className="flex relative">
                   <input
@@ -918,11 +905,11 @@ export default function Produtos({
                     min="0.001"
                     value={compQty}
                     onChange={(e) => setCompQty(e.target.value)}
-                    className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2 pr-12 text-sm text-slate-200 font-mono rounded-lg outline-none focus:border-blue-600 focus:bg-slate-900 font-bold"
+                    className="w-full bg-slate-100 border border-slate-200 px-3 py-2 pr-12 text-sm text-slate-700 font-mono rounded-lg outline-none focus:border-blue-500 focus:bg-white font-bold"
                     placeholder="Ex: 50"
                     required
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] uppercase font-mono font-bold text-slate-500">
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] uppercase font-mono font-bold text-slate-500">
                     {compIngrId
                       ? products.find((p) => p.id === compIngrId)?.unit || 'UN'
                       : 'UN'}
@@ -932,7 +919,7 @@ export default function Produtos({
 
               <button
                 type="submit"
-                className="w-full py-2.5 bg-blue-600 hover:bg-blue-950/400 text-white font-bold rounded-xl text-xs transition cursor-pointer"
+                className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition cursor-pointer"
               >
                 Salvar Componente
               </button>
@@ -943,15 +930,15 @@ export default function Produtos({
 
       {/* FORM MODAL: Create or Edit Category */}
       {showCatForm && (
-        <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
-          <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl relative">
+        <div className="fixed inset-0 bg-slate-50 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
+          <div className="w-full max-w-sm bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl relative">
             <button
               onClick={() => setShowCatForm(false)}
-              className="absolute top-4 right-4 text-slate-500 hover:text-slate-200 cursor-pointer"
+              className="absolute top-4 right-4 text-slate-500 hover:text-slate-900 cursor-pointer"
             >
               <X size={18} />
             </button>
-            <h3 className="text-lg font-display font-bold text-slate-200 mb-4">
+            <h3 className="text-lg font-display font-bold text-slate-700 mb-4">
               {catFormMode === 'create'
                 ? 'Nova Categoria'
                 : 'Renomear Categoria'}
@@ -965,21 +952,21 @@ export default function Produtos({
 
             <form onSubmit={handleSaveCat} className="space-y-4">
               <div>
-                <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
+                <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
                   Nome:
                 </label>
                 <input
                   type="text"
                   value={catName}
                   onChange={(e) => setCatName(e.target.value)}
-                  className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2 text-sm text-slate-200 rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900"
+                  className="w-full bg-slate-100 border border-slate-200 px-3 py-2 text-sm text-slate-700 rounded-lg outline-none focus:border-emerald-500 focus:bg-white"
                   data-testid="categoria-nome-input"
                   required
                 />
               </div>
               <button
                 type="submit"
-                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-950/400 text-white font-bold rounded-xl text-xs transition cursor-pointer"
+                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition cursor-pointer"
               >
                 Salvar
               </button>
@@ -990,12 +977,12 @@ export default function Produtos({
 
       {/* FORM MODAL: Create or Edit Product */}
       {showProductForm && (
-        <div className="fixed inset-0 bg-slate-900/45 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
-          <div className="w-full max-w-3xl bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl relative max-h-[95vh] flex flex-col">
+        <div className="fixed inset-0 bg-white/45 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
+          <div className="w-full max-w-3xl bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl relative max-h-[95vh] flex flex-col">
             <div className="flex justify-between items-center mb-4 shrink-0">
               <div>
-                <h3 className="text-xl font-display font-bold text-slate-850 flex items-center gap-1.5">
-                  <Package size={20} className="text-emerald-500" />
+                <h3 className="text-xl font-display font-bold text-slate-900 flex items-center gap-1.5">
+                  <Package size={20} className="text-emerald-600" />
                   {formMode === 'create'
                     ? 'Cadastrar Novo Item'
                     : 'Editar Ficha do Produto'}
@@ -1006,7 +993,7 @@ export default function Produtos({
               </div>
               <button
                 onClick={() => setShowProductForm(false)}
-                className="text-slate-500 hover:text-slate-200 cursor-pointer p-2 bg-slate-800/50 rounded-lg"
+                className="text-slate-500 hover:text-slate-900 cursor-pointer p-2 bg-slate-100 rounded-lg"
               >
                 <X size={18} />
               </button>
@@ -1026,12 +1013,12 @@ export default function Produtos({
                 {/* Basic fields */}
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
-                      Nome do Produto <span className="text-rose-500">*</span>
+                    <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
+                      Nome do Produto <span className="text-rose-600">*</span>
                     </label>
                     <input
                       type="text"
-                      className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2 text-xs text-slate-200 rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900 font-bold"
+                      className="w-full bg-slate-100 border border-slate-200 px-3 py-2 text-xs text-slate-700 rounded-lg outline-none focus:border-emerald-500 focus:bg-white font-bold"
                       placeholder="Ex: Bohemia Long Neck 355ml"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
@@ -1042,11 +1029,11 @@ export default function Produtos({
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
-                        Categoria <span className="text-rose-500">*</span>
+                      <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
+                        Categoria <span className="text-rose-600">*</span>
                       </label>
                       <select
-                        className="w-full bg-slate-800/50 border border-slate-800 px-2 py-2 text-xs text-slate-200 rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900 cursor-pointer"
+                        className="w-full bg-slate-100 border border-slate-200 px-2 py-2 text-xs text-slate-700 rounded-lg outline-none focus:border-emerald-500 focus:bg-white cursor-pointer"
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                         data-testid="produto-categoria-select"
@@ -1061,11 +1048,11 @@ export default function Produtos({
                     </div>
 
                     <div>
-                      <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
+                      <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
                         Status
                       </label>
                       <select
-                        className="w-full bg-slate-800/50 border border-slate-800 px-2 py-2 text-xs text-slate-200 rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900 cursor-pointer font-bold"
+                        className="w-full bg-slate-100 border border-slate-200 px-2 py-2 text-xs text-slate-700 rounded-lg outline-none focus:border-emerald-500 focus:bg-white cursor-pointer font-bold"
                         value={active ? 'true' : 'false'}
                         onChange={(e) => setActive(e.target.value === 'true')}
                       >
@@ -1075,16 +1062,16 @@ export default function Produtos({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 pb-3 border-b border-slate-800">
+                  <div className="grid grid-cols-2 gap-3 pb-3 border-b border-slate-200">
                     <div>
-                      <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
+                      <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
                         Preço Custo (R$)
                       </label>
                       <input
                         type="number"
                         step="0.01"
                         min="0"
-                        className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2 text-xs font-mono text-slate-200 rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900"
+                        className="w-full bg-slate-100 border border-slate-200 px-3 py-2 text-xs font-mono text-slate-700 rounded-lg outline-none focus:border-emerald-500 focus:bg-white"
                         value={costPrice}
                         onChange={(e) => setCostPrice(e.target.value)}
                         data-testid="produto-preco-custo-input"
@@ -1093,14 +1080,14 @@ export default function Produtos({
                     </div>
 
                     <div>
-                      <label className="block text-[10px] uppercase font-mono text-emerald-300 mb-1 font-bold">
-                        Venda (R$) <span className="text-rose-500">*</span>
+                      <label className="block text-[11px] uppercase font-mono text-emerald-700 mb-1 font-bold">
+                        Venda (R$) <span className="text-rose-600">*</span>
                       </label>
                       <input
                         type="number"
                         step="0.01"
                         min="0"
-                        className="w-full bg-emerald-950/40 border border-emerald-800/60 px-3 py-2 text-sm font-mono text-emerald-200 rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900 font-bold"
+                        className="w-full bg-emerald-50 border border-emerald-200 px-3 py-2 text-sm font-mono text-emerald-800 rounded-lg outline-none focus:border-emerald-500 focus:bg-white font-bold"
                         value={price}
                         onChange={(e) => setPrice(e.target.value)}
                         data-testid="produto-preco-venda-input"
@@ -1111,20 +1098,20 @@ export default function Produtos({
 
                   {/* Toggle IsComposite product */}
                   <div
-                    className={`flex items-start gap-2.5 p-3 border rounded-xl transition ${isComposite ? 'bg-blue-950/40 border-blue-800/60' : 'bg-slate-800/50 border-slate-800'}`}
+                    className={`flex items-start gap-2.5 p-3 border rounded-xl transition ${isComposite ? 'bg-blue-50 border-blue-200' : 'bg-slate-100 border-slate-200'}`}
                   >
                     <input
                       id="checkbox-is-composite"
                       type="checkbox"
                       checked={isComposite}
                       onChange={(e) => setIsComposite(e.target.checked)}
-                      className="w-4 h-4 mt-0.5 text-blue-500 border-slate-600 rounded focus:ring-blue-600 cursor-pointer"
+                      className="w-4 h-4 mt-0.5 text-blue-600 border-slate-300 rounded focus:ring-blue-500 cursor-pointer"
                     />
                     <label
                       htmlFor="checkbox-is-composite"
-                      className="text-xs text-slate-300 cursor-pointer"
+                      className="text-xs text-slate-600 cursor-pointer"
                     >
-                      <span className="font-bold block text-slate-50 mb-0.5">
+                      <span className="font-bold block text-slate-900 mb-0.5">
                         Produto Composto? (Receita)
                       </span>
                       Ex: Caipirinha. A venda desconta estoque proporcionalmente
@@ -1134,13 +1121,13 @@ export default function Produtos({
 
                   {/* Stock configs (If not composite product) */}
                   {!isComposite && (
-                    <div className="grid grid-cols-3 gap-3 p-3 bg-slate-900 shadow-xs rounded-xl border border-slate-800">
+                    <div className="grid grid-cols-3 gap-3 p-3 bg-white shadow-xs rounded-xl border border-slate-200">
                       <div>
-                        <label className="block text-[9px] uppercase font-mono text-slate-500 mb-1">
+                        <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
                           Unidade
                         </label>
                         <select
-                          className="w-full bg-slate-800/50 border border-slate-800 px-2 py-1.5 text-xs text-slate-200 rounded-lg outline-none focus:border-emerald-600 cursor-pointer"
+                          className="w-full bg-slate-100 border border-slate-200 px-2 py-1.5 text-xs text-slate-700 rounded-lg outline-none focus:border-emerald-500 cursor-pointer"
                           value={unit}
                           onChange={(e) =>
                             setUnit(e.target.value as 'un' | 'ml')
@@ -1152,13 +1139,13 @@ export default function Produtos({
                       </div>
 
                       <div>
-                        <label className="block text-[9px] uppercase font-mono text-slate-500 mb-1">
+                        <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
                           Estoque
                         </label>
                         <input
                           type="number"
                           step="0.01"
-                          className="w-full bg-slate-800/50 border border-slate-800 px-2 py-1.5 text-xs font-mono text-slate-200 rounded-lg outline-none focus:border-emerald-600"
+                          className="w-full bg-slate-100 border border-slate-200 px-2 py-1.5 text-xs font-mono text-slate-700 rounded-lg outline-none focus:border-emerald-500"
                           value={stock}
                           onChange={(e) => setStock(e.target.value)}
                           data-testid="produto-estoque-input"
@@ -1166,13 +1153,13 @@ export default function Produtos({
                       </div>
 
                       <div>
-                        <label className="block text-[9px] uppercase font-mono text-slate-500 mb-1">
+                        <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
                           Alerta Mín
                         </label>
                         <input
                           type="number"
                           step="1"
-                          className="w-full bg-slate-800/50 border border-slate-800 px-2 py-1.5 text-xs font-mono text-slate-200 rounded-lg outline-none focus:border-emerald-600"
+                          className="w-full bg-slate-100 border border-slate-200 px-2 py-1.5 text-xs font-mono text-slate-700 rounded-lg outline-none focus:border-emerald-500"
                           value={minStock}
                           onChange={(e) => setMinStock(e.target.value)}
                         />
@@ -1180,8 +1167,8 @@ export default function Produtos({
                     </div>
                   )}
                   {isComposite && (
-                    <div className="grid grid-cols-1 gap-3 p-3 bg-slate-800/50 rounded-xl border border-slate-800">
-                      <div className="text-[11px] text-slate-400 leading-relaxed">
+                    <div className="grid grid-cols-1 gap-3 p-3 bg-slate-100 rounded-xl border border-slate-200">
+                      <div className="text-xs text-slate-500 leading-relaxed">
                         Produto composto na API não possui unidade de estoque
                         própria. A baixa acontece pelos componentes cadastrados
                         na composição.
@@ -1193,28 +1180,111 @@ export default function Produtos({
                 {/* Right block */}
                 <div className="flex flex-col">
                   {isComposite ? (
-                    <div className="rounded-2xl border-2 border-dashed border-slate-800 h-full flex flex-col justify-center items-center text-center p-6 text-slate-500 bg-blue-950/40/10">
-                      <Layers size={36} className="text-blue-300 mb-3" />
-                      <h5 className="text-sm font-bold text-slate-500">
-                        Produto Composto
-                      </h5>
-                      <p className="text-[10px] text-slate-500 mt-2 max-w-[200px] leading-relaxed">
-                        Este produto é formado por outros insumos. Para
-                        incluí-los ou removê-los, volte para a lista de
-                        produtos, encontre-o e clique no botão{' '}
-                        <span className="font-bold text-blue-500">
-                          azul de composição
-                        </span>
-                        .
-                      </p>
+                    <div className="rounded-2xl border border-blue-200 bg-blue-950/20 h-full flex flex-col p-4 gap-3 overflow-hidden">
+                      <div className="flex items-center gap-2 text-slate-700">
+                        <Layers size={16} className="text-blue-700 shrink-0" />
+                        <h5 className="text-xs font-bold uppercase tracking-wide">
+                          Composição da receita
+                        </h5>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <select
+                          className="flex-1 min-w-0 bg-slate-100 border border-slate-200 px-2 py-2 text-xs text-slate-700 rounded-lg outline-none focus:border-emerald-500 cursor-pointer"
+                          value={selectedIngredientId}
+                          onChange={(e) =>
+                            setSelectedIngredientId(e.target.value)
+                          }
+                          data-testid="produto-composicao-select-ingrediente"
+                        >
+                          <option value="">Selecione um componente...</option>
+                          {products
+                            .filter(
+                              (p) =>
+                                !p.isComposite &&
+                                p.id !== editingProductId &&
+                                (p.active ?? true),
+                            )
+                            .map((p) => (
+                              <option key={p.id} value={p.id}>
+                                {p.name} ({p.unit})
+                              </option>
+                            ))}
+                        </select>
+                        <input
+                          type="number"
+                          step="0.001"
+                          min="0"
+                          placeholder="Qtd."
+                          className="w-16 bg-slate-100 border border-slate-200 px-2 py-2 text-xs font-mono text-slate-700 rounded-lg outline-none focus:border-emerald-500"
+                          value={ingredientQty}
+                          onChange={(e) => setIngredientQty(e.target.value)}
+                          data-testid="produto-composicao-qtd-input"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddRecipeIngredient}
+                          disabled={
+                            !selectedIngredientId ||
+                            isNaN(parseFloat(ingredientQty))
+                          }
+                          className="px-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-100 disabled:text-blue-400/60 text-white rounded-lg transition cursor-pointer shrink-0"
+                          data-testid="produto-composicao-add-btn"
+                        >
+                          <PlusCircle size={16} />
+                        </button>
+                      </div>
+
+                      {recipe.length === 0 ? (
+                        <div className="flex-1 flex flex-col items-center justify-center text-center text-slate-500 text-xs py-6 px-4">
+                          <Layers size={28} className="text-slate-700 mb-2" />
+                          Nenhum componente adicionado ainda. Adicione pelo
+                          menos um para poder salvar este produto composto.
+                        </div>
+                      ) : (
+                        <ul
+                          className="flex-1 overflow-y-auto space-y-1.5 pr-1"
+                          data-testid="produto-composicao-lista"
+                        >
+                          {recipe.map((item) => {
+                            const ingr = products.find(
+                              (p) => p.id === item.ingredientId,
+                            );
+                            return (
+                              <li
+                                key={item.ingredientId}
+                                className="flex items-center justify-between gap-2 bg-slate-100 border border-slate-200 rounded-lg px-3 py-2 text-xs"
+                              >
+                                <span className="text-slate-700 font-semibold truncate">
+                                  {ingr ? ingr.name : 'Desconhecido'}
+                                </span>
+                                <span className="font-mono text-blue-700 font-bold shrink-0">
+                                  {item.quantity} {ingr?.unit.toUpperCase()}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleRemoveRecipeIngredient(
+                                      item.ingredientId,
+                                    )
+                                  }
+                                  className="text-slate-500 hover:text-rose-600 transition cursor-pointer shrink-0"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
                     </div>
                   ) : (
-                    <div className="rounded-2xl border-2 border-dashed border-slate-800 h-full flex flex-col justify-center items-center text-center p-6 text-slate-500 bg-slate-800/50/50">
-                      <Layers size={36} className="text-slate-300 mb-3" />
+                    <div className="rounded-2xl border-2 border-dashed border-slate-200 h-full flex flex-col justify-center items-center text-center p-6 text-slate-500 bg-slate-100/50">
+                      <Layers size={36} className="text-slate-600 mb-3" />
                       <h5 className="text-sm font-bold text-slate-500">
                         Configuração de Físico
                       </h5>
-                      <p className="text-[10px] text-slate-500 mt-2 max-w-[200px] leading-relaxed">
+                      <p className="text-[11px] text-slate-500 mt-2 max-w-[200px] leading-relaxed">
                         Este produto deduzirá o estoque direto dele mesmo na
                         hora venda.
                       </p>
@@ -1224,17 +1294,17 @@ export default function Produtos({
               </div>
 
               {/* Action operations buttons */}
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-800 shrink-0">
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 shrink-0">
                 <button
                   type="button"
                   onClick={() => setShowProductForm(false)}
-                  className="px-6 py-2.5 text-xs font-semibold rounded-xl bg-slate-900 border border-slate-800 text-slate-500 hover:bg-slate-800/50 transition duration-150 cursor-pointer"
+                  className="px-6 py-2.5 text-xs font-semibold rounded-xl bg-white border border-slate-200 text-slate-500 hover:bg-slate-100 transition duration-150 cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-8 py-2.5 bg-emerald-600 hover:bg-emerald-950/400 text-white font-bold rounded-xl text-xs transition duration-150 shadow-md shadow-emerald-500/10 cursor-pointer flex items-center gap-1.5"
+                  className="px-8 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition duration-150 shadow-md shadow-emerald-500/10 cursor-pointer flex items-center gap-1.5"
                 >
                   <Save size={14} />
                   Salvar Ficha
