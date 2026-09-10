@@ -323,10 +323,10 @@ export default function Comandas({
       {/* VIEW: LISTA GERAL DE COMANDAS */}
       {viewMode === 'list' && (
         <div className="space-y-6">
-          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h2 className="text-xl font-display font-bold text-slate-50 tracking-tight flex items-center gap-2">
-                <Receipt className="text-emerald-500" size={24} />
+              <h2 className="text-xl font-display font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                <Receipt className="text-emerald-600" size={24} />
                 Lista de Comandas
               </h2>
               <p className="text-xs text-slate-500 mt-1">
@@ -340,15 +340,15 @@ export default function Comandas({
                 setNewComandaError(null);
                 setShowNewComandaModal(true);
               }}
-              className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-950/400 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md transition"
+              className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md transition"
             >
               <PlusCircle size={16} />
               Nova Comanda
             </button>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-slate-700 flex flex-col sm:flex-row gap-4 items-center justify-between bg-slate-800/50">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+            <div className="p-4 border-b border-slate-300 flex flex-col sm:flex-row gap-4 items-center justify-between bg-slate-100">
               <div className="relative w-full sm:max-w-xs">
                 <Search
                   size={16}
@@ -359,7 +359,7 @@ export default function Comandas({
                   placeholder="Buscar por nome, id ou cliente..."
                   value={listSearchTerm}
                   onChange={(e) => setListSearchTerm(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-lg py-2 pl-9 pr-3 text-xs outline-none focus:border-emerald-600"
+                  className="w-full bg-white border border-slate-200 rounded-lg py-2 pl-9 pr-3 text-xs outline-none focus:border-emerald-500"
                 />
               </div>
 
@@ -376,8 +376,8 @@ export default function Comandas({
                     onClick={() => setListStatusFilter(f.id as any)}
                     className={`px-3 py-1.5 text-xs font-semibold rounded-lg shrink-0 transition ${
                       listStatusFilter === f.id
-                        ? 'bg-slate-800 text-white shadow-xs'
-                        : 'bg-slate-900 text-slate-500 border border-slate-800 hover:bg-slate-800'
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-100'
                     }`}
                   >
                     {f.label}
@@ -389,7 +389,7 @@ export default function Comandas({
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs text-slate-500 border-collapse">
                 <thead>
-                  <tr className="bg-slate-800/50 border-b border-slate-800 text-[10px] uppercase font-mono text-slate-500 font-bold">
+                  <tr className="bg-slate-100 border-b border-slate-200 text-[11px] uppercase font-mono text-slate-500 font-bold">
                     <th className="px-4 py-3">Num / Identificação</th>
                     <th className="px-4 py-3">Cliente (Vínculo)</th>
                     <th className="px-4 py-3">Status</th>
@@ -399,7 +399,7 @@ export default function Comandas({
                     <th className="px-4 py-3 text-center">Ações</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-200">
                   {filteredListComandas.map((c) => {
                     const comSum = c.items.reduce(
                       (sum, item) => sum + item.price * item.quantity,
@@ -432,14 +432,14 @@ export default function Comandas({
                     return (
                       <tr
                         key={c.id}
-                        className={`hover:bg-slate-800/50 transition duration-150 ${isAberta ? 'bg-emerald-950/40/20' : ''}`}
+                        className={`hover:bg-slate-100 transition duration-150 ${isAberta ? 'bg-emerald-50/20' : ''}`}
                       >
                         <td className="px-4 py-3.5">
-                          <div className="font-bold text-slate-200 text-sm truncate max-w-[150px]">
+                          <div className="font-bold text-slate-700 text-sm truncate max-w-[150px]">
                             {c.code}
                           </div>
                           <div
-                            className="text-[9px] text-slate-500 font-mono mt-0.5"
+                            className="text-[11px] text-slate-500 font-mono mt-0.5"
                             title={new Date(c.createdAt).toLocaleString(
                               'pt-BR',
                             )}
@@ -449,7 +449,7 @@ export default function Comandas({
                         </td>
                         <td className="px-4 py-3.5">
                           {bindedCust ? (
-                            <span className="inline-flex items-center gap-1 font-semibold text-slate-300 bg-slate-800 px-2 py-0.5 rounded border border-slate-800">
+                            <span className="inline-flex items-center gap-1 font-semibold text-slate-600 bg-slate-200 px-2 py-0.5 rounded border border-slate-200">
                               👤 {bindedCust.name}
                             </span>
                           ) : (
@@ -460,33 +460,33 @@ export default function Comandas({
                         </td>
                         <td className="px-4 py-3.5">
                           {c.status === 'active' && (
-                            <span className="inline-flex text-[10px] uppercase font-bold font-mono px-2 py-0.5 rounded-full bg-amber-900/50 text-amber-400 border border-amber-800/60">
+                            <span className="inline-flex text-[11px] uppercase font-bold font-mono px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">
                               ABERTA
                             </span>
                           )}
                           {c.status === 'cancelled' && (
-                            <span className="inline-flex text-[10px] uppercase font-bold font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-500 border border-slate-800">
+                            <span className="inline-flex text-[11px] uppercase font-bold font-mono px-2 py-0.5 rounded-full bg-slate-200 text-slate-500 border border-slate-200">
                               CANCELADA
                             </span>
                           )}
                           {isFiado && (
-                            <span className="inline-flex text-[10px] uppercase font-bold font-mono px-2 py-0.5 rounded-full bg-rose-900/50 text-rose-400 border border-rose-800/60">
+                            <span className="inline-flex text-[11px] uppercase font-bold font-mono px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 border border-rose-200">
                               PENDENTE (FIADO)
                             </span>
                           )}
                           {c.status === 'paid' && !isFiado && (
-                            <span className="inline-flex text-[10px] uppercase font-bold font-mono px-2 py-0.5 rounded-full bg-emerald-900/50 text-emerald-400 border border-emerald-800/60">
+                            <span className="inline-flex text-[11px] uppercase font-bold font-mono px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
                               PAGA
                             </span>
                           )}
                         </td>
-                        <td className="px-4 py-3.5 font-mono text-right font-bold text-slate-200">
+                        <td className="px-4 py-3.5 font-mono text-right font-bold text-slate-700">
                           {fmt(totalCom)}
                         </td>
-                        <td className="px-4 py-3.5 font-mono text-right text-emerald-500 font-bold">
+                        <td className="px-4 py-3.5 font-mono text-right text-emerald-600 font-bold">
                           {fmt(pago)}
                         </td>
-                        <td className="px-4 py-3.5 font-mono text-right text-rose-500 font-bold">
+                        <td className="px-4 py-3.5 font-mono text-right text-rose-600 font-bold">
                           {restante > 0 ? fmt(restante) : '-'}
                         </td>
                         <td className="px-4 py-3.5 text-center">
@@ -496,7 +496,7 @@ export default function Comandas({
                                 setSelectedComandaId(c.id);
                                 setViewMode('pos');
                               }}
-                              className="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-emerald-500 hover:text-emerald-400 text-slate-500 text-[10px] font-bold rounded-lg uppercase tracking-wide transition shadow-2xs"
+                              className="px-3 py-1.5 bg-white border border-slate-200 hover:border-emerald-500 hover:text-emerald-700 text-slate-500 text-[11px] font-bold rounded-lg uppercase tracking-wide transition shadow-2xs"
                             >
                               Abrir
                             </button>
@@ -511,7 +511,7 @@ export default function Comandas({
                                     onCancelarComanda(c.id);
                                   }
                                 }}
-                                className="px-3 py-1.5 bg-slate-900 border border-rose-800/60 hover:bg-rose-950/40 text-rose-500 text-[10px] font-bold rounded-lg uppercase tracking-wide transition shadow-2xs"
+                                className="px-3 py-1.5 bg-white border border-rose-200 hover:bg-rose-50 text-rose-600 text-[11px] font-bold rounded-lg uppercase tracking-wide transition shadow-2xs"
                               >
                                 Cancelar
                               </button>
@@ -548,11 +548,11 @@ export default function Comandas({
           return (
             <div className="space-y-4 animate-fade-in">
               {/* Header / Active Selector */}
-              <div className="bg-slate-900 rounded-xl border border-slate-800 p-3 shadow-sm flex items-center justify-between gap-4">
+              <div className="bg-white rounded-xl border border-slate-200 p-3 shadow-sm flex items-center justify-between gap-4">
                 <div className="flex gap-2 items-center overflow-x-auto pb-1 flex-1">
                   <button
                     onClick={() => setViewMode('list')}
-                    className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-lg transition mr-2 shrink-0 flex items-center gap-1"
+                    className="px-3 py-2 bg-slate-200 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-lg transition mr-2 shrink-0 flex items-center gap-1"
                   >
                     &larr; Voltar
                   </button>
@@ -565,7 +565,7 @@ export default function Comandas({
                       className={`px-4 py-2 text-xs font-bold rounded-lg border shrink-0 transition ${
                         c.id === selectedComandaId
                           ? 'bg-emerald-600 border-emerald-500 text-white shadow-md'
-                          : 'bg-slate-900 border-slate-800 text-slate-500 hover:bg-slate-800/50'
+                          : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-100'
                       }`}
                     >
                       {c.code}
@@ -582,16 +582,16 @@ export default function Comandas({
                     setCheckoutError(null);
                     setShowNewComandaModal(true);
                   }}
-                  className="px-4 py-2 bg-emerald-900/50 hover:bg-emerald-200 text-emerald-300 font-bold rounded-lg text-xs flex items-center gap-1 shrink-0 transition"
+                  className="px-4 py-2 bg-emerald-100 hover:bg-emerald-100 text-emerald-700 font-bold rounded-lg text-xs flex items-center gap-1 shrink-0 transition"
                 >
                   <PlusCircle size={14} /> Nova Comanda
                 </button>
               </div>
 
               {!activeComanda ? (
-                <div className="flex-1 flex flex-col justify-center items-center text-center p-12 bg-slate-900 rounded-xl border border-slate-800 text-slate-500">
+                <div className="flex-1 flex flex-col justify-center items-center text-center p-12 bg-white rounded-xl border border-slate-200 text-slate-500">
                   <ShoppingBag size={48} className="text-slate-250 mb-3" />
-                  <h5 className="font-display font-bold text-slate-300 mb-1">
+                  <h5 className="font-display font-bold text-slate-600 mb-1">
                     Nenhuma comanda em atendimento
                   </h5>
                   <p className="text-xs max-w-xs text-slate-500">
@@ -630,7 +630,7 @@ export default function Comandas({
                   return (
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start min-h-[600px] h-auto lg:h-[calc(100vh-140px)]">
                       {/* COLUNA ESQUERDA: DETALHE DA COMANDA (CARRINHO E RESUMO) = 7 cols */}
-                      <div className="col-span-1 lg:col-span-6 xl:col-span-7 bg-slate-900 rounded-xl border border-slate-800 shadow-sm flex flex-col h-full overflow-hidden">
+                      <div className="col-span-1 lg:col-span-6 xl:col-span-7 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden">
                         {/* Header da Comanda */}
                         <div className="bg-slate-800 text-white p-4 flex justify-between items-center shrink-0">
                           <div>
@@ -638,7 +638,7 @@ export default function Comandas({
                               <h2 className="text-2xl font-display font-black tracking-tight">
                                 {activeComanda.code}
                               </h2>
-                              <span className="text-[10px] uppercase font-mono font-bold bg-amber-950/400 text-slate-50 px-1.5 py-0.5 rounded">
+                              <span className="text-[11px] uppercase font-mono font-bold bg-amber-500 text-slate-900 px-1.5 py-0.5 rounded">
                                 {activeComanda.status === 'active'
                                   ? 'ABERTA'
                                   : activeComanda.status === 'paid' &&
@@ -652,7 +652,7 @@ export default function Comandas({
                             <div className="text-xs text-slate-300 flex items-center gap-1.5 font-mono">
                               <UserCheck size={12} />
                               {bindedCust ? (
-                                <span className="font-bold text-emerald-300">
+                                <span className="font-bold text-emerald-400">
                                   Cliente: {bindedCust.name}
                                 </span>
                               ) : (
@@ -660,7 +660,7 @@ export default function Comandas({
                               )}
                               <div className="relative ml-2 flex items-center">
                                 <select
-                                  className="text-[9px] bg-slate-700 text-white font-bold tracking-wider py-1 pl-2 pr-4 rounded uppercase outline-none appearance-none cursor-pointer"
+                                  className="text-[11px] bg-slate-700 text-slate-100 font-bold tracking-wider py-1 pl-2 pr-4 rounded uppercase outline-none appearance-none cursor-pointer"
                                   value={activeComanda.customerId || ''}
                                   onChange={(e) =>
                                     onUpdateComanda(activeComanda.id, {
@@ -692,7 +692,7 @@ export default function Comandas({
                                     setViewMode('list');
                                   }
                                 }}
-                                className="text-xs font-bold text-rose-300 hover:text-rose-100 bg-rose-900/30 hover:bg-rose-900/50 px-3 py-1.5 rounded-lg border border-transparent hover:border-rose-800 transition shadow-xs cursor-pointer"
+                                className="text-xs font-bold text-rose-400 hover:text-rose-300 bg-rose-900/30 hover:bg-rose-900/50 px-3 py-1.5 rounded-lg border border-transparent hover:border-rose-800/60 transition shadow-xs cursor-pointer"
                               >
                                 CANCELAR CONTA
                               </button>
@@ -701,7 +701,7 @@ export default function Comandas({
                         </div>
 
                         {/* Lista de Itens */}
-                        <div className="flex-1 overflow-y-auto p-4 bg-slate-800/50 space-y-2">
+                        <div className="flex-1 overflow-y-auto p-4 bg-slate-100 space-y-2">
                           {activeComanda.items.map((item) => {
                             const product = products.find(
                               (p) => p.name === item.productName,
@@ -709,29 +709,29 @@ export default function Comandas({
                             return (
                               <div
                                 key={item.id}
-                                className="bg-slate-900 border border-slate-800 rounded-lg p-3 flex shadow-2xs items-center gap-3"
+                                className="bg-white border border-slate-200 rounded-lg p-3 flex shadow-2xs items-center gap-3"
                               >
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-2">
-                                    <h4 className="text-sm font-bold text-slate-200 truncate">
+                                    <h4 className="text-sm font-bold text-slate-700 truncate">
                                       {item.productName}
                                     </h4>
                                     {product?.isComposite ? (
-                                      <span className="text-[9px] bg-blue-950/40 text-blue-400 font-mono font-bold px-1.5 py-0.5 rounded border border-blue-800/60">
+                                      <span className="text-[11px] bg-blue-50 text-blue-700 font-mono font-bold px-1.5 py-0.5 rounded border border-blue-200">
                                         COMPOSTO
                                       </span>
                                     ) : (
-                                      <span className="text-[9px] bg-slate-800 text-slate-500 font-mono font-bold px-1.5 py-0.5 rounded border border-slate-800">
+                                      <span className="text-[11px] bg-slate-200 text-slate-500 font-mono font-bold px-1.5 py-0.5 rounded border border-slate-200">
                                         SIMPLES
                                       </span>
                                     )}
                                   </div>
-                                  <div className="text-[11px] text-slate-500 font-mono mt-0.5">
+                                  <div className="text-xs text-slate-500 font-mono mt-0.5">
                                     {fmt(item.price)} un.
                                   </div>
                                 </div>
 
-                                <div className="flex items-center bg-slate-800/50 border border-slate-800 rounded-lg shrink-0">
+                                <div className="flex items-center bg-slate-100 border border-slate-200 rounded-lg shrink-0">
                                   <button
                                     onClick={() => {
                                       if (item.quantity === 1) {
@@ -752,11 +752,11 @@ export default function Comandas({
                                         );
                                       }
                                     }}
-                                    className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-rose-500 hover:bg-slate-800 rounded-l-lg transition cursor-pointer"
+                                    className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-rose-600 hover:bg-slate-200 rounded-l-lg transition cursor-pointer"
                                   >
                                     <Minus size={14} />
                                   </button>
-                                  <span className="w-8 text-center text-xs font-bold text-slate-300 font-mono">
+                                  <span className="w-8 text-center text-xs font-bold text-slate-600 font-mono">
                                     {item.quantity}
                                   </span>
                                   <button
@@ -767,14 +767,14 @@ export default function Comandas({
                                         item.quantity + 1,
                                       )
                                     }
-                                    className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-emerald-500 hover:bg-slate-800 rounded-r-lg transition cursor-pointer"
+                                    className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-emerald-600 hover:bg-slate-200 rounded-r-lg transition cursor-pointer"
                                   >
                                     <Plus size={14} />
                                   </button>
                                 </div>
 
                                 <div className="text-right min-w-[70px] shrink-0">
-                                  <div className="text-sm font-black text-slate-200 font-mono">
+                                  <div className="text-sm font-black text-slate-700 font-mono">
                                     {fmt(item.price * item.quantity)}
                                   </div>
                                 </div>
@@ -791,7 +791,7 @@ export default function Comandas({
                                         item.id,
                                       );
                                   }}
-                                  className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-rose-500 hover:bg-rose-950/40 rounded-lg shrink-0 transition"
+                                  className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg shrink-0 transition"
                                 >
                                   <Trash2 size={14} />
                                 </button>
@@ -812,8 +812,8 @@ export default function Comandas({
                         </div>
 
                         {/* Resumo Fixo & Pagamento */}
-                        <div className="bg-slate-900 border-t border-slate-800 p-4 shrink-0 shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
-                          <div className="text-xs font-mono text-slate-400 mb-3 bg-slate-800/50 border border-slate-800 rounded-lg px-3 py-2">
+                        <div className="bg-white border-t border-slate-200 p-4 shrink-0 shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
+                          <div className="text-xs font-mono text-slate-500 mb-3 bg-slate-100 border border-slate-200 rounded-lg px-3 py-2">
                             Fechamento pela API usa o total exato dos itens.
                             Desconto, acréscimo e taxa de serviço não estão
                             disponíveis neste fluxo.
@@ -822,25 +822,25 @@ export default function Comandas({
                           {/* Totals Box Horizontal */}
                           <div className="bg-slate-800 rounded-xl p-4 flex justify-between items-center mb-3 text-white">
                             <div className="text-center">
-                              <span className="text-[9px] uppercase font-bold text-slate-500 block mb-0.5 tracking-widest">
+                              <span className="text-[11px] uppercase font-bold text-slate-400 block mb-0.5 tracking-widest">
                                 Valor Recebido
                               </span>
                               <span className="text-lg font-mono font-bold text-emerald-400">
                                 {fmt(pago)}
                               </span>
                             </div>
-                            <div className="w-px h-10 bg-slate-600/50"></div>
+                            <div className="w-px h-10 bg-slate-700"></div>
                             <div className="text-center">
-                              <span className="text-[9px] uppercase font-bold text-slate-500 block mb-0.5 tracking-widest">
+                              <span className="text-[11px] uppercase font-bold text-slate-400 block mb-0.5 tracking-widest">
                                 Módulo Restante
                               </span>
                               <span className="text-lg font-display font-black text-rose-400">
                                 {fmt(restante)}
                               </span>
                             </div>
-                            <div className="w-px h-10 bg-slate-600/50"></div>
+                            <div className="w-px h-10 bg-slate-700"></div>
                             <div className="text-right">
-                              <span className="text-[10px] uppercase font-bold text-slate-500 block mb-0.5 tracking-widest">
+                              <span className="text-[11px] uppercase font-bold text-slate-400 block mb-0.5 tracking-widest">
                                 Total da Conta
                               </span>
                               <span className="text-3xl font-mono font-black text-white">
@@ -854,17 +854,17 @@ export default function Comandas({
                             <div className="flex gap-2">
                               <button
                                 onClick={() => handleLaunchCheckout('fiado')}
-                                className="flex-[1] bg-amber-950/40 rounded-xl border border-amber-800/60 hover:bg-amber-900/50 text-amber-400 font-bold text-[11px] py-4 flex flex-col items-center justify-center transition shadow-2xs leading-tight cursor-pointer"
+                                className="flex-[1] bg-amber-50 rounded-xl border border-amber-200 hover:bg-amber-100 text-amber-700 font-bold text-xs py-4 flex flex-col items-center justify-center transition shadow-2xs leading-tight cursor-pointer"
                               >
                                 LANÇAR NO
                                 <span className="text-sm">CADERNO</span>
                               </button>
                               <button
                                 onClick={() => handleLaunchCheckout('dinheiro')}
-                                className="flex-[2] bg-emerald-600 text-white rounded-xl hover:bg-emerald-950/400 font-bold text-sm py-4 flex flex-col items-center justify-center transition shadow-md shadow-emerald-500/20 leading-tight cursor-pointer"
+                                className="flex-[2] bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 font-bold text-sm py-4 flex flex-col items-center justify-center transition shadow-md shadow-emerald-500/20 leading-tight cursor-pointer"
                               >
                                 PAGAMENTO & FECHAMENTO
-                                <span className="text-[11px] font-normal text-emerald-100">
+                                <span className="text-xs font-normal text-emerald-800">
                                   Dinheiro, Pix ou Cartão
                                 </span>
                               </button>
@@ -874,7 +874,7 @@ export default function Comandas({
                       </div>
 
                       {/* COLUNA DIREITA: BUSCA & INCLUSÃO = 5 cols */}
-                      <div className="col-span-1 lg:col-span-6 xl:col-span-5 bg-slate-900 rounded-xl border border-slate-800 shadow-sm flex flex-col h-full overflow-hidden p-4">
+                      <div className="col-span-1 lg:col-span-6 xl:col-span-5 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden p-4">
                         <div className="text-xs uppercase font-mono font-bold text-slate-500 mb-3 tracking-widest flex items-center gap-2">
                           <PlusCircle size={14} /> Adicionar Produtos
                         </div>
@@ -883,14 +883,14 @@ export default function Comandas({
                         <div className="relative mb-3 shrink-0">
                           <Search
                             size={20}
-                            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-emerald-500"
+                            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-emerald-600"
                           />
                           <input
                             type="text"
                             placeholder="Ex: Skol"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-slate-800/50 border border-slate-800 rounded-xl py-3.5 pl-11 pr-4 text-[13px] text-slate-200 outline-none focus:bg-slate-900 focus:border-emerald-600 transition-all font-sans font-bold shadow-2xs"
+                            className="w-full bg-slate-100 border border-slate-200 rounded-xl py-3.5 pl-11 pr-4 text-[13px] text-slate-700 outline-none focus:bg-white focus:border-emerald-500 transition-all font-sans font-bold shadow-2xs"
                             autoComplete="off"
                           />
                         </div>
@@ -904,10 +904,10 @@ export default function Comandas({
                             <button
                               key={cat}
                               onClick={() => setSelectedCategory(cat)}
-                              className={`px-3 py-1.5 rounded-lg text-[10px] uppercase font-mono font-semibold cursor-pointer shrink-0 transition ${
+                              className={`px-3 py-1.5 rounded-lg text-[11px] uppercase font-mono font-semibold cursor-pointer shrink-0 transition ${
                                 selectedCategory === cat
-                                  ? 'bg-slate-800 text-white shadow-xs'
-                                  : 'bg-slate-800 text-slate-500 hover:bg-slate-700'
+                                  ? 'bg-emerald-600 text-white shadow-xs'
+                                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                               }`}
                             >
                               {cat}
@@ -929,25 +929,25 @@ export default function Comandas({
                                   !outOfStock && handleAddProductToComanda(p)
                                 }
                                 disabled={outOfStock}
-                                className={`p-3 bg-slate-900 border border-slate-800 rounded-xl text-left flex flex-col justify-between h-[90px] shadow-sm transition ${
+                                className={`p-3 bg-white border border-slate-200 rounded-xl text-left flex flex-col justify-between h-[90px] shadow-sm transition ${
                                   outOfStock
                                     ? 'opacity-40 cursor-not-allowed'
                                     : 'hover:border-emerald-500 hover:shadow-md cursor-pointer'
                                 }`}
                               >
                                 <div>
-                                  <span className="text-[9px] uppercase text-slate-500 font-mono font-bold block mb-0.5 truncate">
+                                  <span className="text-[11px] uppercase text-slate-500 font-mono font-bold block mb-0.5 truncate">
                                     {p.category}
                                   </span>
-                                  <span className="text-xs font-bold text-slate-200 leading-tight line-clamp-2">
+                                  <span className="text-xs font-bold text-slate-700 leading-tight line-clamp-2">
                                     {p.name}
                                   </span>
                                 </div>
                                 <div className="flex justify-between items-end w-full">
-                                  <span className="text-[13px] font-mono font-black text-emerald-400">
+                                  <span className="text-[13px] font-mono font-black text-emerald-700">
                                     {fmt(p.price)}
                                   </span>
-                                  <span className="text-[9px] text-slate-500 font-mono font-bold bg-slate-800 px-1 rounded">
+                                  <span className="text-[11px] text-slate-500 font-mono font-bold bg-slate-200 px-1 rounded">
                                     {p.isComposite
                                       ? 'CMP'
                                       : `${p.stock} ${p.unit.toUpperCase()}`}
@@ -959,18 +959,18 @@ export default function Comandas({
                         </div>
 
                         {hiddenProductsCount > 0 && (
-                          <p className="text-[10px] text-slate-500 font-mono text-center py-2 shrink-0">
+                          <p className="text-[11px] text-slate-500 font-mono text-center py-2 shrink-0">
                             Mostrando {visibleProducts.length} de{' '}
                             {filteredProducts.length} produtos — digite pra
                             buscar os outros {hiddenProductsCount}.
                           </p>
                         )}
 
-                        <div className="mt-4 border-t border-slate-800 pt-4 shrink-0 bg-slate-800/50/50 -mx-4 -mb-4 p-4 rounded-b-xl border-dashed">
-                          <span className="text-[10px] text-slate-500 uppercase font-mono font-bold block mb-2 flex items-center gap-1">
+                        <div className="mt-4 border-t border-slate-200 pt-4 shrink-0 bg-slate-100/50 -mx-4 -mb-4 p-4 rounded-b-xl border-dashed">
+                          <span className="text-[11px] text-slate-500 uppercase font-mono font-bold block mb-2 flex items-center gap-1">
                             <Plus size={12} /> Lançamentos avulsos
                           </span>
-                          <p className="text-xs text-slate-400 leading-relaxed">
+                          <p className="text-xs text-slate-500 leading-relaxed">
                             A API atual só permite adicionar itens previamente
                             cadastrados em produtos. Para venda eventual,
                             cadastre o item no catálogo e lance por aqui.
@@ -987,17 +987,17 @@ export default function Comandas({
 
       {/* MODAL 1: Create New Comanda */}
       {showNewComandaModal && (
-        <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
-          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl relative">
+        <div className="fixed inset-0 bg-slate-50 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
+          <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl relative">
             <button
               onClick={() => setShowNewComandaModal(false)}
-              className="absolute top-4 right-4 text-slate-500 hover:text-slate-200 cursor-pointer"
+              className="absolute top-4 right-4 text-slate-500 hover:text-slate-900 cursor-pointer"
             >
               <X size={18} />
             </button>
 
-            <h3 className="text-lg font-display font-bold text-slate-850 mb-4 flex items-center gap-1.5">
-              <PlusCircle className="text-emerald-500" size={18} />
+            <h3 className="text-lg font-display font-bold text-slate-900 mb-4 flex items-center gap-1.5">
+              <PlusCircle className="text-emerald-600" size={18} />
               Abrir Nova Comanda
             </h3>
 
@@ -1009,7 +1009,7 @@ export default function Comandas({
 
             <form onSubmit={handleCreateComanda} className="space-y-4">
               <div>
-                <label className="block text-xs uppercase font-mono text-slate-505 mb-1 font-bold">
+                <label className="block text-xs uppercase font-mono text-slate-500 mb-1 font-bold">
                   Identificação / Nome (Ex: Comanda 15, Balcão João):
                 </label>
                 <input
@@ -1017,7 +1017,7 @@ export default function Comandas({
                   placeholder="Ex: Balcão Canto, Mesa 4 orelha"
                   value={newComandaName}
                   onChange={(e) => setNewComandaName(e.target.value)}
-                  className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2.5 rounded-lg text-xs text-slate-200 outline-none focus:bg-slate-900 focus:border-emerald-600"
+                  className="w-full bg-slate-100 border border-slate-200 px-3 py-2.5 rounded-lg text-xs text-slate-700 outline-none focus:bg-white focus:border-emerald-500"
                   data-testid="comanda-nome-input"
                   required
                   autoFocus
@@ -1025,13 +1025,13 @@ export default function Comandas({
               </div>
 
               <div>
-                <label className="block text-xs uppercase font-mono text-slate-505 mb-1 font-bold">
+                <label className="block text-xs uppercase font-mono text-slate-500 mb-1 font-bold">
                   Vincular Cliente Registrado (Opcional):
                 </label>
                 <select
                   value={newComandaCustomerId}
                   onChange={(e) => setNewComandaCustomerId(e.target.value)}
-                  className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2 text-xs text-slate-300 rounded-lg outline-none focus:bg-slate-900 focus:border-emerald-605"
+                  className="w-full bg-slate-100 border border-slate-200 px-3 py-2 text-xs text-slate-600 rounded-lg outline-none focus:bg-white focus:border-emerald-500"
                 >
                   <option value="">Não vincular (Consumo imediato)</option>
                   {customers.map((c) => (
@@ -1047,13 +1047,13 @@ export default function Comandas({
                 <button
                   type="button"
                   onClick={() => setShowNewComandaModal(false)}
-                  className="flex-1 py-2 text-xs font-semibold bg-slate-800/50 text-slate-500 border border-slate-800 rounded-lg hover:bg-slate-800"
+                  className="flex-1 py-2 text-xs font-semibold bg-slate-100 text-slate-500 border border-slate-200 rounded-lg hover:bg-slate-200"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-950/400 text-white rounded-lg cursor-pointer transition shadow-xs"
+                  className="flex-1 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg cursor-pointer transition shadow-xs"
                 >
                   Abrir Comanda
                 </button>
@@ -1065,23 +1065,23 @@ export default function Comandas({
 
       {/* MODAL 2: Checkout / Payment Details */}
       {showCheckoutModal && selectedComanda && (
-        <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
-          <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl relative">
+        <div className="fixed inset-0 bg-slate-50 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
+          <div className="w-full max-w-lg bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl relative">
             <button
               onClick={() => setShowCheckoutModal(false)}
-              className="absolute top-4 right-4 text-slate-500 hover:text-slate-200 cursor-pointer"
+              className="absolute top-4 right-4 text-slate-500 hover:text-slate-900 cursor-pointer"
             >
               <X size={18} />
             </button>
 
-            <h3 className="text-lg font-display font-bold text-slate-850 mb-1">
+            <h3 className="text-lg font-display font-bold text-slate-900 mb-1">
               Finalização Balcão
             </h3>
             <p className="text-xs text-slate-500 font-mono mb-4">
               Comanda: {selectedComanda.code}
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-5 mb-5 border-y border-slate-700 py-4">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-5 mb-5 border-y border-slate-300 py-4">
               {/* Payment selection */}
               <div className="md:col-span-6 space-y-2.5">
                 <label className="block text-xs uppercase font-mono text-slate-500 font-bold">
@@ -1103,8 +1103,8 @@ export default function Comandas({
                       }}
                       className={`px-3 py-2 text-xs font-bold rounded-lg text-left border cursor-pointer transition ${
                         checkoutPaymentMethod === m.id
-                          ? 'bg-emerald-950/40 border-emerald-500 text-emerald-300 shadow-2xs'
-                          : 'bg-slate-800/50 border-slate-205 text-slate-655 hover:bg-slate-800'
+                          ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-2xs'
+                          : 'bg-slate-100 border-slate-205 text-slate-655 hover:bg-slate-200'
                       }`}
                     >
                       {m.label}
@@ -1119,14 +1119,14 @@ export default function Comandas({
                   <span className="text-xs uppercase font-mono text-slate-500 block mb-2 font-bold">
                     Resumo da Conta:
                   </span>
-                  <div className="space-y-1 bg-slate-800/50 p-3 rounded-lg border border-slate-800 text-xs font-mono">
+                  <div className="space-y-1 bg-slate-100 p-3 rounded-lg border border-slate-200 text-xs font-mono">
                     <div className="flex justify-between text-slate-500">
                       <span>Itens:</span>
                       <span>{fmt(subtotalSelected)}</span>
                     </div>
-                    <div className="flex justify-between text-slate-200 font-bold border-t border-slate-800 pt-1.5 mt-1.5 text-sm">
+                    <div className="flex justify-between text-slate-700 font-bold border-t border-slate-200 pt-1.5 mt-1.5 text-sm">
                       <span>Total:</span>
-                      <span className="text-emerald-400">
+                      <span className="text-emerald-700">
                         {fmt(totalSelected)}
                       </span>
                     </div>
@@ -1137,13 +1137,13 @@ export default function Comandas({
                 {checkoutPaymentMethod === 'fiado' && (
                   <div className="mt-4 space-y-2">
                     <div className="flex justify-between items-center">
-                      <label className="block text-[10px] uppercase font-mono text-rose-750 font-bold">
+                      <label className="block text-[11px] uppercase font-mono text-rose-750 font-bold">
                         Vincular Cliente do Caderno:
                       </label>
                       <button
                         type="button"
                         onClick={() => setShowNewClientForm(!showNewClientForm)}
-                        className="text-[10px] text-emerald-500 hover:underline inline-flex items-center gap-0.5 cursor-pointer font-bold"
+                        className="text-[11px] text-emerald-600 hover:underline inline-flex items-center gap-0.5 cursor-pointer font-bold"
                       >
                         <UserPlus size={10} /> + Novo
                       </button>
@@ -1156,7 +1156,7 @@ export default function Comandas({
                           setCheckoutCustomerId(e.target.value);
                           setCheckoutError(null);
                         }}
-                        className="w-full bg-slate-800/50 border border-slate-800 px-2.5 py-1.5 text-xs text-slate-200 rounded-lg outline-none"
+                        className="w-full bg-slate-100 border border-slate-200 px-2.5 py-1.5 text-xs text-slate-700 rounded-lg outline-none"
                         data-testid="checkout-cliente-select"
                         required
                       >
@@ -1170,14 +1170,14 @@ export default function Comandas({
                     ) : (
                       <form
                         onSubmit={handleQuickAddClient}
-                        className="bg-slate-800/50 p-2.5 rounded border border-slate-800 space-y-1.5 text-left"
+                        className="bg-slate-100 p-2.5 rounded border border-slate-200 space-y-1.5 text-left"
                       >
                         <input
                           type="text"
                           placeholder="Nome Completo"
                           value={newClientName}
                           onChange={(e) => setNewClientName(e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-250 py-1 px-1.5 text-[10px] rounded text-slate-200"
+                          className="w-full bg-white border border-slate-200 py-1 px-1.5 text-[11px] rounded text-slate-700"
                           required
                         />
                         <input
@@ -1185,11 +1185,11 @@ export default function Comandas({
                           placeholder="Telefone"
                           value={newClientPhone}
                           onChange={(e) => setNewClientPhone(e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-250 py-1 px-1.5 text-[10px] rounded text-slate-200"
+                          className="w-full bg-white border border-slate-200 py-1 px-1.5 text-[11px] rounded text-slate-700"
                         />
                         <button
                           type="submit"
-                          className="w-full bg-emerald-600 hover:bg-emerald-950/400 font-bold text-[10px] rounded text-white cursor-pointer py-1"
+                          className="w-full bg-emerald-600 hover:bg-emerald-700 font-bold text-[11px] rounded text-white cursor-pointer py-1"
                         >
                           Salvar
                         </button>
@@ -1201,7 +1201,7 @@ export default function Comandas({
             </div>
 
             {checkoutError && (
-              <div className="p-3 bg-rose-950/40 border border-rose-150 rounded-xl text-rose-500 text-xs font-semibold mb-4 text-center">
+              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-600 text-xs font-semibold mb-4 text-center">
                 ⚠️ {checkoutError}
               </div>
             )}
@@ -1210,7 +1210,7 @@ export default function Comandas({
               <button
                 type="button"
                 onClick={() => setShowCheckoutModal(false)}
-                className="flex-1 py-3 font-semibold text-xs rounded-xl bg-slate-800/50 border border-slate-800 text-slate-500 hover:bg-slate-800 duration-150 cursor-pointer"
+                className="flex-1 py-3 font-semibold text-xs rounded-xl bg-slate-100 border border-slate-200 text-slate-500 hover:bg-slate-200 duration-150 cursor-pointer"
               >
                 Cancelar
               </button>
@@ -1218,7 +1218,7 @@ export default function Comandas({
                 type="button"
                 id="btn-confirm-pos-payment"
                 onClick={handleConfirmCheckout}
-                className="flex-1 py-3 font-bold text-xs rounded-xl bg-emerald-600 hover:bg-emerald-950/400 text-white transition cursor-pointer shadow-md shadow-emerald-500/10"
+                className="flex-1 py-3 font-bold text-xs rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition cursor-pointer shadow-md shadow-emerald-500/10"
               >
                 Confirmar Pagamento
               </button>
@@ -1229,34 +1229,34 @@ export default function Comandas({
 
       {/* MODAL 3: Receipt Preview Cupom Balcão */}
       {showReceiptModal && receiptComanda && (
-        <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
-          <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl relative">
+        <div className="fixed inset-0 bg-slate-50 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
+          <div className="w-full max-w-sm bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl relative">
             <button
               onClick={() => setShowReceiptModal(false)}
-              className="absolute top-4 right-4 text-slate-500 hover:text-slate-200 cursor-pointer animate-pulse"
+              className="absolute top-4 right-4 text-slate-500 hover:text-slate-900 cursor-pointer animate-pulse"
             >
               <X size={18} />
             </button>
 
             {/* Recibo Mini Thermal printer style */}
-            <div className="bg-stone-50 text-stone-900 font-mono text-[11px] p-5 rounded-lg border border-slate-250 space-y-3.5 shadow-inner leading-normal">
+            <div className="bg-stone-50 text-stone-900 font-mono text-xs p-5 rounded-lg border border-slate-200 space-y-3.5 shadow-inner leading-normal">
               <div className="text-center font-bold">
-                <p className="text-sm tracking-tight font-sans font-extrabold text-slate-850">
+                <p className="text-sm tracking-tight font-sans font-extrabold text-slate-900">
                   BAR AREA VERDE
                 </p>
-                <p className="text-[9px] font-normal tracking-wide">
+                <p className="text-[11px] font-normal tracking-wide">
                   AMIGOS E FAMILIA LTDA
                 </p>
-                <p className="text-[8px] font-normal text-stone-500 border-b border-dashed border-stone-300 pb-2">
+                <p className="text-[10px] font-normal text-stone-500 border-b border-dashed border-stone-300 pb-2">
                   AV. DA AMIZADE, 1800 - BALCÃO
                 </p>
               </div>
 
               <div>
-                <p className="font-bold uppercase tracking-wider text-center text-[10px] text-stone-605">
+                <p className="font-bold uppercase tracking-wider text-center text-[11px] text-stone-605">
                   ** CUPOM OPERACIONAL **
                 </p>
-                <div className="grid grid-cols-2 mt-2 gap-y-0.5 text-[9px] text-stone-650">
+                <div className="grid grid-cols-2 mt-2 gap-y-0.5 text-[11px] text-stone-650">
                   <span>Comanda/ID:</span>
                   <span className="text-right font-bold">
                     {receiptComanda.code}
@@ -1274,14 +1274,14 @@ export default function Comandas({
                     )}
                   </span>
                   <span>Pagamento:</span>
-                  <span className="text-right font-bold text-emerald-300">
+                  <span className="text-right font-bold text-emerald-700">
                     {(receiptComanda.paymentMethod || 'DINHEIRO').toUpperCase()}
                   </span>
                 </div>
               </div>
 
               {/* Items Table */}
-              <div className="border-t border-b border-dashed border-stone-300 py-2 space-y-1 select-none text-[9px]">
+              <div className="border-t border-b border-dashed border-stone-300 py-2 space-y-1 select-none text-[11px]">
                 <div className="grid grid-cols-12 font-bold text-stone-500 mb-1">
                   <span className="col-span-6 animate-pulse">
                     PRODUCT DESCRIPTION
@@ -1308,7 +1308,7 @@ export default function Comandas({
               </div>
 
               {/* Summary */}
-              <div className="space-y-0.5 text-right text-[10px] text-stone-700">
+              <div className="space-y-0.5 text-right text-[11px] text-stone-700">
                 <p className="flex justify-between">
                   <span>SUBTOTAL:</span>
                   <span>
@@ -1321,7 +1321,7 @@ export default function Comandas({
                   </span>
                 </p>
                 {receiptComanda.discount > 0 && (
-                  <p className="flex justify-between text-rose-400 font-bold font-mono">
+                  <p className="flex justify-between text-rose-700 font-bold font-mono">
                     <span>DESCONTO (-):</span>
                     <span>{receiptComanda.discount.toFixed(2)}</span>
                   </p>
@@ -1332,7 +1332,7 @@ export default function Comandas({
                     <span>{receiptComanda.addition.toFixed(2)}</span>
                   </p>
                 )}
-                <p className="flex justify-between font-bold text-xs pt-1.5 border-t border-dashed border-stone-300 mt-1 text-slate-50">
+                <p className="flex justify-between font-bold text-xs pt-1.5 border-t border-dashed border-stone-300 mt-1 text-slate-900">
                   <span>TOTAL PAGO:</span>
                   <span className="text-sm font-sans font-extrabold text-emerald-805">
                     R${' '}
@@ -1348,10 +1348,10 @@ export default function Comandas({
                 </p>
               </div>
 
-              <div className="text-center text-[8px] text-stone-450 pt-3 border-t border-dashed border-stone-300 space-y-0.5">
+              <div className="text-center text-[10px] text-stone-450 pt-3 border-t border-dashed border-stone-300 space-y-0.5">
                 <p>Obrigado pela preferência e respeito.</p>
                 <p>Volte sempre à Area Verde!</p>
-                <p className="font-mono mt-1 text-[7px] text-stone-400">
+                <p className="font-mono mt-1 text-[10px] text-stone-400">
                   Sistema Area Verde - POS Balcão
                 </p>
               </div>
@@ -1359,7 +1359,7 @@ export default function Comandas({
 
             <button
               onClick={() => setShowReceiptModal(false)}
-              className="mt-6 w-full py-2.5 bg-emerald-600 hover:bg-emerald-950/400 font-bold rounded-xl text-xs text-white transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+              className="mt-6 w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 font-bold rounded-xl text-xs text-white transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
             >
               <Printer size={14} /> Fechar e Prosseguir
             </button>

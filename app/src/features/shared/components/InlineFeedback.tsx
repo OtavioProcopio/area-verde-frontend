@@ -6,9 +6,9 @@ interface InlineFeedbackProps {
 }
 
 const TONE_CLASSES: Record<InlineFeedbackProps['tone'], string> = {
-  success: 'bg-emerald-950/40 border-emerald-800/60 text-emerald-400',
-  error: 'bg-rose-950/40 border-rose-800/60 text-rose-400',
-  info: 'bg-slate-800/70 border-slate-700 text-slate-300',
+  success: 'bg-emerald-50 border-emerald-200 text-emerald-800',
+  error: 'bg-rose-50 border-rose-200 text-rose-700',
+  info: 'bg-slate-100 border-slate-200 text-slate-600',
 };
 
 export function InlineFeedback({ tone, message }: InlineFeedbackProps) {

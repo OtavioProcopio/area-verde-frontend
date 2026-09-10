@@ -74,24 +74,21 @@ export default function Login({
   return (
     <div
       id="login-screen"
-      className="min-h-screen flex items-center justify-center bg-slate-800/50 p-6 selection:bg-emerald-600"
+      className="min-h-screen flex items-center justify-center bg-slate-50 p-6 selection:bg-emerald-600 selection:text-white"
     >
-      <div className="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-emerald-900/30 blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 h-96 w-96 rounded-full bg-green-100/20 blur-[100px] pointer-events-none" />
-
-      <div className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 p-8 shadow-2xl">
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-600 via-green-500 to-emerald-700" />
+      <div className="relative w-full max-w-sm overflow-hidden rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-600" />
 
         <div className="mb-8 text-center">
           <div className="mb-3 inline-flex items-center justify-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-600 animate-pulse" />
-            <span className="text-xs uppercase tracking-widest font-mono text-emerald-400 font-bold">
+            <span className="h-2 w-2 rounded-full bg-emerald-600" />
+            <span className="text-xs uppercase tracking-widest font-mono text-emerald-700 font-bold">
               {senhaConfigurada ? 'Acesso Restrito' : 'Configuracao Inicial'}
             </span>
           </div>
 
-          <h1 className="mb-2 text-4xl font-display font-bold tracking-tight text-slate-50">
-            Area <span className="text-emerald-500">Verde</span>
+          <h1 className="mb-2 text-3xl font-display font-bold tracking-tight text-slate-900">
+            Area <span className="text-emerald-600">Verde</span>
           </h1>
           <p className="text-sm font-medium text-slate-500">
             {senhaConfigurada
@@ -118,7 +115,7 @@ export default function Login({
               <div className="relative">
                 <Lock
                   size={18}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
                 />
                 <input
                   type="password"
@@ -128,7 +125,7 @@ export default function Login({
                     clearMessages();
                   }}
                   disabled={isLoading}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-800/50 py-3 pl-11 pr-4 text-center text-xl font-mono font-bold tracking-widest text-slate-100 outline-none transition focus:border-emerald-500"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-center text-xl font-mono font-bold tracking-widest text-slate-900 outline-none transition focus:border-emerald-500 focus:bg-white"
                   placeholder="****"
                   data-testid="login-senha-input"
                   autoFocus
@@ -139,7 +136,7 @@ export default function Login({
             <button
               type="submit"
               disabled={primaryDisabled}
-              className="mb-6 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3.5 text-sm font-bold text-white transition hover:bg-emerald-500 disabled:bg-emerald-900/50 disabled:text-emerald-200"
+              className="mb-6 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3.5 text-sm font-bold text-white transition hover:bg-emerald-700 disabled:bg-emerald-200 disabled:text-emerald-500"
             >
               {isLoading ? (
                 <Loader2 size={18} className="animate-spin" />
@@ -153,7 +150,7 @@ export default function Login({
             onSubmit={handleInitialPasswordSetup}
             className="mt-5 space-y-4"
           >
-            <div className="rounded-2xl border border-emerald-900 bg-emerald-950/30 p-4 text-xs text-emerald-300">
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-xs text-emerald-800">
               O backend ainda nao possui uma senha configurada. Defina uma senha
               com no minimo 4 caracteres para liberar o acesso.
             </div>
@@ -165,7 +162,7 @@ export default function Login({
               <div className="relative">
                 <KeyRound
                   size={18}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
                 />
                 <input
                   type="password"
@@ -175,7 +172,7 @@ export default function Login({
                     clearMessages();
                   }}
                   disabled={isLoading}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-800/50 py-3 pl-11 pr-4 text-center text-lg font-mono font-bold tracking-widest text-slate-100 outline-none transition focus:border-emerald-500"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-center text-lg font-mono font-bold tracking-widest text-slate-900 outline-none transition focus:border-emerald-500 focus:bg-white"
                   placeholder="****"
                   data-testid="setup-nova-senha-input"
                   autoFocus
@@ -190,7 +187,7 @@ export default function Login({
               <div className="relative">
                 <ShieldCheck
                   size={18}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
                 />
                 <input
                   type="password"
@@ -200,7 +197,7 @@ export default function Login({
                     clearMessages();
                   }}
                   disabled={isLoading}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-800/50 py-3 pl-11 pr-4 text-center text-lg font-mono font-bold tracking-widest text-slate-100 outline-none transition focus:border-emerald-500"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-center text-lg font-mono font-bold tracking-widest text-slate-900 outline-none transition focus:border-emerald-500 focus:bg-white"
                   placeholder="****"
                   data-testid="setup-confirmar-senha-input"
                 />
@@ -210,7 +207,7 @@ export default function Login({
             <button
               type="submit"
               disabled={primaryDisabled}
-              className="mb-6 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3.5 text-sm font-bold text-white transition hover:bg-emerald-500 disabled:bg-emerald-900/50 disabled:text-emerald-200"
+              className="mb-6 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3.5 text-sm font-bold text-white transition hover:bg-emerald-700 disabled:bg-emerald-200 disabled:text-emerald-500"
             >
               {isLoading ? (
                 <Loader2 size={18} className="animate-spin" />
@@ -221,10 +218,10 @@ export default function Login({
           </form>
         )}
 
-        <div className="mt-6 flex gap-3 rounded-2xl border border-emerald-900 bg-emerald-950/40 p-4 text-xs text-emerald-300">
-          <Sprout size={20} className="shrink-0 text-emerald-500 mt-0.5" />
+        <div className="mt-6 flex gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-600">
+          <Sprout size={20} className="shrink-0 text-emerald-600 mt-0.5" />
           <div>
-            <span className="mb-0.5 block font-bold text-emerald-300">
+            <span className="mb-0.5 block font-bold text-slate-700">
               Acesso centralizado
             </span>
             A validacao da senha e feita pela API do bar. O frontend so mantem a

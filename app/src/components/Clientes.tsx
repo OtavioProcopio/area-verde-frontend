@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Customer, CustomerHistoryEntry } from '../types';
+import { Customer, CustomerHistoryEntry, Fiado } from '../types';
+import Fiados from './Fiados';
 import {
   Users,
   Search,
@@ -20,6 +21,7 @@ type OperationResult = { success: boolean; msg: string };
 
 interface ClientesProps {
   customers: Customer[];
+  fiados: Fiado[];
   caixaIsOpen: boolean;
   onAddCustomer: (c: {
     name: string;
@@ -39,11 +41,13 @@ interface ClientesProps {
 
 export default function Clientes({
   customers,
+  fiados,
   caixaIsOpen,
   onAddCustomer,
   onUpdateCustomer,
   onPagarFiado,
 }: ClientesProps) {
+  const [mainTab, setMainTab] = useState<'cadastro' | 'fiados'>('cadastro');
   const [viewState, setViewState] = useState<'list' | 'detail'>('list');
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(
     null,
@@ -181,26 +185,57 @@ export default function Clientes({
 
   return (
     <div id="clientes-module" className="space-y-6 animate-fade-in pb-10">
-      {viewState === 'list' && (
-        <>
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <span className="text-xs uppercase tracking-widest font-mono text-emerald-500 font-bold block mb-1">
-                Caderneta de Contas
-              </span>
-              <h2 className="text-3xl font-display font-bold text-slate-50 tracking-tight">
-                Controle de <span className="text-emerald-500">Clientes</span>
-              </h2>
-            </div>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <span className="text-xs uppercase tracking-widest font-mono text-emerald-600 font-bold block mb-1">
+            Caderneta de Contas
+          </span>
+          <h2 className="text-3xl font-display font-bold text-slate-900 tracking-tight">
+            Clientes & <span className="text-emerald-600">Fiado</span>
+          </h2>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {mainTab === 'cadastro' && viewState === 'list' && (
             <button
               onClick={handleAddNewTrigger}
-              className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-950/400 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow-md transition"
+              className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow-md transition"
             >
               <UserPlus size={14} /> Novo Cliente
             </button>
-          </div>
+          )}
 
-          <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
+          <div className="flex bg-slate-200/60 p-1 rounded-xl shadow-inner border border-slate-200">
+            <button
+              id="clientes-subtab-cadastro"
+              onClick={() => setMainTab('cadastro')}
+              className={`px-4 py-2 text-xs font-bold font-mono uppercase tracking-wider rounded-lg transition-all ${mainTab === 'cadastro' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-900 cursor-pointer'}`}
+            >
+              Cadastro
+            </button>
+            <button
+              id="clientes-subtab-fiados"
+              onClick={() => setMainTab('fiados')}
+              className={`px-4 py-2 text-xs font-bold font-mono uppercase tracking-wider rounded-lg transition-all ${mainTab === 'fiados' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-900 cursor-pointer'}`}
+            >
+              Fiado &amp; Pendências
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {mainTab === 'fiados' && (
+        <Fiados
+          fiados={fiados}
+          customers={customers}
+          caixaIsOpen={caixaIsOpen}
+          onPagarFiado={onPagarFiado}
+        />
+      )}
+
+      {mainTab === 'cadastro' && viewState === 'list' && (
+        <>
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
             <div className="relative w-full sm:w-1/2 md:w-1/3">
               <Search
                 size={16}
@@ -209,14 +244,14 @@ export default function Clientes({
               <input
                 type="text"
                 placeholder="Busca por nome, apelido, telefone..."
-                className="w-full pl-9 pr-3 py-2 bg-slate-800/50 border border-slate-800 rounded-xl text-xs outline-none focus:border-emerald-500"
+                className="w-full pl-9 pr-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none focus:border-emerald-500"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <div className="w-full sm:w-auto">
               <select
-                className="w-full px-3 py-2 bg-slate-800/50 border border-slate-800 rounded-xl text-xs outline-none focus:border-emerald-500 cursor-pointer text-slate-300 font-bold"
+                className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none focus:border-emerald-500 cursor-pointer text-slate-600 font-bold"
                 value={filterActive}
                 onChange={(e) => setFilterActive(e.target.value as any)}
               >
@@ -227,21 +262,21 @@ export default function Clientes({
             </div>
           </div>
 
-          <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-sm">
+          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs text-slate-300">
+              <table className="w-full text-left border-collapse text-sm text-slate-600">
                 <thead>
-                  <tr className="border-b border-slate-800 text-[10px] uppercase font-mono tracking-wider text-slate-500 bg-slate-800/50">
-                    <th className="px-5 py-3">Cliente</th>
-                    <th className="px-4 py-3">Contato</th>
-                    <th className="px-4 py-3 text-center">Status</th>
-                    <th className="px-4 py-3 text-right">
+                  <tr className="border-b border-slate-200 text-xs uppercase font-mono tracking-wider text-slate-500 bg-slate-100">
+                    <th className="px-5 py-3.5">Cliente</th>
+                    <th className="px-4 py-3.5">Contato</th>
+                    <th className="px-4 py-3.5 text-center">Status</th>
+                    <th className="px-4 py-3.5 text-right">
                       Saldo Devedor / Fiado
                     </th>
-                    <th className="px-5 py-3 text-right">Ações</th>
+                    <th className="px-5 py-3.5 text-right">Ações</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-200">
                   {filteredCustomers.map((c) => {
                     const pendencyCount = c.history.filter(
                       (h) => h.amount > 0 && h.type !== 'payment',
@@ -250,62 +285,62 @@ export default function Clientes({
                     return (
                       <tr
                         key={c.id}
-                        className={`hover:bg-slate-800/50/80 transition ${!isAct ? 'opacity-60 bg-slate-800/50' : ''} ${c.balance > 0 ? 'bg-rose-950/40/10' : ''}`}
+                        className={`hover:bg-slate-100/80 transition ${!isAct ? 'opacity-60 bg-slate-100' : ''} ${c.balance > 0 ? 'bg-rose-50/10' : ''}`}
                       >
-                        <td className="px-5 py-3">
-                          <span className="font-bold text-slate-200 block text-xs truncate max-w-[200px]">
+                        <td className="px-5 py-3.5">
+                          <span className="font-bold text-slate-700 block text-sm truncate max-w-[200px]">
                             {c.name}
                           </span>
                           {c.nickname && (
-                            <span className="text-[10px] text-slate-500 mt-0.5 inline-flex font-mono bg-slate-800 px-1.5 py-0.5 rounded uppercase">
+                            <span className="text-xs text-slate-500 mt-0.5 inline-flex font-mono bg-slate-200 px-1.5 py-0.5 rounded uppercase">
                               {c.nickname}
                             </span>
                           )}
                         </td>
-                        <td className="px-4 py-3 font-mono text-[10px] text-slate-500">
+                        <td className="px-4 py-3.5 font-mono text-xs text-slate-500">
                           {c.phone || '--'}
                         </td>
-                        <td className="px-4 py-3 text-center">
+                        <td className="px-4 py-3.5 text-center">
                           {isAct ? (
-                            <span className="px-2 py-0.5 rounded text-[9px] uppercase font-bold font-mono border bg-emerald-950/40 text-emerald-400 border-emerald-800/60">
+                            <span className="px-2 py-0.5 rounded text-[11px] uppercase font-bold font-mono border bg-emerald-50 text-emerald-700 border-emerald-200">
                               ATIVO
                             </span>
                           ) : (
-                            <span className="px-2 py-0.5 rounded text-[9px] uppercase font-bold font-mono border bg-slate-800/50 text-slate-500 border-slate-800">
+                            <span className="px-2 py-0.5 rounded text-[11px] uppercase font-bold font-mono border bg-slate-100 text-slate-500 border-slate-200">
                               INATIVO
                             </span>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-4 py-3.5 text-right">
                           {c.balance > 0 ? (
                             <div>
-                              <span className="font-mono text-sm font-black text-rose-500 block">
+                              <span className="font-mono text-sm font-black text-rose-600 block">
                                 {fmt(c.balance)}
                               </span>
                               {pendencyCount > 0 && (
-                                <span className="text-[9px] text-rose-400 font-bold uppercase">
+                                <span className="text-xs text-rose-700 font-bold uppercase">
                                   {pendencyCount} pendências
                                 </span>
                               )}
                             </div>
                           ) : (
-                            <span className="font-mono text-xs font-bold text-slate-300">
+                            <span className="font-mono text-sm font-bold text-slate-600">
                               Quitado
                             </span>
                           )}
                         </td>
-                        <td className="px-5 py-3 text-right">
+                        <td className="px-5 py-3.5 text-right">
                           <div className="flex items-center justify-end gap-1.5 inline-flex">
                             <button
                               onClick={() => viewDetails(c)}
-                              className="w-7 h-7 flex items-center justify-center bg-slate-800/50 hover:bg-emerald-950/40 border border-slate-800 hover:border-emerald-800/60 text-slate-500 hover:text-emerald-400 rounded transition cursor-pointer"
+                              className="w-7 h-7 flex items-center justify-center bg-slate-100 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 text-slate-500 hover:text-emerald-700 rounded transition cursor-pointer"
                               title="Ver Detalhes"
                             >
                               <Eye size={14} />
                             </button>
                             <button
                               onClick={() => handleEditTrigger(c)}
-                              className="w-7 h-7 flex items-center justify-center bg-slate-800/50 hover:bg-slate-800 border border-slate-800 text-slate-500 rounded transition cursor-pointer"
+                              className="w-7 h-7 flex items-center justify-center bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-500 rounded transition cursor-pointer"
                               title="Editar"
                             >
                               <Edit3 size={14} />
@@ -314,8 +349,8 @@ export default function Clientes({
                               onClick={() => handleToggleStatus(c)}
                               className={`w-7 h-7 flex items-center justify-center border rounded transition cursor-pointer ${
                                 isAct
-                                  ? 'bg-rose-950/40 border-rose-800/60 text-rose-500 hover:bg-rose-900/50'
-                                  : 'bg-emerald-950/40 border-emerald-800/60 text-emerald-500 hover:bg-emerald-900/50'
+                                  ? 'bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-100'
+                                  : 'bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-100'
                               }`}
                               title={isAct ? 'Inativar' : 'Ativar'}
                             >
@@ -334,7 +369,7 @@ export default function Clientes({
                     <tr>
                       <td
                         colSpan={5}
-                        className="text-center py-12 text-slate-500 italic text-xs bg-slate-800/50/30"
+                        className="text-center py-12 text-slate-500 italic text-xs bg-slate-100/30"
                       >
                         Nenhum cliente atende aos critérios de busca.
                       </td>
@@ -348,23 +383,23 @@ export default function Clientes({
       )}
 
       {/* DETALHES DO CLIENTE VIEW */}
-      {viewState === 'detail' && selectedCustomer && (
+      {mainTab === 'cadastro' && viewState === 'detail' && selectedCustomer && (
         <div className="animate-fade-in space-y-4">
           {/* Detail header */}
-          <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <button
                 onClick={() => setViewState('list')}
-                className="text-[10px] uppercase font-mono font-bold text-slate-500 hover:text-slate-200 transition block mb-2 cursor-pointer flex items-center gap-1"
+                className="text-[11px] uppercase font-mono font-bold text-slate-500 hover:text-slate-900 transition block mb-2 cursor-pointer flex items-center gap-1"
               >
                 <ArrowLeft size={12} /> Voltar para lista
               </button>
               <div className="flex items-center gap-3">
-                <h2 className="text-2xl font-display font-bold text-slate-50">
+                <h2 className="text-2xl font-display font-bold text-slate-900">
                   {selectedCustomer.name}
                 </h2>
                 {selectedCustomer.nickname && (
-                  <span className="text-[10px] font-mono text-slate-500 bg-slate-800 px-2 py-0.5 rounded-full uppercase border border-slate-800">
+                  <span className="text-[11px] font-mono text-slate-500 bg-slate-200 px-2 py-0.5 rounded-full uppercase border border-slate-200">
                     {selectedCustomer.nickname}
                   </span>
                 )}
@@ -372,7 +407,7 @@ export default function Clientes({
               <div className="text-xs text-slate-500 mt-1 flex gap-4">
                 <span>Telefone: {selectedCustomer.phone || '--'}</span>
                 <span
-                  className={`font-mono uppercase text-[10px] items-center flex gap-1 font-bold ${(selectedCustomer.active ?? true) ? 'text-emerald-500' : 'text-slate-500'}`}
+                  className={`font-mono uppercase text-[11px] items-center flex gap-1 font-bold ${(selectedCustomer.active ?? true) ? 'text-emerald-600' : 'text-slate-500'}`}
                 >
                   {(selectedCustomer.active ?? true) ? '• Ativo' : '• Inativo'}
                 </span>
@@ -382,7 +417,7 @@ export default function Clientes({
             <div className="flex gap-2 w-full md:w-auto">
               <button
                 onClick={() => handleEditTrigger(selectedCustomer)}
-                className="flex-1 md:flex-initial px-4 py-2 border border-slate-800 bg-slate-800/50 hover:bg-slate-800 text-xs font-bold text-slate-300 rounded-xl cursor-pointer transition text-center"
+                className="flex-1 md:flex-initial px-4 py-2 border border-slate-200 bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-600 rounded-xl cursor-pointer transition text-center"
               >
                 Editar Cadastro
               </button>
@@ -393,17 +428,17 @@ export default function Clientes({
             {/* Financial panel */}
             <div className="lg:col-span-5 flex flex-col gap-5">
               {/* Balance & Info */}
-              <div className="bg-slate-800/50 border border-slate-800 p-5 rounded-2xl shadow-sm">
+              <div className="bg-slate-100 border border-slate-200 p-5 rounded-2xl shadow-sm">
                 <h3 className="text-xs uppercase font-mono font-bold text-slate-500 mb-3 block">
                   Dados Financeiros / Fiado
                 </h3>
 
-                <div className="flex justify-between items-end border-b border-slate-800 pb-3 mb-3">
-                  <span className="text-sm font-bold text-slate-300">
+                <div className="flex justify-between items-end border-b border-slate-200 pb-3 mb-3">
+                  <span className="text-sm font-bold text-slate-600">
                     Saldo Pendente (Dívida)
                   </span>
                   <span
-                    className={`text-2xl font-mono font-black ${selectedCustomer.balance > 0 ? 'text-rose-500' : 'text-emerald-500'}`}
+                    className={`text-2xl font-mono font-black ${selectedCustomer.balance > 0 ? 'text-rose-600' : 'text-emerald-600'}`}
                   >
                     {fmt(selectedCustomer.balance)}
                   </span>
@@ -415,11 +450,11 @@ export default function Clientes({
                   em fiado.
                 </div>
 
-                <div className="mt-5 p-3 bg-slate-900 border border-slate-800 rounded-lg text-xs">
-                  <span className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
+                <div className="mt-5 p-3 bg-white border border-slate-200 rounded-lg text-xs">
+                  <span className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
                     Anotações
                   </span>
-                  <p className="text-slate-300 italic">
+                  <p className="text-slate-600 italic">
                     {selectedCustomer.notes ||
                       'Nenhuma anotação registrada para o cliente.'}
                   </p>
@@ -427,11 +462,11 @@ export default function Clientes({
               </div>
 
               {/* Payment Action */}
-              <div className="bg-emerald-950/40 border border-emerald-800/60 p-5 rounded-2xl shadow-sm">
-                <h4 className="text-sm font-display font-bold text-emerald-200 mb-2 flex items-center gap-1.5">
+              <div className="bg-emerald-50 border border-emerald-200 p-5 rounded-2xl shadow-sm">
+                <h4 className="text-sm font-display font-bold text-emerald-800 mb-2 flex items-center gap-1.5">
                   <Coins size={16} /> Registrar Pagamento de Fiado
                 </h4>
-                <p className="text-[10px] text-emerald-400/80 mb-4 leading-relaxed">
+                <p className="text-[11px] text-emerald-700/80 mb-4 leading-relaxed">
                   Abata o saldo devedor recebendo o valor do cliente agora. Se
                   em dinheiro, garanta que o Caixa esteja aberto.
                 </p>
@@ -441,7 +476,7 @@ export default function Clientes({
                     type="number"
                     step="0.01"
                     min="0.01"
-                    className="w-full bg-slate-900 border border-emerald-800/60 py-2 px-3 text-sm font-mono text-emerald-200 rounded-lg outline-none focus:border-emerald-600 font-bold"
+                    className="w-full bg-white border border-emerald-200 py-2 px-3 text-sm font-mono text-emerald-800 rounded-lg outline-none focus:border-emerald-500 font-bold"
                     placeholder="Quantia (R$)"
                     value={payAmount}
                     onChange={(e) => setPayAmount(e.target.value)}
@@ -458,10 +493,10 @@ export default function Clientes({
                         key={item.id}
                         type="button"
                         onClick={() => setPayMethod(item.id as any)}
-                        className={`px-2 py-1.5 text-[10px] rounded font-bold border transition cursor-pointer ${
+                        className={`px-2 py-1.5 text-[11px] rounded font-bold border transition cursor-pointer ${
                           payMethod === item.id
-                            ? 'bg-emerald-600 border-emerald-700 text-white shadow-xs'
-                            : 'bg-slate-900 border-emerald-800/60 text-emerald-400 hover:bg-emerald-900/50'
+                            ? 'bg-emerald-600 border-emerald-300 text-white shadow-xs'
+                            : 'bg-white border-emerald-200 text-emerald-700 hover:bg-emerald-100'
                         }`}
                       >
                         {item.label}
@@ -481,8 +516,8 @@ export default function Clientes({
             </div>
 
             {/* History / Transactions Panel */}
-            <div className="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col h-[550px]">
-              <h3 className="text-sm font-display font-bold text-slate-200 mb-4 border-b border-slate-800 pb-3 flex items-center gap-2">
+            <div className="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col h-[550px]">
+              <h3 className="text-sm font-display font-bold text-slate-700 mb-4 border-b border-slate-200 pb-3 flex items-center gap-2">
                 <FileText size={16} className="text-slate-500" /> Histórico de
                 Fiados e Pendências
               </h3>
@@ -493,13 +528,13 @@ export default function Clientes({
                   return (
                     <div
                       key={hist.id}
-                      className={`p-3 border rounded-xl flex justify-between items-start text-xs ${isCharge ? 'bg-amber-950/40/30 border-amber-900' : 'bg-emerald-950/40/50 border-emerald-900'}`}
+                      className={`p-3 border rounded-xl flex justify-between items-start text-xs ${isCharge ? 'bg-amber-50/30 border-amber-200' : 'bg-emerald-50/50 border-emerald-200'}`}
                     >
                       <div>
-                        <span className="font-bold text-slate-200 block text-sm">
+                        <span className="font-bold text-slate-700 block text-sm">
                           {hist.description}
                         </span>
-                        <span className="text-[10px] text-slate-500 font-mono mt-1 opacity-80 block">
+                        <span className="text-[11px] text-slate-500 font-mono mt-1 opacity-80 block">
                           {new Date(hist.timestamp).toLocaleString('pt-BR')} •
                           Tipo:{' '}
                           {hist.type === 'sale'
@@ -511,7 +546,7 @@ export default function Clientes({
                       </div>
 
                       <div
-                        className={`font-mono font-black text-right shrink-0 ${isCharge ? 'text-amber-500' : 'text-emerald-500'}`}
+                        className={`font-mono font-black text-right shrink-0 ${isCharge ? 'text-amber-600' : 'text-emerald-600'}`}
                       >
                         {isCharge ? '+' : ''} {fmt(hist.amount)}
                       </div>
@@ -521,7 +556,7 @@ export default function Clientes({
 
                 {selectedCustomer.history.length === 0 && (
                   <div className="text-center py-20 text-slate-500 text-xs italic flex flex-col items-center">
-                    <AlertOctagon size={32} className="text-slate-200 mb-3" />
+                    <AlertOctagon size={32} className="text-slate-700 mb-3" />
                     <p>
                       Ainda não há nenhum histórico financeiro ou fiado
                       cadastrado.
@@ -535,21 +570,21 @@ export default function Clientes({
       )}
 
       {/* FORM MODAL: Create/Edit Customer */}
-      {showForm && (
-        <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
-          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl relative">
+      {mainTab === 'cadastro' && showForm && (
+        <div className="fixed inset-0 bg-slate-50 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
+          <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl relative">
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              className="absolute top-4 right-4 text-slate-500 hover:text-slate-200 cursor-pointer"
+              className="absolute top-4 right-4 text-slate-500 hover:text-slate-900 cursor-pointer"
             >
               <X size={18} />
             </button>
-            <h3 className="text-lg font-display font-bold text-slate-200 mb-1 flex items-center gap-2">
-              <Users className="text-emerald-500" size={20} />
+            <h3 className="text-lg font-display font-bold text-slate-700 mb-1 flex items-center gap-2">
+              <Users className="text-emerald-600" size={20} />
               {formMode === 'create' ? 'Novo Cliente' : 'Editar Cliente'}
             </h3>
-            <p className="text-[10px] font-mono text-slate-500 mb-4 block">
+            <p className="text-[11px] font-mono text-slate-500 mb-4 block">
               Cadastro operacional de clientes e acompanhamento de pendências.
             </p>
 
@@ -562,27 +597,27 @@ export default function Clientes({
             <form onSubmit={handleSaveCustomer} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2 sm:col-span-1">
-                  <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
-                    Nome Completo <span className="text-rose-500">*</span>
+                  <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
+                    Nome Completo <span className="text-rose-600">*</span>
                   </label>
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2 text-sm text-slate-200 rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900 font-bold"
+                    className="w-full bg-slate-100 border border-slate-200 px-3 py-2 text-sm text-slate-700 rounded-lg outline-none focus:border-emerald-500 focus:bg-white font-bold"
                     required
                     placeholder="Ex: João Silva"
                   />
                 </div>
                 <div className="col-span-2 sm:col-span-1">
-                  <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
+                  <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
                     Apelido
                   </label>
                   <input
                     type="text"
                     value={nickname}
                     onChange={(e) => setNickname(e.target.value)}
-                    className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2 text-sm text-slate-200 rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900"
+                    className="w-full bg-slate-100 border border-slate-200 px-3 py-2 text-sm text-slate-700 rounded-lg outline-none focus:border-emerald-500 focus:bg-white"
                     placeholder="Ex: Joãozinho"
                   />
                 </div>
@@ -590,39 +625,39 @@ export default function Clientes({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
+                  <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
                     Telefone
                   </label>
                   <input
                     type="text"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2 text-xs text-slate-200 rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900 font-mono"
+                    className="w-full bg-slate-100 border border-slate-200 px-3 py-2 text-xs text-slate-700 rounded-lg outline-none focus:border-emerald-500 focus:bg-white font-mono"
                     placeholder="(31) 90000-0000"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
+                <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
                   Motivo / Observação
                 </label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2 text-xs text-slate-200 rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900 resize-none h-16"
+                  className="w-full bg-slate-100 border border-slate-200 px-3 py-2 text-xs text-slate-700 rounded-lg outline-none focus:border-emerald-500 focus:bg-white resize-none h-16"
                   placeholder="Alguma nota sobre o cliente ou restrição..."
                 />
               </div>
 
-              <div className="flex items-center gap-3 p-3 bg-slate-800/50 border border-slate-800 rounded-xl">
-                <p className="text-[10px] font-mono font-bold text-slate-500 uppercase flex-1">
+              <div className="flex items-center gap-3 p-3 bg-slate-100 border border-slate-200 rounded-xl">
+                <p className="text-[11px] font-mono font-bold text-slate-500 uppercase flex-1">
                   Status do Cliente
                 </p>
                 <select
                   value={active ? 'true' : 'false'}
                   onChange={(e) => setActive(e.target.value === 'true')}
-                  className="text-xs bg-slate-900 border border-slate-600 rounded px-2 py-1 outline-none text-slate-300 font-bold"
+                  className="text-xs bg-white border border-slate-300 rounded px-2 py-1 outline-none text-slate-600 font-bold"
                 >
                   <option value="true">ATIVO</option>
                   <option value="false">INATIVO</option>
@@ -631,7 +666,7 @@ export default function Clientes({
 
               <button
                 type="submit"
-                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-950/400 text-white font-bold rounded-xl text-xs transition cursor-pointer mt-2 shadow-md"
+                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition cursor-pointer mt-2 shadow-md"
               >
                 Salvar Cliente
               </button>

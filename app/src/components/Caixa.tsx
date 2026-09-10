@@ -184,19 +184,19 @@ export default function Caixa({
   return (
     <div
       id="caixa-diario-module"
-      className="space-y-6 animate-fade-in text-slate-200"
+      className="space-y-6 animate-fade-in text-slate-700"
     >
       {/* Title block */}
       <div
         id="caixa-header-container"
-        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xs"
+        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs"
       >
         <div>
-          <span className="text-xs uppercase tracking-widest font-mono text-emerald-500 font-bold block mb-1">
+          <span className="text-xs uppercase tracking-widest font-mono text-emerald-600 font-bold block mb-1">
             Tesouraria e Operação
           </span>
-          <h2 className="text-3xl font-display font-bold text-slate-50 tracking-tight">
-            Caixa <span className="text-emerald-500">Diário</span> Balcão
+          <h2 className="text-3xl font-display font-bold text-slate-900 tracking-tight">
+            Caixa <span className="text-emerald-600">Diário</span> Balcão
           </h2>
           <p className="text-xs text-slate-500 mt-1 leading-normal">
             Controle de abertura física, suprimento de troco, sangrias para
@@ -206,13 +206,13 @@ export default function Caixa({
 
         <div>
           {caixa.isOpen ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-950/40 border border-emerald-800/60 text-emerald-400 text-xs font-bold font-mono">
-              <Unlock size={12} className="text-emerald-500 animate-pulse" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold font-mono">
+              <Unlock size={12} className="text-emerald-600 animate-pulse" />
               STATUS: CAIXA ABERTO
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-950/40 border border-rose-800/60 text-rose-500 text-xs font-bold font-mono">
-              <Lock size={12} className="text-rose-500" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-50 border border-rose-200 text-rose-600 text-xs font-bold font-mono">
+              <Lock size={12} className="text-rose-600" />
               STATUS: FECHADO
             </span>
           )}
@@ -223,12 +223,12 @@ export default function Caixa({
       {!caixa.isOpen && (
         <div
           id="state-caixa-fechado-card"
-          className="bg-slate-900 border border-slate-800 rounded-2xl p-8 flex flex-col items-center justify-center text-center shadow-xs"
+          className="bg-white border border-slate-200 rounded-2xl p-8 flex flex-col items-center justify-center text-center shadow-xs"
         >
-          <div className="p-4 bg-rose-950/40 border border-rose-900 rounded-2xl text-rose-500 mb-5 animate-pulse">
+          <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-rose-600 mb-5 animate-pulse">
             <Lock size={40} className="stroke-[1.5]" />
           </div>
-          <h3 className="text-xl font-display font-black text-slate-50 mb-2">
+          <h3 className="text-xl font-display font-black text-slate-900 mb-2">
             Nenhum Caixa Aberto
           </h3>
           <p className="text-sm text-slate-500 max-w-lg mb-6 leading-relaxed">
@@ -242,7 +242,7 @@ export default function Caixa({
               setFormError(null);
               setIsAbrirModalOpen(true);
             }}
-            className="px-6 py-3 bg-emerald-600 hover:bg-emerald-950/400 text-white font-bold rounded-xl text-sm shadow-md shadow-emerald-500/15 cursor-pointer hover:shadow-emerald-500/20 active:scale-[0.98] transition-all flex items-center gap-2"
+            className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm shadow-md shadow-emerald-500/15 cursor-pointer hover:shadow-emerald-500/20 active:scale-[0.98] transition-all flex items-center gap-2"
           >
             <Unlock size={16} />
             Abrir Caixa Agora
@@ -254,14 +254,14 @@ export default function Caixa({
       {caixa.isOpen && (
         <div id="state-caixa-aberto-container" className="space-y-6">
           {/* Header metadata row */}
-          <div className="bg-emerald-900/5 border border-emerald-900/10 p-4 rounded-xl flex flex-wrap justify-between items-center gap-2 text-xs">
-            <div className="flex items-center gap-2 text-emerald-300 font-bold">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-950/400 animate-ping"></span>
+          <div className="bg-emerald-900/5 border border-emerald-200/10 p-4 rounded-xl flex flex-wrap justify-between items-center gap-2 text-xs">
+            <div className="flex items-center gap-2 text-emerald-700 font-bold">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-50 animate-ping"></span>
               <span>Caixa de Atendimento Ativo</span>
             </div>
             <div className="text-slate-500 font-mono">
               Abertura oficial em:{' '}
-              <strong className="text-slate-200">
+              <strong className="text-slate-700">
                 {new Date(caixa.openedAt || '').toLocaleString('pt-BR')}
               </strong>
             </div>
@@ -269,69 +269,69 @@ export default function Caixa({
 
           {/* KPI Cards Strip */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div className="bg-slate-900 rounded-2xl border border-slate-800 p-4.5 shadow-xs">
-              <span className="text-[10px] uppercase font-mono text-slate-500 block font-bold mb-1">
+            <div className="bg-white rounded-2xl border border-slate-200 p-4.5 shadow-xs">
+              <span className="text-[11px] uppercase font-mono text-slate-500 block font-bold mb-1">
                 Fundo Inicial
               </span>
-              <h4 className="text-lg font-bold font-mono text-slate-200">
+              <h4 className="text-lg font-bold font-mono text-slate-700">
                 {fmt(caixa.initialCash)}
               </h4>
-              <p className="text-[9px] text-slate-500 mt-1">
+              <p className="text-[11px] text-slate-500 mt-1">
                 Lançamento de abertura
               </p>
             </div>
 
-            <div className="bg-slate-900 rounded-2xl border border-slate-800 p-4.5 shadow-xs">
-              <span className="text-[10px] uppercase font-mono text-slate-500 block font-bold mb-1">
+            <div className="bg-white rounded-2xl border border-slate-200 p-4.5 shadow-xs">
+              <span className="text-[11px] uppercase font-mono text-slate-500 block font-bold mb-1">
                 Total Recebido (Dinheiro)
               </span>
-              <h4 className="text-lg font-bold font-mono text-emerald-500">
+              <h4 className="text-lg font-bold font-mono text-emerald-600">
                 +{fmt(totalRecebidoHoje)}
               </h4>
-              <p className="text-[9px] text-slate-500 mt-1">
+              <p className="text-[11px] text-slate-500 mt-1">
                 Comandas e fiados pagos
               </p>
             </div>
 
-            <div className="bg-slate-900 rounded-2xl border border-slate-800 p-4.5 shadow-xs">
-              <span className="text-[10px] uppercase font-mono text-slate-500 block font-bold mb-1">
+            <div className="bg-white rounded-2xl border border-slate-200 p-4.5 shadow-xs">
+              <span className="text-[11px] uppercase font-mono text-slate-500 block font-bold mb-1">
                 Total Reforços
               </span>
-              <h4 className="text-lg font-bold font-mono text-blue-500">
+              <h4 className="text-lg font-bold font-mono text-blue-600">
                 +{fmt(totalReforcos)}
               </h4>
-              <p className="text-[9px] text-slate-500 mt-1">
+              <p className="text-[11px] text-slate-500 mt-1">
                 Adicionados à gaveta
               </p>
             </div>
 
-            <div className="bg-slate-900 rounded-2xl border border-slate-800 p-4.5 shadow-xs">
-              <span className="text-[10px] uppercase font-mono text-slate-500 block font-bold mb-1">
+            <div className="bg-white rounded-2xl border border-slate-200 p-4.5 shadow-xs">
+              <span className="text-[11px] uppercase font-mono text-slate-500 block font-bold mb-1">
                 Total Sangrias
               </span>
-              <h4 className="text-lg font-bold font-mono text-rose-500">
+              <h4 className="text-lg font-bold font-mono text-rose-600">
                 -{fmt(totalSangrias)}
               </h4>
-              <p className="text-[9px] text-slate-500 mt-1">
+              <p className="text-[11px] text-slate-500 mt-1">
                 Retiradas emergenciais
               </p>
             </div>
 
-            <div className="bg-emerald-950/40 border border-emerald-250 rounded-2xl p-4.5 text-emerald-100">
-              <span className="text-[10px] uppercase font-mono block font-bold mb-1 text-emerald-300">
+            <div className="bg-emerald-50 border border-emerald-250 rounded-2xl p-4.5 text-emerald-800">
+              <span className="text-[11px] uppercase font-mono block font-bold mb-1 text-emerald-700">
                 Saldo Esperado (Físico)
               </span>
-              <h4 className="text-xl font-black font-mono text-emerald-400">
+              <h4 className="text-xl font-black font-mono text-emerald-700">
                 {fmt(caixa.currentCashInMoney)}
               </h4>
-              <p className="text-[9px] text-emerald-300/80 mt-1">
+              <p className="text-[11px] text-emerald-700/80 mt-1">
                 Estoque vivo na gaveta
               </p>
             </div>
           </div>
 
           {/* Action Triggers Row */}
-          <div className="bg-slate-900 border border-slate-800 p-4.5 rounded-2xl shadow-xs flex flex-wrap gap-4 items-center justify-between">
+          <div className="bg-white border border-slate-200 p-4.5 rounded-2xl shadow-xs flex flex-wrap gap-4 items-center justify-between">
             <div className="flex gap-2.5">
               <button
                 id="btn-reforco-trigger"
@@ -339,9 +339,9 @@ export default function Caixa({
                   setFormError(null);
                   setIsReforcoModalOpen(true);
                 }}
-                className="px-4 py-2.5 rounded-xl bg-slate-800/50 hover:bg-emerald-950/40 text-slate-300 hover:text-emerald-400 border border-slate-800 hover:border-emerald-300 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-slate-200 hover:border-emerald-300 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
               >
-                <Plus size={14} className="text-emerald-500" />
+                <Plus size={14} className="text-emerald-600" />
                 Registrar Reforço
               </button>
 
@@ -351,9 +351,9 @@ export default function Caixa({
                   setFormError(null);
                   setIsSangriaModalOpen(true);
                 }}
-                className="px-4 py-2.5 rounded-xl bg-slate-800/50 hover:bg-rose-950/40 text-slate-300 hover:text-rose-500 border border-slate-800 hover:border-rose-300 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 hover:border-rose-300 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
               >
-                <Minus size={14} className="text-rose-500" />
+                <Minus size={14} className="text-rose-600" />
                 Registrar Sangria
               </button>
             </div>
@@ -364,7 +364,7 @@ export default function Caixa({
                 setFormError(null);
                 setIsFecharModalOpen(true);
               }}
-              className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-950/400 text-white text-xs font-bold transition cursor-pointer shadow-md shadow-rose-500/10 flex items-center gap-1.5"
+              className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition cursor-pointer shadow-md shadow-rose-500/10 flex items-center gap-1.5"
             >
               <Lock size={13} />
               Fechar Caixa do Dia
@@ -374,15 +374,15 @@ export default function Caixa({
           {/* Main area: Logs & Other Payment totals */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Logs List - Left Column (8 cols) */}
-            <div className="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xs">
+            <div className="lg:col-span-8 bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
-                <h4 className="text-sm font-bold font-display text-slate-850 flex items-center gap-2">
-                  <Coins size={16} className="text-emerald-500" />
+                <h4 className="text-sm font-bold font-display text-slate-900 flex items-center gap-2">
+                  <Coins size={16} className="text-emerald-600" />
                   Movimentações Finaceiras de Balcão e Trocos
                 </h4>
 
                 {/* Filter list */}
-                <div className="flex gap-1 bg-slate-800/50 border border-slate-800 p-1 rounded-lg">
+                <div className="flex gap-1 bg-slate-100 border border-slate-200 p-1 rounded-lg">
                   {(['all', 'venda', 'suprimento', 'sangria'] as const).map(
                     (opt) => {
                       const labels: Record<string, string> = {
@@ -395,10 +395,10 @@ export default function Caixa({
                         <button
                           key={opt}
                           onClick={() => setLogFilter(opt)}
-                          className={`px-2 py-1 text-[10px] font-bold rounded cursor-pointer ${
+                          className={`px-2 py-1 text-[11px] font-bold rounded cursor-pointer ${
                             logFilter === opt
                               ? 'bg-emerald-600 text-white font-black'
-                              : 'text-slate-500 hover:text-slate-855'
+                              : 'text-slate-500 hover:text-slate-900'
                           }`}
                         >
                           {labels[opt]}
@@ -419,16 +419,16 @@ export default function Caixa({
                   return (
                     <div
                       key={log.id}
-                      className="p-3 bg-slate-800/50/70 border border-slate-700 rounded-xl flex justify-between items-center text-xs"
+                      className="p-3 bg-slate-100/70 border border-slate-300 rounded-xl flex justify-between items-center text-xs"
                     >
                       <div className="space-y-0.5">
-                        <div className="flex items-center gap-1.5 font-bold text-slate-200">
+                        <div className="flex items-center gap-1.5 font-bold text-slate-700">
                           <span
-                            className={`w-1.5 h-1.5 rounded-full ${isPositive ? 'bg-emerald-950/400 animate-pulse' : 'bg-rose-950/400'}`}
+                            className={`w-1.5 h-1.5 rounded-full ${isPositive ? 'bg-emerald-50 animate-pulse' : 'bg-rose-50'}`}
                           />
                           <span>{log.description}</span>
                         </div>
-                        <div className="text-[10px] text-slate-500 font-mono">
+                        <div className="text-[11px] text-slate-500 font-mono">
                           {new Date(log.timestamp).toLocaleTimeString('pt-BR')}{' '}
                           - {log.type.toUpperCase()}
                           {log.paymentMethod &&
@@ -436,7 +436,7 @@ export default function Caixa({
                         </div>
                       </div>
                       <span
-                        className={`font-mono font-bold text-sm ${isPositive ? 'text-emerald-500' : 'text-rose-500'}`}
+                        className={`font-mono font-bold text-sm ${isPositive ? 'text-emerald-600' : 'text-rose-600'}`}
                       >
                         {isPositive ? '+' : '-'} {fmt(log.amount)}
                       </span>
@@ -455,7 +455,7 @@ export default function Caixa({
             {/* Other totals summary widget - Right Column (4 cols) */}
             <div className="lg:col-span-4 space-y-6">
               {/* Other Payment Channels Today info */}
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xs">
+              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
                 <h4 className="text-xs uppercase font-mono text-slate-500 font-extrabold mb-3.5 tracking-wider block">
                   Outros Meios de Pagamento (Hoje)
                 </h4>
@@ -478,17 +478,17 @@ export default function Caixa({
                     return (
                       <div
                         key={m.id}
-                        className="p-3 bg-slate-800/50 border border-slate-700 rounded-xl flex justify-between items-center text-xs"
+                        className="p-3 bg-slate-100 border border-slate-300 rounded-xl flex justify-between items-center text-xs"
                       >
                         <div>
-                          <span className="font-semibold text-slate-850 block">
+                          <span className="font-semibold text-slate-900 block">
                             {m.label}
                           </span>
-                          <span className="text-[9px] uppercase tracking-wider text-slate-500 font-mono">
+                          <span className="text-[11px] uppercase tracking-wider text-slate-500 font-mono">
                             Lançamentos
                           </span>
                         </div>
-                        <span className="font-mono font-bold text-slate-300">
+                        <span className="font-mono font-bold text-slate-600">
                           {fmt(soma)}
                         </span>
                       </div>
@@ -496,11 +496,11 @@ export default function Caixa({
                   })}
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-slate-800 flex justify-between text-xs">
+                <div className="mt-4 pt-3 border-t border-slate-200 flex justify-between text-xs">
                   <span className="font-bold text-slate-500">
                     Subtotal Somas:
                   </span>
-                  <span className="font-mono font-black text-slate-200">
+                  <span className="font-mono font-black text-slate-700">
                     {fmt(OUTROS_MEIOS_SOMA)}
                   </span>
                 </div>
@@ -508,8 +508,8 @@ export default function Caixa({
 
               {/* Opened notes indicator */}
               {caixa.notes && (
-                <div className="p-4 bg-emerald-950/40/50 border border-emerald-150 rounded-2xl text-xs text-emerald-300">
-                  <span className="font-semibold block mb-0.5 font-mono text-[10px] uppercase text-emerald-400">
+                <div className="p-4 bg-emerald-50/50 border border-emerald-200 rounded-2xl text-xs text-emerald-700">
+                  <span className="font-semibold block mb-0.5 font-mono text-[11px] uppercase text-emerald-700">
                     Anotação de abertura:
                   </span>
                   <p className="italic">"{caixa.notes}"</p>
@@ -523,9 +523,9 @@ export default function Caixa({
       {/* 3. HISTÓRICO DE FECHAMENTOS DE CAIXA */}
       <div
         id="historico-caixas-fechados-container"
-        className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xs"
+        className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs"
       >
-        <h3 className="text-base font-display font-bold text-slate-50 tracking-tight flex items-center gap-2 mb-4">
+        <h3 className="text-base font-display font-bold text-slate-900 tracking-tight flex items-center gap-2 mb-4">
           <History size={16} className="text-slate-500" />
           Histórico de Caixas Anteriores (Fechados)
         </h3>
@@ -533,7 +533,7 @@ export default function Caixa({
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-slate-500 border-collapse">
             <thead>
-              <tr className="border-b border-slate-700 text-[10px] uppercase font-mono text-slate-500 bg-slate-800/50">
+              <tr className="border-b border-slate-300 text-[11px] uppercase font-mono text-slate-500 bg-slate-100">
                 <th className="px-4 py-3">Abertura</th>
                 <th className="px-4 py-3">Fechamento</th>
                 <th className="px-4 py-3 text-center">Status</th>
@@ -544,36 +544,36 @@ export default function Caixa({
                 <th className="px-4 py-3 text-right">Dinheiro Final</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-200">
               {caixasHistory.map((s) => (
                 <tr
                   key={s.id}
-                  className="hover:bg-slate-800/50/80 duration-100"
+                  className="hover:bg-slate-100/80 duration-100"
                 >
-                  <td className="px-4 py-3 font-mono text-[11px] leading-tight text-slate-300">
+                  <td className="px-4 py-3 font-mono text-xs leading-tight text-slate-600">
                     {new Date(s.openedAt).toLocaleString('pt-BR')}
                   </td>
-                  <td className="px-4 py-3 font-mono text-[11px] leading-tight text-slate-500">
+                  <td className="px-4 py-3 font-mono text-xs leading-tight text-slate-500">
                     {new Date(s.closedAt).toLocaleString('pt-BR')}
                   </td>
                   <td className="px-4 py-3 text-center">
-                    <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase font-mono bg-slate-800 text-slate-500 border border-slate-800">
+                    <span className="px-2 py-0.5 rounded-full text-[11px] font-extrabold uppercase font-mono bg-slate-200 text-slate-500 border border-slate-200">
                       {s.status.toUpperCase()}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right font-mono text-slate-705">
+                  <td className="px-4 py-3 text-right font-mono text-slate-700">
                     {fmt(s.initialCash)}
                   </td>
-                  <td className="px-4 py-3 text-right font-mono text-blue-500">
+                  <td className="px-4 py-3 text-right font-mono text-blue-600">
                     +{fmt(s.totalReforcos)}
                   </td>
-                  <td className="px-4 py-3 text-right font-mono text-rose-500">
+                  <td className="px-4 py-3 text-right font-mono text-rose-600">
                     -{fmt(s.totalSangrias)}
                   </td>
-                  <td className="px-4 py-3 text-right font-mono text-slate-200 font-bold">
+                  <td className="px-4 py-3 text-right font-mono text-slate-700 font-bold">
                     {fmt(s.totalVendido)}
                   </td>
-                  <td className="px-4 py-3 text-right font-mono text-emerald-400 font-black">
+                  <td className="px-4 py-3 text-right font-mono text-emerald-700 font-black">
                     {fmt(s.finalCashInMoney)}
                   </td>
                 </tr>
@@ -599,21 +599,21 @@ export default function Caixa({
 
       {/* 1. MODAL ABRIR CAIXA */}
       {isAbrirModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-900 rounded-2xl border border-slate-800 max-w-md w-full shadow-2xl p-6 relative animate-fade-in">
+        <div className="fixed inset-0 bg-slate-50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl border border-slate-200 max-w-md w-full shadow-2xl p-6 relative animate-fade-in">
             <button
               onClick={() => setIsAbrirModalOpen(false)}
-              className="absolute right-4 top-4 text-slate-500 hover:text-slate-500 cursor-pointer"
+              className="absolute right-4 top-4 text-slate-500 hover:text-slate-700 cursor-pointer"
             >
               <X size={18} />
             </button>
 
             <div className="flex gap-3.5 mb-5 items-center">
-              <div className="p-2 bg-emerald-950/40 text-emerald-500 rounded-xl">
+              <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
                 <Unlock size={20} />
               </div>
               <div>
-                <h3 className="text-lg font-black font-display text-slate-50">
+                <h3 className="text-lg font-black font-display text-slate-900">
                   Iniciar Nova Operação
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5 font-mono">
@@ -644,7 +644,7 @@ export default function Caixa({
                     placeholder="0.00"
                     value={aberturaValor}
                     onChange={(e) => setAberturaValor(e.target.value)}
-                    className="w-full bg-slate-800/50 border border-slate-800 focus:bg-slate-900 focus:border-emerald-600 py-2.5 pl-9 pr-3 rounded-xl font-mono text-base outline-none transition"
+                    className="w-full bg-slate-100 border border-slate-200 focus:bg-white focus:border-emerald-500 py-2.5 pl-9 pr-3 rounded-xl font-mono text-base outline-none transition"
                     data-testid="caixa-valor-inicial-input"
                     required
                   />
@@ -660,10 +660,10 @@ export default function Caixa({
                       key={p}
                       type="button"
                       onClick={() => setAberturaValor(flt.toFixed(2))}
-                      className={`px-2.5 py-1 text-[11px] font-mono rounded border transition cursor-pointer ${
+                      className={`px-2.5 py-1 text-xs font-mono rounded border transition cursor-pointer ${
                         parseFloat(aberturaValor) === flt
                           ? 'bg-emerald-600 text-white border-emerald-500'
-                          : 'bg-slate-800/50 text-slate-500 border-slate-800 hover:bg-slate-800'
+                          : 'bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200'
                       }`}
                     >
                       {fmt(flt)}
@@ -680,7 +680,7 @@ export default function Caixa({
                   value={aberturaObs}
                   onChange={(e) => setAberturaObs(e.target.value)}
                   placeholder="Ex: Cédulas de troco pegas com o gerente para o sábado de sol"
-                  className="w-full bg-slate-800/50 border border-slate-800 focus:bg-slate-900 focus:border-emerald-600 p-2.5 text-xs rounded-xl h-20 outline-none resize-none transition"
+                  className="w-full bg-slate-100 border border-slate-200 focus:bg-white focus:border-emerald-500 p-2.5 text-xs rounded-xl h-20 outline-none resize-none transition"
                 />
               </div>
 
@@ -688,13 +688,13 @@ export default function Caixa({
                 <button
                   type="button"
                   onClick={() => setIsAbrirModalOpen(false)}
-                  className="flex-1 py-2 rounded-xl bg-slate-800/50 hover:bg-slate-800 text-slate-500 border border-slate-800 text-xs font-bold transition cursor-pointer text-center"
+                  className="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 border border-slate-200 text-xs font-bold transition cursor-pointer text-center"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-950/400 text-white text-xs font-bold transition cursor-pointer text-center shadow-md shadow-emerald-500/10"
+                  className="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition cursor-pointer text-center shadow-md shadow-emerald-500/10"
                 >
                   Confirmar Abertura
                 </button>
@@ -706,24 +706,24 @@ export default function Caixa({
 
       {/* 2. MODAL REGISTRAR REFORÇO */}
       {isReforcoModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-900 rounded-2xl border border-slate-800 max-w-sm w-full shadow-2xl p-6 relative animate-fade-in">
+        <div className="fixed inset-0 bg-slate-50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl border border-slate-200 max-w-sm w-full shadow-2xl p-6 relative animate-fade-in">
             <button
               onClick={() => setIsReforcoModalOpen(false)}
-              className="absolute right-4 top-4 text-slate-500 hover:text-slate-500 cursor-pointer"
+              className="absolute right-4 top-4 text-slate-500 hover:text-slate-700 cursor-pointer"
             >
               <X size={18} />
             </button>
 
             <div className="flex gap-3 mb-4 items-center">
-              <div className="p-2 bg-blue-950/40 text-blue-500 rounded-xl">
+              <div className="p-2 bg-blue-50 text-blue-600 rounded-xl">
                 <Plus size={18} />
               </div>
               <div>
-                <h3 className="text-base font-black font-display text-slate-50">
+                <h3 className="text-base font-black font-display text-slate-900">
                   Registrar Reforço
                 </h3>
-                <p className="text-[10px] text-slate-500 font-mono">
+                <p className="text-[11px] text-slate-500 font-mono">
                   SUPRIMENTO DE FLUXO DE TROCO
                 </p>
               </div>
@@ -751,7 +751,7 @@ export default function Caixa({
                     placeholder="0.00"
                     value={reforcoValor}
                     onChange={(e) => setReforcoValor(e.target.value)}
-                    className="w-full bg-slate-800/50 border border-slate-800 focus:bg-slate-900 focus:border-blue-600 py-2 pl-9 pr-3 rounded-lg font-mono text-sm outline-none transition"
+                    className="w-full bg-slate-100 border border-slate-200 focus:bg-white focus:border-blue-500 py-2 pl-9 pr-3 rounded-lg font-mono text-sm outline-none transition"
                     required
                   />
                 </div>
@@ -766,7 +766,7 @@ export default function Caixa({
                   placeholder="Ex: Peguei R$ 50 em moedas na padaria"
                   value={reforcoDesc}
                   onChange={(e) => setReforcoDesc(e.target.value)}
-                  className="w-full bg-slate-800/50 border border-slate-800 focus:bg-slate-900 focus:border-blue-600 py-2 px-3 rounded-lg text-xs outline-none transition"
+                  className="w-full bg-slate-100 border border-slate-200 focus:bg-white focus:border-blue-500 py-2 px-3 rounded-lg text-xs outline-none transition"
                   required
                 />
               </div>
@@ -775,13 +775,13 @@ export default function Caixa({
                 <button
                   type="button"
                   onClick={() => setIsReforcoModalOpen(false)}
-                  className="flex-1 py-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-bold cursor-pointer text-center"
+                  className="flex-1 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 text-xs font-bold cursor-pointer text-center"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2 rounded-lg bg-emerald-650 hover:bg-emerald-600 text-white text-xs font-bold cursor-pointer text-center"
+                  className="flex-1 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer text-center"
                 >
                   Salvar Entrada
                 </button>
@@ -793,24 +793,24 @@ export default function Caixa({
 
       {/* 3. MODAL REGISTRAR SANGRIA */}
       {isSangriaModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-900 rounded-2xl border border-slate-800 max-w-sm w-full shadow-2xl p-6 relative animate-fade-in">
+        <div className="fixed inset-0 bg-slate-50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl border border-slate-200 max-w-sm w-full shadow-2xl p-6 relative animate-fade-in">
             <button
               onClick={() => setIsSangriaModalOpen(false)}
-              className="absolute right-4 top-4 text-slate-500 hover:text-slate-500 cursor-pointer"
+              className="absolute right-4 top-4 text-slate-500 hover:text-slate-700 cursor-pointer"
             >
               <X size={18} />
             </button>
 
             <div className="flex gap-3 mb-4 items-center">
-              <div className="p-2 bg-rose-950/40 text-rose-500 rounded-xl">
+              <div className="p-2 bg-rose-50 text-rose-600 rounded-xl">
                 <Minus size={18} />
               </div>
               <div>
-                <h3 className="text-base font-black font-display text-slate-50">
+                <h3 className="text-base font-black font-display text-slate-900">
                   Registrar Sangria
                 </h3>
-                <p className="text-[10px] text-slate-500 font-mono">
+                <p className="text-[11px] text-slate-500 font-mono">
                   RETIRADA RÁPIDA DE DINHEIRO
                 </p>
               </div>
@@ -838,11 +838,11 @@ export default function Caixa({
                     placeholder="0.00"
                     value={sangriaValor}
                     onChange={(e) => setSangriaValor(e.target.value)}
-                    className="w-full bg-slate-800/50 border border-slate-800 focus:bg-slate-900 focus:border-rose-600 py-2 pl-9 pr-3 rounded-lg font-mono text-sm outline-none transition"
+                    className="w-full bg-slate-100 border border-slate-200 focus:bg-white focus:border-rose-500 py-2 pl-9 pr-3 rounded-lg font-mono text-sm outline-none transition"
                     required
                   />
                 </div>
-                <p className="text-[9px] text-slate-500 mt-1">
+                <p className="text-[11px] text-slate-500 mt-1">
                   Disponível em dinheiro físico:{' '}
                   <strong>{fmt(caixa.currentCashInMoney)}</strong>
                 </p>
@@ -857,7 +857,7 @@ export default function Caixa({
                   placeholder="Ex: Compra de saco de gelo / pagar Seu Adilson"
                   value={sangriaDesc}
                   onChange={(e) => setSangriaDesc(e.target.value)}
-                  className="w-full bg-slate-800/50 border border-slate-800 focus:bg-slate-900 focus:border-rose-600 py-2 px-3 rounded-lg text-xs outline-none transition"
+                  className="w-full bg-slate-100 border border-slate-200 focus:bg-white focus:border-rose-500 py-2 px-3 rounded-lg text-xs outline-none transition"
                   required
                 />
               </div>
@@ -866,13 +866,13 @@ export default function Caixa({
                 <button
                   type="button"
                   onClick={() => setIsSangriaModalOpen(false)}
-                  className="flex-1 py-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-bold cursor-pointer text-center"
+                  className="flex-1 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 text-xs font-bold cursor-pointer text-center"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2 rounded-lg bg-rose-600 hover:bg-rose-950/400 text-white text-xs font-bold cursor-pointer text-center"
+                  className="flex-1 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold cursor-pointer text-center"
                 >
                   Salvar Retirada
                 </button>
@@ -884,24 +884,24 @@ export default function Caixa({
 
       {/* 4. MODAL FECHAR CAIXA */}
       {isFecharModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-900 rounded-2xl border border-slate-800 max-w-md w-full shadow-2xl p-6 relative animate-fade-in">
+        <div className="fixed inset-0 bg-slate-50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl border border-slate-200 max-w-md w-full shadow-2xl p-6 relative animate-fade-in">
             <button
               onClick={() => setIsFecharModalOpen(false)}
-              className="absolute right-4 top-4 text-slate-500 hover:text-slate-500 cursor-pointer"
+              className="absolute right-4 top-4 text-slate-500 hover:text-slate-700 cursor-pointer"
             >
               <X size={18} />
             </button>
 
             <div className="flex gap-3 mb-4 items-center">
-              <div className="p-2 bg-rose-950/40 text-rose-500 rounded-xl animate-pulse">
+              <div className="p-2 bg-rose-50 text-rose-600 rounded-xl animate-pulse">
                 <Lock size={18} />
               </div>
               <div>
-                <h3 className="text-base font-black font-display text-slate-50">
+                <h3 className="text-base font-black font-display text-slate-900">
                   Fechar Caixa Diário
                 </h3>
-                <p className="text-[10px] text-slate-500 font-mono">
+                <p className="text-[11px] text-slate-500 font-mono">
                   CONSOLIDAÇÃO DE DADOS DE BALCÃO
                 </p>
               </div>
@@ -914,8 +914,8 @@ export default function Caixa({
             )}
 
             <form onSubmit={handleFechamentoConfirm} className="space-y-4">
-              <div className="bg-slate-800/50 border border-slate-700 p-3.5 rounded-xl space-y-2 text-xs">
-                <span className="text-[9px] uppercase tracking-wider font-mono text-slate-500 block font-bold leading-none">
+              <div className="bg-slate-100 border border-slate-300 p-3.5 rounded-xl space-y-2 text-xs">
+                <span className="text-[11px] uppercase tracking-wider font-mono text-slate-500 block font-bold leading-none">
                   Resumo Consolidado Interno:
                 </span>
 
@@ -923,7 +923,7 @@ export default function Caixa({
                   <span className="text-slate-500">
                     Fundo de Troco Inicial:
                   </span>
-                  <span className="font-mono font-bold text-slate-200">
+                  <span className="font-mono font-bold text-slate-700">
                     {fmt(caixa.initialCash)}
                   </span>
                 </div>
@@ -932,7 +932,7 @@ export default function Caixa({
                   <span className="text-slate-500">
                     Faturamento Vendas (Dinheiro):
                   </span>
-                  <span className="font-mono font-bold text-emerald-500">
+                  <span className="font-mono font-bold text-emerald-600">
                     +{fmt(totalRecebidoHoje)}
                   </span>
                 </div>
@@ -941,7 +941,7 @@ export default function Caixa({
                   <span className="text-slate-500 font-medium">
                     Reforços de Caixa:
                   </span>
-                  <span className="font-mono font-bold text-blue-500">
+                  <span className="font-mono font-bold text-blue-600">
                     +{fmt(totalReforcos)}
                   </span>
                 </div>
@@ -950,14 +950,14 @@ export default function Caixa({
                   <span className="text-slate-500 font-medium">
                     Sangrias Totais:
                   </span>
-                  <span className="font-mono font-bold text-rose-500">
+                  <span className="font-mono font-bold text-rose-600">
                     -{fmt(totalSangrias)}
                   </span>
                 </div>
 
-                <div className="border-t border-slate-800 my-1 pt-1.5 flex justify-between font-bold text-slate-50">
+                <div className="border-t border-slate-200 my-1 pt-1.5 flex justify-between font-bold text-slate-900">
                   <span>Saldo Final em Dinheiro:</span>
-                  <span className="font-mono text-emerald-400 font-black text-sm">
+                  <span className="font-mono text-emerald-700 font-black text-sm">
                     {fmt(saldoEsperadoGaveta)}
                   </span>
                 </div>
@@ -971,14 +971,14 @@ export default function Caixa({
                   value={fechamentoObs}
                   onChange={(e) => setFechamentoObs(e.target.value)}
                   placeholder="Ex: Tudo bateu 100% no balcão hoje. Sobraram algumas moedas de R$ 0,25 para troco de segunda."
-                  className="w-full bg-slate-800/50 border border-slate-800 focus:bg-slate-900 focus:border-rose-600 p-2 text-xs rounded-lg h-16 outline-none resize-none transition"
+                  className="w-full bg-slate-100 border border-slate-200 focus:bg-white focus:border-rose-500 p-2 text-xs rounded-lg h-16 outline-none resize-none transition"
                 />
               </div>
 
-              <div className="p-3 bg-amber-950/40 border border-amber-800/60 rounded-lg flex items-start gap-2 text-[10px] text-amber-800 leading-normal">
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-2 text-[11px] text-amber-800 leading-normal">
                 <AlertTriangle
                   size={14}
-                  className="text-amber-500 shrink-0 mt-0.2"
+                  className="text-amber-600 shrink-0 mt-0.2"
                 />
                 <span>
                   Esta ação fechará oficialmente o movimento. Vendas adicionais
@@ -991,13 +991,13 @@ export default function Caixa({
                 <button
                   type="button"
                   onClick={() => setIsFecharModalOpen(false)}
-                  className="flex-1 py-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-bold cursor-pointer text-center"
+                  className="flex-1 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 text-xs font-bold cursor-pointer text-center"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2 rounded-lg bg-rose-600 hover:bg-rose-950/400 text-white text-xs font-bold cursor-pointer text-center"
+                  className="flex-1 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold cursor-pointer text-center"
                 >
                   Fechar Caixa Operativo
                 </button>

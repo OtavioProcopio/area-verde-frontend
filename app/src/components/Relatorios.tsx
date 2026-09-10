@@ -75,9 +75,9 @@ export default function Relatorios({
     `R$ ${(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   const renderEmptyState = (message: string) => (
-    <div className="text-center py-12 bg-slate-900 border border-slate-800 rounded-2xl shadow-sm">
-      <AlertOctagon size={40} className="mx-auto text-slate-300 mb-4" />
-      <h3 className="text-sm font-bold text-slate-300">Relatório Vazio</h3>
+    <div className="text-center py-12 bg-white border border-slate-200 rounded-2xl shadow-sm">
+      <AlertOctagon size={40} className="mx-auto text-slate-600 mb-4" />
+      <h3 className="text-sm font-bold text-slate-600">Relatório Vazio</h3>
       <p className="text-xs text-slate-500 mt-1">{message}</p>
     </div>
   );
@@ -158,7 +158,7 @@ export default function Relatorios({
 
   // 1. DIÁRIO
   const renderDiario = () => {
-    if (loading) return <div className="text-slate-400">Carregando...</div>;
+    if (loading) return <div className="text-slate-500">Carregando...</div>;
     if (!dailyReport)
       return renderEmptyState('Não há dados para a data informada.');
 
@@ -179,38 +179,38 @@ export default function Relatorios({
     return (
       <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-emerald-950/40 border border-emerald-800/60 p-5 rounded-2xl shadow-sm">
-            <div className="text-[10px] uppercase font-mono font-bold text-emerald-500">
+          <div className="bg-emerald-50 border border-emerald-200 p-5 rounded-2xl shadow-sm">
+            <div className="text-[11px] uppercase font-mono font-bold text-emerald-600">
               Total Vendido
             </div>
-            <div className="text-2xl font-black font-mono text-emerald-400 mt-1">
+            <div className="text-2xl font-black font-mono text-emerald-700 mt-1">
               {fmt(dailyReport.totalSold)}
             </div>
           </div>
-          <div className="bg-blue-950/40 border border-blue-800/60 p-5 rounded-2xl shadow-sm">
-            <div className="text-[10px] uppercase font-mono font-bold text-blue-500">
+          <div className="bg-blue-50 border border-blue-200 p-5 rounded-2xl shadow-sm">
+            <div className="text-[11px] uppercase font-mono font-bold text-blue-600">
               Total Recebido
             </div>
-            <div className="text-2xl font-black font-mono text-blue-400 mt-1">
+            <div className="text-2xl font-black font-mono text-blue-700 mt-1">
               {fmt(dailyReport.totalReceived)}
             </div>
           </div>
         </div>
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-800/50 border-b border-slate-800 uppercase font-mono text-[10px] tracking-wider text-slate-500">
+            <thead className="bg-slate-100 border-b border-slate-200 uppercase font-mono text-[11px] tracking-wider text-slate-500">
               <tr>
                 <th className="px-5 py-3">Indicador</th>
                 <th className="px-5 py-3 text-right">Valor R$</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-200">
               {tableData.map((m, i) => (
-                <tr key={i} className="hover:bg-slate-800/50">
-                  <td className="px-5 py-3 font-bold text-slate-300">
+                <tr key={i} className="hover:bg-slate-100">
+                  <td className="px-5 py-3 font-bold text-slate-600">
                     {m.label}
                   </td>
-                  <td className="px-5 py-3 text-right font-mono font-bold text-slate-50">
+                  <td className="px-5 py-3 text-right font-mono font-bold text-slate-900">
                     {fmt(m.value)}
                   </td>
                 </tr>
@@ -224,16 +224,16 @@ export default function Relatorios({
 
   // 3. PRODUTOS (Mais Vendidos)
   const renderProdutos = () => {
-    if (loading) return <div className="text-slate-400">Carregando...</div>;
+    if (loading) return <div className="text-slate-500">Carregando...</div>;
     if (bestSelling.length === 0)
       return renderEmptyState(
         'Nenhum produto foi vendido no período selecionado.',
       );
 
     return (
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
         <table className="w-full text-left text-xs">
-          <thead className="bg-slate-800/50 border-b border-slate-800 uppercase font-mono text-[10px] tracking-wider text-slate-500">
+          <thead className="bg-slate-100 border-b border-slate-200 uppercase font-mono text-[11px] tracking-wider text-slate-500">
             <tr>
               <th className="px-5 py-3">Produto</th>
               <th className="px-5 py-3">Categoria</th>
@@ -241,14 +241,14 @@ export default function Relatorios({
               <th className="px-5 py-3 text-right">Valor Gerado</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-200">
             {bestSelling.map((p, i) => (
-              <tr key={i} className="hover:bg-slate-800/50">
-                <td className="px-5 py-3 font-bold text-slate-200">{p.name}</td>
-                <td className="px-5 py-3 uppercase text-[10px] text-slate-500 font-mono">
+              <tr key={i} className="hover:bg-slate-100">
+                <td className="px-5 py-3 font-bold text-slate-700">{p.name}</td>
+                <td className="px-5 py-3 uppercase text-[11px] text-slate-500 font-mono">
                   {p.category || '---'}
                 </td>
-                <td className="px-5 py-3 text-right font-mono font-black text-emerald-400">
+                <td className="px-5 py-3 text-right font-mono font-black text-emerald-700">
                   {p.quantity}
                 </td>
                 <td className="px-5 py-3 text-right font-mono text-slate-500 font-bold">
@@ -264,14 +264,14 @@ export default function Relatorios({
 
   // 4. FIADOS (Dívidas)
   const renderFiados = () => {
-    if (loading) return <div className="text-slate-400">Carregando...</div>;
+    if (loading) return <div className="text-slate-500">Carregando...</div>;
     if (fiados.length === 0)
       return renderEmptyState('Não há fiados para exibir neste período.');
 
     return (
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
         <table className="w-full text-left text-xs">
-          <thead className="bg-slate-800/50 border-b border-slate-800 uppercase font-mono text-[10px] tracking-wider text-slate-500">
+          <thead className="bg-slate-100 border-b border-slate-200 uppercase font-mono text-[11px] tracking-wider text-slate-500">
             <tr>
               <th className="px-5 py-3">Data</th>
               <th className="px-5 py-3">Cliente</th>
@@ -279,28 +279,28 @@ export default function Relatorios({
               <th className="px-5 py-3 text-right">Total</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-200">
             {fiados.map((c, i) => (
-              <tr key={i} className="hover:bg-slate-800/50">
-                <td className="px-5 py-3 font-mono text-[10px] text-slate-400">
+              <tr key={i} className="hover:bg-slate-100">
+                <td className="px-5 py-3 font-mono text-[11px] text-slate-500">
                   {c.pendenteEm
                     ? new Date(c.pendenteEm).toLocaleDateString()
                     : '-'}
                 </td>
-                <td className="px-5 py-3 font-bold text-slate-200">
+                <td className="px-5 py-3 font-bold text-slate-700">
                   {c.customerName || 'Não identificado'}
                 </td>
                 <td className="px-5 py-3 gap-1 flex items-center justify-center">
-                  <span className="px-2 py-0.5 rounded text-[9px] uppercase font-bold font-mono border bg-amber-950/40 text-amber-400 border-amber-800/60">
+                  <span className="px-2 py-0.5 rounded text-[11px] uppercase font-bold font-mono border bg-amber-50 text-amber-700 border-amber-200">
                     PENDENTE
                   </span>
                   {c.overdue && (
-                    <span className="px-2 py-0.5 rounded text-[9px] uppercase font-bold font-mono border bg-rose-950/40 text-rose-400 border-rose-800/60">
+                    <span className="px-2 py-0.5 rounded text-[11px] uppercase font-bold font-mono border bg-rose-50 text-rose-700 border-rose-200">
                       Vencido
                     </span>
                   )}
                 </td>
-                <td className="px-5 py-3 text-right font-mono font-black text-rose-500">
+                <td className="px-5 py-3 text-right font-mono font-black text-rose-600">
                   {fmt(c.total)}
                 </td>
               </tr>
@@ -313,16 +313,16 @@ export default function Relatorios({
 
   // 5. ESTOQUE
   const renderEstoque = () => {
-    if (loading) return <div className="text-slate-400">Carregando...</div>;
+    if (loading) return <div className="text-slate-500">Carregando...</div>;
     if (stock.length === 0)
       return renderEmptyState(
         'Todos os produtos estão com estoque normal e acima do mínimo.',
       );
 
     return (
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
         <table className="w-full text-left text-xs">
-          <thead className="bg-slate-800/50 border-b border-slate-800 uppercase font-mono text-[10px] tracking-wider text-slate-500">
+          <thead className="bg-slate-100 border-b border-slate-200 uppercase font-mono text-[11px] tracking-wider text-slate-500">
             <tr>
               <th className="px-5 py-3">Insumo / Físico</th>
               <th className="px-5 py-3 text-center">Unidade</th>
@@ -330,10 +330,10 @@ export default function Relatorios({
               <th className="px-5 py-3 text-right">Saldo Atual</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-200">
             {stock.map((p, i) => (
-              <tr key={i} className="hover:bg-slate-800/50 bg-amber-950/40/20">
-                <td className="px-5 py-3 font-bold text-slate-200">
+              <tr key={i} className="hover:bg-slate-100 bg-amber-50/20">
+                <td className="px-5 py-3 font-bold text-slate-700">
                   {p.productName}
                 </td>
                 <td className="px-5 py-3 text-center font-mono text-slate-500 uppercase">
@@ -342,7 +342,7 @@ export default function Relatorios({
                 <td className="px-5 py-3 text-center font-mono text-slate-500">
                   {p.minStock}
                 </td>
-                <td className="px-5 py-3 text-right font-mono font-black text-rose-500">
+                <td className="px-5 py-3 text-right font-mono font-black text-rose-600">
                   {p.stock}
                 </td>
               </tr>
@@ -355,32 +355,32 @@ export default function Relatorios({
 
   // 6. ESTOQUE CONSUMIDO
   const renderEstoqueConsumido = () => {
-    if (loading) return <div className="text-slate-400">Carregando...</div>;
+    if (loading) return <div className="text-slate-500">Carregando...</div>;
     if (consumedStock.length === 0)
       return renderEmptyState(
         'Nenhum item consumido do estoque físico no período.',
       );
 
     return (
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
         <table className="w-full text-left text-xs">
-          <thead className="bg-slate-800/50 border-b border-slate-800 uppercase font-mono text-[10px] tracking-wider text-slate-500">
+          <thead className="bg-slate-100 border-b border-slate-200 uppercase font-mono text-[11px] tracking-wider text-slate-500">
             <tr>
               <th className="px-5 py-3">Insumo Físico Baixado</th>
               <th className="px-5 py-3 text-center">Unidade</th>
               <th className="px-5 py-3 text-right">Qtd Consumida (Soma)</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-200">
             {consumedStock.map((entry, i) => (
-              <tr key={i} className="hover:bg-slate-800/50">
-                <td className="px-5 py-3 font-bold text-slate-200">
+              <tr key={i} className="hover:bg-slate-100">
+                <td className="px-5 py-3 font-bold text-slate-700">
                   {entry.productName}
                 </td>
                 <td className="px-5 py-3 text-center font-mono text-slate-500 uppercase">
                   {entry.unit}
                 </td>
-                <td className="px-5 py-3 text-right font-mono font-black text-rose-500">
+                <td className="px-5 py-3 text-right font-mono font-black text-rose-600">
                   {entry.consumed}
                 </td>
               </tr>
@@ -393,38 +393,38 @@ export default function Relatorios({
 
   // 7. COMANDAS
   const renderComandas = () => {
-    if (loading) return <div className="text-slate-400">Carregando...</div>;
+    if (loading) return <div className="text-slate-500">Carregando...</div>;
     if (commandasReport.length === 0)
       return renderEmptyState('Nenhuma comanda encontrada no período.');
 
     return (
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
         <table className="w-full text-left text-xs">
-          <thead className="bg-slate-800/50 border-b border-slate-800 uppercase font-mono text-[10px] tracking-wider text-slate-500">
+          <thead className="bg-slate-100 border-b border-slate-200 uppercase font-mono text-[11px] tracking-wider text-slate-500">
             <tr>
               <th className="px-5 py-3 text-center">Status</th>
               <th className="px-5 py-3 text-center">Quantidade</th>
               <th className="px-5 py-3 text-right">Total Fechado (R$)</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-200">
             {commandasReport.map((c, i) => {
               let badge = '';
               if (c.status === 'ABERTA')
-                badge = 'bg-amber-950/40 text-amber-400 border-amber-800/60';
+                badge = 'bg-amber-50 text-amber-700 border-amber-200';
               if (c.status === 'FECHADA')
                 badge =
-                  'bg-emerald-950/40 text-emerald-400 border-emerald-800/60';
+                  'bg-emerald-50 text-emerald-700 border-emerald-200';
               if (c.status === 'CANCELADA')
-                badge = 'bg-rose-950/40 text-rose-400 border-rose-800/60';
+                badge = 'bg-rose-50 text-rose-700 border-rose-200';
               if (c.status === 'PENDENTE')
-                badge = 'bg-blue-950/40 text-blue-400 border-blue-800/60';
+                badge = 'bg-blue-50 text-blue-700 border-blue-200';
 
               return (
-                <tr key={i} className="hover:bg-slate-800/50">
+                <tr key={i} className="hover:bg-slate-100">
                   <td className="px-5 py-3 text-center">
                     <span
-                      className={`px-2 py-0.5 rounded text-[9px] uppercase font-bold font-mono border ${badge}`}
+                      className={`px-2 py-0.5 rounded text-[11px] uppercase font-bold font-mono border ${badge}`}
                     >
                       {c.status}
                     </span>
@@ -432,7 +432,7 @@ export default function Relatorios({
                   <td className="px-5 py-3 text-center text-slate-500 font-bold">
                     {c.quantity}
                   </td>
-                  <td className="px-5 py-3 text-right font-mono font-bold text-slate-200">
+                  <td className="px-5 py-3 text-right font-mono font-bold text-slate-700">
                     {fmt(c.total)}
                   </td>
                 </tr>
@@ -457,20 +457,20 @@ export default function Relatorios({
     <div id="relatorios-module" className="space-y-6 animate-fade-in pb-10">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <span className="text-xs uppercase tracking-widest font-mono text-blue-500 font-bold block mb-1">
+          <span className="text-xs uppercase tracking-widest font-mono text-blue-600 font-bold block mb-1">
             Módulo Gerencial
           </span>
-          <h2 className="text-3xl font-display font-bold text-slate-50 tracking-tight">
-            Relatórios <span className="text-blue-500">& Gestão</span>
+          <h2 className="text-3xl font-display font-bold text-slate-900 tracking-tight">
+            Relatórios <span className="text-blue-600">& Gestão</span>
           </h2>
         </div>
 
-        <div className="w-full sm:w-auto flex items-center bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
-          <div className="px-3 text-slate-500 bg-slate-800/50 h-full flex items-center border-r border-slate-800 text-[10px] font-mono font-bold uppercase">
+        <div className="w-full sm:w-auto flex items-center bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+          <div className="px-3 text-slate-500 bg-slate-100 h-full flex items-center border-r border-slate-200 text-[11px] font-mono font-bold uppercase">
             Período:
           </div>
           <select
-            className="px-3 py-2 text-xs font-bold text-slate-300 bg-slate-900 outline-none cursor-pointer"
+            className="px-3 py-2 text-xs font-bold text-slate-600 bg-white outline-none cursor-pointer"
             value={period}
             onChange={(e) => setPeriod(e.target.value)}
           >
@@ -487,7 +487,7 @@ export default function Relatorios({
           <button
             key={t.id}
             onClick={() => setActiveTab(t.id as TabType)}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === t.id ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-900 border border-slate-800 text-slate-500 hover:bg-slate-800/50'}`}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition cursor-pointer ${activeTab === t.id ? 'bg-blue-600 text-white shadow-md' : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-100'}`}
           >
             <t.icon size={14} />
             {t.label}

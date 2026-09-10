@@ -10,9 +10,7 @@ const Dashboard = lazy(() => import('./components/Dashboard'));
 const Comandas = lazy(() => import('./components/Comandas'));
 const Caixa = lazy(() => import('./components/Caixa'));
 const Produtos = lazy(() => import('./components/Produtos'));
-const Estoque = lazy(() => import('./components/Estoque'));
 const Clientes = lazy(() => import('./components/Clientes'));
-const Fiados = lazy(() => import('./components/Fiados'));
 const Relatorios = lazy(() => import('./components/Relatorios'));
 const Configuracoes = lazy(() => import('./components/Configuracoes'));
 
@@ -23,7 +21,6 @@ import {
   Coins,
   Package,
   Users,
-  Wallet,
   BarChart3,
   Settings,
   LogOut,
@@ -108,10 +105,10 @@ export default function App() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#090d13]">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center space-y-4">
           <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mr-2 inline-block"></div>
-          <span className="text-gray-400 text-sm font-mono block">
+          <span className="text-slate-500 text-sm font-mono block">
             Iniciando sistema Area Verde...
           </span>
         </div>
@@ -121,19 +118,19 @@ export default function App() {
 
   if (!configuracao && bootstrapError) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#090d13] p-6">
-        <div className="w-full max-w-md rounded-3xl border border-rose-900 bg-slate-900 p-8 text-center shadow-2xl">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-rose-800/60 bg-rose-950/40 text-rose-500">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+        <div className="w-full max-w-md rounded-2xl border border-rose-200 bg-white p-8 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-rose-200 bg-rose-50 text-rose-600">
             <Lock size={20} />
           </div>
-          <h1 className="text-2xl font-display font-bold text-slate-50">
+          <h1 className="text-2xl font-display font-bold text-slate-900">
             Nao foi possivel iniciar o sistema
           </h1>
-          <p className="mt-3 text-sm text-slate-400">{bootstrapError}</p>
+          <p className="mt-3 text-sm text-slate-500">{bootstrapError}</p>
           <button
             type="button"
             onClick={() => void refreshState()}
-            className="mt-6 inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-emerald-500"
+            className="mt-6 inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-emerald-700"
           >
             Tentar novamente
           </button>
@@ -184,41 +181,39 @@ export default function App() {
     }, 0);
 
   return (
-    <div className="min-h-screen bg-slate-800 flex flex-col text-slate-200 antialiased selection:bg-emerald-600 selection:text-white">
-      {/* GEOMETRIC BALANCE THEME CONTAINER */}
-
+    <div className="min-h-screen bg-slate-50 flex flex-col text-slate-700 antialiased selection:bg-emerald-600 selection:text-white">
       {/* TOP HEADER STATUS PANEL */}
-      <header className="bg-slate-900 border-b border-slate-800 sticky top-0 z-30 px-6 py-3.5 flex flex-col md:flex-row justify-between items-center gap-4 shadow-sm">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 px-6 py-3 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4">
         {/* Brand identity area */}
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-gradient-to-br from-emerald-600 to-emerald-800 text-white rounded-xl shadow-lg shadow-emerald-600/15">
-            <Sprout size={20} className="animate-spin-slow" />
+          <div className="p-2 bg-emerald-600 text-white rounded-lg">
+            <Sprout size={18} />
           </div>
           <div>
-            <span className="text-[10px] uppercase font-mono text-emerald-500 font-bold block leading-normal">
+            <span className="text-[11px] uppercase font-mono text-emerald-700 font-bold block leading-normal">
               Boteco Familiar S.O.
             </span>
-            <h1 className="text-lg font-display font-bold text-slate-50 tracking-tight">
+            <h1 className="text-base font-display font-bold text-slate-900 tracking-tight">
               {configuracao?.nomeBar || 'Area Verde - Balcao Principal'}
             </h1>
           </div>
         </div>
 
         {/* Dynamic micro widgets & status badges */}
-        <div className="flex flex-wrap items-center gap-3 md:gap-5 text-xs text-slate-500 font-mono">
+        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 font-mono">
           {/* Caixa Status Widget */}
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/50 border border-slate-800 rounded-xl select-none">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg select-none">
             {caixa.isOpen ? (
               <>
-                <Unlock size={14} className="text-emerald-500 animate-pulse" />
-                <span className="font-semibold text-emerald-400">
+                <Unlock size={14} className="text-emerald-600" />
+                <span className="font-semibold text-emerald-700">
                   Caixa Aberto: {`R$ ${caixa.currentCashInMoney.toFixed(2)}`}
                 </span>
               </>
             ) : (
               <>
-                <Lock size={14} className="text-rose-500" />
-                <span className="font-semibold text-rose-500">
+                <Lock size={14} className="text-rose-600" />
+                <span className="font-semibold text-rose-600">
                   Caixa Fechado
                 </span>
               </>
@@ -227,7 +222,7 @@ export default function App() {
 
           {/* Comanda Status Widget */}
           {activeComandasCount > 0 && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-950/40 border border-amber-800/60 text-amber-400 rounded-xl">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 border border-amber-200 text-amber-700 rounded-lg">
               <ShoppingBag size={14} />
               <span className="font-semibold">
                 {activeComandasCount} Comandas (R${' '}
@@ -237,8 +232,8 @@ export default function App() {
           )}
 
           {/* Clock tracker badge */}
-          <div className="flex items-center gap-1.5 text-slate-300 font-semibold bg-slate-800/50 px-3 py-1.5 border border-slate-800 rounded-xl select-none">
-            <Clock size={14} className="text-emerald-500" />
+          <div className="flex items-center gap-1.5 text-slate-600 font-semibold bg-slate-50 px-3 py-1.5 border border-slate-200 rounded-lg select-none">
+            <Clock size={14} className="text-emerald-600" />
             <span>{time.toLocaleTimeString('pt-BR')}</span>
           </div>
 
@@ -251,7 +246,7 @@ export default function App() {
                 logout();
               }
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/50 hover:bg-rose-950/40 border border-slate-800 hover:border-rose-800/60 text-slate-500 hover:text-rose-500 font-bold rounded-xl cursor-pointer duration-150 shrink-0"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 text-slate-500 hover:text-rose-600 font-bold rounded-lg cursor-pointer transition duration-150 shrink-0"
             title="Sair do Sistema"
           >
             <LogOut size={14} />
@@ -261,25 +256,19 @@ export default function App() {
       </header>
 
       {/* SYSTEM BODY CONTAINER */}
-      <div className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="flex-1 max-w-[1600px] w-full mx-auto p-4 md:p-5 grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* NAV SYTEM BAR: Left Drawer style on desktop, top scrolling bar on mobile */}
         <aside
-          className="lg:col-span-3 lg:sticky lg:top-24 h-auto lg:max-h-[calc(100vh-140px)] flex flex-col justify-between"
+          className="lg:col-span-2 lg:sticky lg:top-[68px] h-auto lg:max-h-[calc(100vh-88px)] flex flex-col justify-between"
           id="side-drawer"
         >
-          <nav className="flex overflow-x-auto lg:overflow-visible lg:flex-col gap-2 bg-emerald-950 border border-emerald-900 p-3 lg:p-4 rounded-2xl shadow-xl select-none no-scrollbar snap-x">
+          <nav className="flex overflow-x-auto lg:overflow-visible lg:flex-col gap-1 bg-white border border-slate-200 p-2 rounded-xl select-none no-scrollbar snap-x">
             {[
               { id: 'dashboard', label: 'Painel Geral', icon: LayoutDashboard },
               { id: 'comandas', label: 'Comandas POS', icon: ShoppingBag },
               { id: 'caixa', label: 'Controle Caixa', icon: Coins },
-              { id: 'estoque', label: 'Estoque do Balcão', icon: Package },
-              {
-                id: 'produtos',
-                label: 'Catálogo de Produtos',
-                icon: LayoutDashboard,
-              },
-              { id: 'clientes', label: 'Clientes', icon: Users },
-              { id: 'fiados', label: 'Fiado / Pendências', icon: Wallet },
+              { id: 'produtos', label: 'Produtos & Estoque', icon: Package },
+              { id: 'clientes', label: 'Clientes & Fiado', icon: Users },
               { id: 'relatorios', label: 'Relatórios', icon: BarChart3 },
               { id: 'configuracoes', label: 'Ajustes', icon: Settings },
             ].map((tab) => {
@@ -293,10 +282,10 @@ export default function App() {
                   onClick={() => {
                     setActiveTab(tab.id);
                   }}
-                  className={`flex items-center gap-2 lg:gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl text-xs font-bold transition duration-155 cursor-pointer text-left whitespace-nowrap shrink-0 snap-center ${
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition duration-150 cursor-pointer text-left whitespace-nowrap shrink-0 snap-center ${
                     isActive
-                      ? 'bg-emerald-800 text-white shadow-lg shadow-emerald-950/20'
-                      : 'text-emerald-200/80 hover:text-white hover:bg-emerald-900/60'
+                      ? 'bg-emerald-50 text-emerald-700'
+                      : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
                   }`}
                 >
                   <TabIcon size={16} />
@@ -307,8 +296,8 @@ export default function App() {
           </nav>
 
           {/* Quick legal credentials attribution inside navigation margins - NO tech larp indicators */}
-          <div className="hidden lg:block p-4 border border-slate-800 rounded-2xl bg-slate-900 text-[10px] text-slate-500 font-mono mt-4 leading-normal shadow-sm">
-            <span className="text-emerald-400 font-bold block mb-1">
+          <div className="hidden lg:block p-3 border border-slate-200 rounded-xl bg-white text-[11px] text-slate-500 font-mono mt-3 leading-normal">
+            <span className="text-emerald-700 font-bold block mb-1">
               Area Verde S.O.
             </span>
             Gestão simplificada e ágil para o balcão. Todos os direitos
@@ -316,8 +305,8 @@ export default function App() {
           </div>
         </aside>
 
-        {/* WORKSPACE CONTENT AREA (9 cols) */}
-        <main className="lg:col-span-9" id="main-workspace-box">
+        {/* WORKSPACE CONTENT AREA */}
+        <main className="lg:col-span-10" id="main-workspace-box">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
@@ -374,15 +363,6 @@ export default function App() {
                   />
                 )}
 
-                {activeTab === 'estoque' && (
-                  <Estoque
-                    products={products}
-                    categories={categories}
-                    onUpdateProduct={updateProduct}
-                    onRefreshState={refreshState}
-                  />
-                )}
-
                 {activeTab === 'produtos' && (
                   <Produtos
                     products={products}
@@ -399,19 +379,11 @@ export default function App() {
                 {activeTab === 'clientes' && (
                   <Clientes
                     customers={customers}
+                    fiados={fiados}
                     caixaIsOpen={caixa.isOpen}
                     onAddCustomer={addCustomer}
                     onUpdateCustomer={updateCustomer}
                     onDeleteCustomer={deleteCustomer}
-                    onPagarFiado={pagarFiado}
-                  />
-                )}
-
-                {activeTab === 'fiados' && (
-                  <Fiados
-                    fiados={fiados}
-                    customers={customers}
-                    caixaIsOpen={caixa.isOpen}
                     onPagarFiado={pagarFiado}
                   />
                 )}
