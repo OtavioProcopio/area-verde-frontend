@@ -185,7 +185,8 @@ test.describe.serial('Fluxo completo de atendimento no bar', () => {
   });
 
   test('quita o fiado do cliente no caderno de pendências', async () => {
-    await page.locator('#nav-link-fiados').click();
+    await page.locator('#nav-link-clientes').click();
+    await page.locator('#clientes-subtab-fiados').click();
 
     const row = page.locator('tr', { hasText: CLIENTE_NOME });
     await expect(row).toBeVisible({ timeout: 10_000 });

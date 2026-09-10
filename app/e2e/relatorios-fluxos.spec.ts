@@ -82,7 +82,8 @@ test('aba Alerta de Estoque mostra produto com saldo baixo', async ({
 
   await loginUI(page, SENHA);
   // reduz o estoque do produto pra abaixo do mínimo via ajuste no Estoque
-  await page.locator('#nav-link-estoque').click();
+  await page.locator('#nav-link-produtos').click();
+  await page.locator('#produtos-subtab-estoque').click();
   const row = page.locator('tr', { hasText: `Produto E2E ${runId}` });
   await row.getByTitle('Ajuste Manual').click();
   await page.locator('input[type="number"]').fill('1');

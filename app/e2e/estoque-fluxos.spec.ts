@@ -14,7 +14,8 @@ test('registra uma entrada de estoque e atualiza o saldo', async ({
   await apiSetupProdutoUnico(runId);
 
   await loginUI(page, SENHA);
-  await page.locator('#nav-link-estoque').click();
+  await page.locator('#nav-link-produtos').click();
+  await page.locator('#produtos-subtab-estoque').click();
 
   const row = page.locator('tr', { hasText: `Produto E2E ${runId}` });
   await row.getByTitle('Dar Entrada').click();
@@ -33,7 +34,8 @@ test('faz um ajuste manual de estoque', async ({ page }) => {
   await apiSetupProdutoUnico(runId);
 
   await loginUI(page, SENHA);
-  await page.locator('#nav-link-estoque').click();
+  await page.locator('#nav-link-produtos').click();
+  await page.locator('#produtos-subtab-estoque').click();
 
   const row = page.locator('tr', { hasText: `Produto E2E ${runId}` });
   await row.getByTitle('Ajuste Manual').click();
@@ -58,7 +60,8 @@ test('mostra o histórico de movimentações após uma entrada', async ({
   await apiSetupProdutoUnico(runId);
 
   await loginUI(page, SENHA);
-  await page.locator('#nav-link-estoque').click();
+  await page.locator('#nav-link-produtos').click();
+  await page.locator('#produtos-subtab-estoque').click();
 
   const row = page.locator('tr', { hasText: `Produto E2E ${runId}` });
   await row.getByTitle('Dar Entrada').click();
