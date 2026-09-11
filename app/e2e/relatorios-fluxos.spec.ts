@@ -29,10 +29,12 @@ test('aba Diário Operacional mostra o total vendido após uma venda em dinheiro
   await loginUI(page, SENHA);
   await page.locator('#nav-link-comandas').click();
   await page
-    .locator('tr', { hasText: `Comanda Relatorio ${runId}` })
+    .locator('[data-testid="comanda-card"]', {
+      hasText: `Comanda Relatorio ${runId}`,
+    })
     .getByRole('button', { name: 'Abrir' })
     .click();
-  await page.getByRole('button', { name: /PAGAMENTO & FECHAMENTO/ }).click();
+  await page.getByRole('button', { name: /Pagamento e fechamento/i }).click();
   await page.getByRole('button', { name: '💵 Dinheiro' }).click();
   await page.locator('#btn-confirm-pos-payment').click();
   await fecharRecibo(page);
@@ -46,9 +48,7 @@ test('aba Diário Operacional mostra o total vendido após uma venda em dinheiro
   await expect(page.getByText('Total Recebido')).toBeVisible();
 });
 
-test('aba Produtos Mais Vendidos lista o produto vendido', async ({
-  page,
-}) => {
+test('aba Produtos Mais Vendidos lista o produto vendido', async ({ page }) => {
   const runId = Date.now().toString(36);
   await apiAbrirCaixa();
   const { produto } = await apiSetupProdutoUnico(runId, 12);
@@ -58,10 +58,12 @@ test('aba Produtos Mais Vendidos lista o produto vendido', async ({
   await loginUI(page, SENHA);
   await page.locator('#nav-link-comandas').click();
   await page
-    .locator('tr', { hasText: `Comanda Vendido ${runId}` })
+    .locator('[data-testid="comanda-card"]', {
+      hasText: `Comanda Vendido ${runId}`,
+    })
     .getByRole('button', { name: 'Abrir' })
     .click();
-  await page.getByRole('button', { name: /PAGAMENTO & FECHAMENTO/ }).click();
+  await page.getByRole('button', { name: /Pagamento e fechamento/i }).click();
   await page.getByRole('button', { name: '💵 Dinheiro' }).click();
   await page.locator('#btn-confirm-pos-payment').click();
   await fecharRecibo(page);
@@ -116,10 +118,12 @@ test('aba Estoque Consumido mostra o produto baixado após uma venda', async ({
   await loginUI(page, SENHA);
   await page.locator('#nav-link-comandas').click();
   await page
-    .locator('tr', { hasText: `Comanda Consumo ${runId}` })
+    .locator('[data-testid="comanda-card"]', {
+      hasText: `Comanda Consumo ${runId}`,
+    })
     .getByRole('button', { name: 'Abrir' })
     .click();
-  await page.getByRole('button', { name: /PAGAMENTO & FECHAMENTO/ }).click();
+  await page.getByRole('button', { name: /Pagamento e fechamento/i }).click();
   await page.getByRole('button', { name: '💵 Dinheiro' }).click();
   await page.locator('#btn-confirm-pos-payment').click();
   await fecharRecibo(page);
@@ -145,9 +149,7 @@ test('aba Inadimplência / Fiados mostra o cliente com pendência aberta', async
 
   await loginUI(page, SENHA);
   await page.locator('#nav-link-relatorios').click();
-  await page
-    .getByRole('button', { name: 'Inadimplência / Fiados' })
-    .click();
+  await page.getByRole('button', { name: 'Inadimplência / Fiados' }).click();
 
   await expect(page.getByText(`Cliente Fiado ${runId}`)).toBeVisible({
     timeout: 10_000,
@@ -164,18 +166,18 @@ test('aba Comandas mostra o total de comandas fechadas', async ({ page }) => {
   await loginUI(page, SENHA);
   await page.locator('#nav-link-comandas').click();
   await page
-    .locator('tr', { hasText: `Comanda Status ${runId}` })
+    .locator('[data-testid="comanda-card"]', {
+      hasText: `Comanda Status ${runId}`,
+    })
     .getByRole('button', { name: 'Abrir' })
     .click();
-  await page.getByRole('button', { name: /PAGAMENTO & FECHAMENTO/ }).click();
+  await page.getByRole('button', { name: /Pagamento e fechamento/i }).click();
   await page.getByRole('button', { name: '💵 Dinheiro' }).click();
   await page.locator('#btn-confirm-pos-payment').click();
   await fecharRecibo(page);
 
   await page.locator('#nav-link-relatorios').click();
-  await page
-    .getByRole('button', { name: 'Comandas', exact: true })
-    .click();
+  await page.getByRole('button', { name: 'Comandas', exact: true }).click();
 
   await expect(page.getByText('FECHADA')).toBeVisible({ timeout: 10_000 });
 });
@@ -209,9 +211,9 @@ test('mostra feedback de erro quando o relatório falha ao carregar', async ({
 
   await page.locator('#nav-link-relatorios').click();
 
-  await expect(
-    page.getByText('Erro interno ao gerar relatório'),
-  ).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByText('Erro interno ao gerar relatório')).toBeVisible({
+    timeout: 10_000,
+  });
   // A tela não mostra dados velhos/parciais quando o load falha.
   await expect(page.getByText('Total Vendido')).toHaveCount(0);
 });

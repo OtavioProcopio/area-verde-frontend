@@ -123,14 +123,16 @@ test.describe.serial('Fluxo completo de atendimento no bar', () => {
       timeout: 10_000,
     });
 
-    const dialogPromise = page.waitForEvent('dialog');
     await page
-      .getByRole('button', { name: /PAGAMENTO & FECHAMENTO/ })
+      .getByRole('button', { name: /Pagamento e fechamento/i })
       .click();
-    const dialog = await dialogPromise;
 
-    expect(dialog.message()).toContain('vazia');
-    await expect(page.getByRole('heading', { name: 'Finalização Balcão' })).toHaveCount(0);
+    await expect(
+      page.getByText(/Impossível fechar uma comanda vazia/i),
+    ).toBeVisible({ timeout: 10_000 });
+    await expect(
+      page.getByRole('heading', { name: 'Finalização do balcão' }),
+    ).toHaveCount(0);
   });
 
   test('adiciona item na comanda e fecha com pagamento em dinheiro', async () => {
@@ -139,7 +141,7 @@ test.describe.serial('Fluxo completo de atendimento no bar', () => {
     await page.getByRole('button', { name: PRODUTO_NOME }).first().click();
 
     await page
-      .getByRole('button', { name: /PAGAMENTO & FECHAMENTO/ })
+      .getByRole('button', { name: /Pagamento e fechamento/i })
       .click();
     await page.getByRole('button', { name: '💵 Dinheiro' }).click();
     await page.locator('#btn-confirm-pos-payment').click();
@@ -160,7 +162,7 @@ test.describe.serial('Fluxo completo de atendimento no bar', () => {
     await page.getByPlaceholder('Ex: Skol').fill(PRODUTO_NOME);
     await page.getByRole('button', { name: PRODUTO_NOME }).first().click();
 
-    await page.getByRole('button', { name: /LANÇAR NO/ }).click();
+    await page.getByRole('button', { name: /Lançar no/i }).click();
     await page.getByRole('button', { name: '+ Novo' }).click();
 
     await page.getByPlaceholder('Nome Completo').fill(CLIENTE_NOME);

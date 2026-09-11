@@ -133,7 +133,7 @@ test('paga um fiado pela tela de detalhe do cliente', async ({ page }) => {
     .locator('tr', { hasText: `Cliente Fiado Det ${runId}` })
     .getByRole('button', { name: 'Abrir' })
     .click();
-  await page.getByRole('button', { name: /LANÇAR NO/ }).click();
+  await page.getByRole('button', { name: /Lançar no/i }).click();
   // a comanda já foi criada com clienteId, então handleLaunchCheckout já
   // pré-seleciona o cliente vinculado no select — só confirmamos.
   await expect(page.getByTestId('checkout-cliente-select')).toHaveValue(
