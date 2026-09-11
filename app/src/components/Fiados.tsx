@@ -137,87 +137,87 @@ export default function Fiados({
     `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   return (
-    <div className="space-y-6 animate-fade-in pb-10">
+    <div className="space-y-5 pb-10">
       {/* DASHBOARD CARDS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {/* Total em aberto */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col justify-between items-start hover:shadow-md transition">
-          <div className="flex justify-between items-center w-full mb-3">
-            <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200">
-              <Wallet className="text-slate-500" size={18} />
+        <div className="flex flex-col items-start justify-between rounded-2xl border border-counter-700 bg-counter-900 p-5">
+          <div className="mb-3 flex w-full items-center justify-between">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-counter-700 bg-counter-800">
+              <Wallet className="text-cream-300" size={22} />
             </div>
-            <span className="text-[11px] font-mono text-slate-500 font-bold uppercase">
+            <span className="text-xs font-bold uppercase text-cream-400">
               Total
             </span>
           </div>
           <div>
-            <p className="text-xs text-slate-500 font-bold uppercase mb-1">
+            <p className="mb-1 text-xs font-bold uppercase text-cream-400">
               Valor em Aberto
             </p>
-            <h3 className="text-2xl font-black font-mono text-slate-700">
+            <h3 className="font-mono text-2xl font-black text-cream-100">
               {fmt(totalEmAberto)}
             </h3>
           </div>
         </div>
 
         {/* Quantidade pendente */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col justify-between items-start hover:shadow-md transition">
-          <div className="flex justify-between items-center w-full mb-3">
-            <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center border border-amber-200">
-              <FileText className="text-amber-600" size={18} />
+        <div className="flex flex-col items-start justify-between rounded-2xl border border-counter-700 bg-counter-900 p-5">
+          <div className="mb-3 flex w-full items-center justify-between">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-gold-500/30 bg-gold-500/10">
+              <FileText className="text-gold-400" size={22} />
             </div>
-            <span className="text-[11px] font-mono text-amber-700 font-bold uppercase">
+            <span className="text-xs font-bold uppercase text-gold-400">
               Volume
             </span>
           </div>
           <div>
-            <p className="text-xs text-amber-600/80 font-bold uppercase mb-1">
+            <p className="mb-1 text-xs font-bold uppercase text-gold-300/80">
               Pendências
             </p>
-            <h3 className="text-2xl font-black font-mono text-amber-600">
+            <h3 className="font-mono text-2xl font-black text-gold-400">
               {countAbertos} abertas
             </h3>
           </div>
         </div>
 
         {/* Vencidos */}
-        <div className="bg-rose-50 border border-rose-200 rounded-2xl p-5 shadow-sm flex flex-col justify-between items-start hover:shadow-md transition">
-          <div className="flex justify-between items-center w-full mb-3">
-            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center border border-rose-200">
-              <AlertOctagon className="text-rose-600" size={18} />
+        <div className="flex flex-col items-start justify-between rounded-2xl border border-rose-400/30 bg-rose-400/10 p-5">
+          <div className="mb-3 flex w-full items-center justify-between">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-rose-400/30 bg-counter-900">
+              <AlertOctagon className="text-rose-400" size={22} />
             </div>
-            <span className="text-[11px] font-mono text-rose-700 font-bold uppercase">
+            <span className="text-xs font-bold uppercase text-rose-400">
               Alerta
             </span>
           </div>
           <div>
-            <p className="text-xs text-rose-600/80 font-bold uppercase mb-1">
+            <p className="mb-1 text-xs font-bold uppercase text-rose-300/80">
               Dívidas Vencidas
             </p>
-            <h3 className="text-2xl font-black font-mono text-rose-600">
+            <h3 className="font-mono text-2xl font-black text-rose-400">
               {fmt(totalVencidos)}
             </h3>
           </div>
         </div>
       </div>
 
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
+      <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-counter-700 bg-counter-900 p-4 sm:flex-row">
         <div className="relative w-full sm:w-1/2 md:w-1/3">
           <Search
-            size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+            size={19}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-cream-400"
           />
           <input
             type="text"
             placeholder="Busca por cliente ou comanda..."
-            className="w-full pl-9 pr-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none focus:border-amber-400"
+            className="w-full rounded-xl border border-counter-700 bg-counter-950 py-2.5 pl-9 pr-3 text-sm text-cream-100 outline-none focus:border-gold-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <div className="w-full sm:w-auto">
           <select
-            className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none focus:border-amber-400 cursor-pointer text-slate-600 font-bold"
+            className="w-full cursor-pointer rounded-xl border border-counter-700 bg-counter-950 px-3 py-2.5 text-sm font-bold text-cream-200 outline-none focus:border-gold-500"
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value as any)}
           >
@@ -228,11 +228,11 @@ export default function Fiados({
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-counter-700 bg-counter-900">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs text-slate-600">
+          <table className="w-full border-collapse text-left">
             <thead>
-              <tr className="border-b border-slate-200 text-[11px] uppercase font-mono tracking-wider text-slate-500 bg-slate-100">
+              <tr className="border-b border-counter-700 bg-counter-950 text-xs font-bold uppercase tracking-wide text-cream-400">
                 <th className="px-5 py-3">Cliente</th>
                 <th className="px-4 py-3">Referência</th>
                 <th className="px-4 py-3 text-center">Status</th>
@@ -241,7 +241,7 @@ export default function Fiados({
                 <th className="px-5 py-3 text-right">Ações</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200">
+            <tbody className="divide-y divide-counter-800">
               {filteredFiados.map((f) => {
                 const c = customers.find((cust) => cust.id === f.customerId);
                 const isOverdue =
@@ -251,76 +251,76 @@ export default function Fiados({
                 return (
                   <tr
                     key={f.id}
-                    className={`hover:bg-slate-100/80 transition ${isOverdue ? 'bg-rose-50/20' : ''}`}
+                    className={`transition hover:bg-counter-800 ${isOverdue ? 'bg-rose-400/5' : ''}`}
                   >
-                    <td className="px-5 py-3">
-                      <span className="font-bold text-slate-700 block text-sm">
+                    <td className="px-5 py-3.5">
+                      <span className="block text-sm font-bold text-cream-100">
                         {c ? c.name : 'Desconhecido'}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3.5">
                       <div className="flex flex-col gap-0.5">
-                        <span className="font-mono text-slate-500 font-bold text-xs">
+                        <span className="font-mono text-xs font-bold text-cream-300">
                           {f.comandaId || 'Ajuste Manual'}
                         </span>
-                        <span className="text-[11px] text-slate-500 flex items-center gap-1">
-                          <Clock size={10} />{' '}
+                        <span className="flex items-center gap-1 text-xs text-cream-400">
+                          <Clock size={12} />{' '}
                           {new Date(f.date).toLocaleDateString('pt-BR')}
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-center">
+                    <td className="px-4 py-3.5 text-center">
                       {isQuitado ? (
-                        <span className="px-2 py-0.5 rounded text-[11px] uppercase font-bold font-mono border bg-emerald-50 text-emerald-700 border-emerald-200">
+                        <span className="rounded border border-emerald-400/30 bg-emerald-400/10 px-2 py-0.5 text-xs font-bold uppercase text-emerald-400">
                           QUITADO
                         </span>
                       ) : isOverdue ? (
-                        <span className="px-2 py-0.5 rounded text-[11px] uppercase font-bold font-mono border bg-rose-50 text-rose-700 border-rose-200">
+                        <span className="rounded border border-rose-400/30 bg-rose-400/10 px-2 py-0.5 text-xs font-bold uppercase text-rose-400">
                           VENCIDO
                         </span>
                       ) : (
-                        <span className="px-2 py-0.5 rounded text-[11px] uppercase font-bold font-mono border bg-amber-50 text-amber-700 border-amber-200">
+                        <span className="rounded border border-gold-500/30 bg-gold-500/10 px-2 py-0.5 text-xs font-bold uppercase text-gold-400">
                           ABERTO
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-center">
-                      <div className="text-[11px] font-mono">
-                        <div className="text-slate-500">
+                    <td className="px-4 py-3.5 text-center">
+                      <div className="font-mono text-xs">
+                        <div className="text-cream-400">
                           Orig: {fmt(f.originalValue)}
                         </div>
-                        <div className="text-emerald-600 font-bold">
+                        <div className="font-bold text-emerald-400">
                           Pago: {fmt(f.paidValue)}
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3.5 text-right">
                       <span
-                        className={`font-mono text-sm font-black ${isQuitado ? 'text-slate-500' : isOverdue ? 'text-rose-600' : 'text-amber-600'}`}
+                        className={`font-mono text-sm font-black ${isQuitado ? 'text-cream-400' : isOverdue ? 'text-rose-400' : 'text-gold-400'}`}
                       >
                         {fmt(f.remainingValue)}
                       </span>
                     </td>
-                    <td className="px-5 py-3 text-right">
-                      <div className="flex items-center justify-end gap-1.5 inline-flex">
+                    <td className="px-5 py-3.5 text-right">
+                      <div className="inline-flex items-center justify-end gap-1.5">
                         <button
                           onClick={() =>
                             alert(
                               `Comanda ID: ${f.comandaId}\nFuncionalidade em desenvolvimento.`,
                             )
                           }
-                          className="px-2 py-1 flex items-center gap-1 bg-slate-100 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 text-slate-500 hover:text-emerald-700 rounded transition cursor-pointer font-bold text-[11px] uppercase"
+                          className="flex items-center gap-1 rounded border border-counter-700 bg-counter-800 px-2.5 py-1.5 text-xs font-bold uppercase text-cream-300 transition hover:border-gold-500/50 hover:text-gold-300"
                           title="Ver Comanda"
                         >
-                          <Eye size={12} /> Comanda
+                          <Eye size={16} /> Comanda
                         </button>
                         {!isQuitado && (
                           <button
                             onClick={() => openQuitar(f)}
-                            className="px-2 py-1 flex items-center gap-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded transition cursor-pointer font-bold text-[11px] uppercase"
+                            className="flex items-center gap-1 rounded border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1.5 text-xs font-bold uppercase text-emerald-400 transition hover:bg-emerald-400/20"
                             title="Quitar Valor"
                           >
-                            <CheckCircle size={12} /> Quitar
+                            <CheckCircle size={16} /> Quitar
                           </button>
                         )}
                       </div>
@@ -332,7 +332,7 @@ export default function Fiados({
                 <tr>
                   <td
                     colSpan={6}
-                    className="text-center py-12 text-slate-500 italic text-xs bg-slate-100/30"
+                    className="bg-counter-950/40 py-12 text-center text-sm italic text-cream-400"
                   >
                     Nenhuma pendência encontrada.
                   </td>
@@ -345,27 +345,27 @@ export default function Fiados({
 
       {/* MODAL: QUITAR */}
       {activeModal === 'quitar' && selectedFiado && (
-        <div className="fixed inset-0 bg-slate-50 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
-          <div className="w-full max-w-sm bg-white border border-emerald-200 rounded-2xl p-6 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="relative w-full max-w-sm rounded-2xl border-2 border-emerald-400/30 bg-counter-900 p-5 shadow-2xl">
             <button
               type="button"
               onClick={() => setActiveModal(null)}
-              className="absolute top-4 right-4 text-slate-500 hover:text-slate-900 cursor-pointer"
+              className="absolute right-4 top-4 text-cream-400 hover:text-cream-100"
             >
-              <X size={18} />
+              <X size={22} />
             </button>
-            <h3 className="text-lg font-display font-bold text-emerald-700 mb-1 flex items-center gap-2">
-              <CheckCircle className="text-emerald-600" size={20} />
+            <h3 className="mb-1 flex items-center gap-2 font-display text-lg font-bold text-emerald-300">
+              <CheckCircle className="text-emerald-400" size={24} />
               Quitar Pagamento
             </h3>
-            <p className="text-[11px] font-mono text-emerald-600 mb-4 block uppercase font-bold">
+            <p className="mb-4 block text-xs font-bold uppercase text-emerald-400">
               Resumo da Dívida Atual: {fmt(selectedFiado.remainingValue)}
             </p>
 
-            <form onSubmit={handleQuitar} className="space-y-4">
+            <form onSubmit={handleQuitar} className="space-y-3">
               <div>
-                <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
-                  Valor a Pagar (R$) <span className="text-rose-600">*</span>
+                <label className="mb-1 block text-xs font-bold text-cream-400">
+                  Valor a Pagar (R$) <span className="text-rose-400">*</span>
                 </label>
                 <input
                   type="number"
@@ -373,14 +373,14 @@ export default function Fiados({
                   min="0.01"
                   value={payAmount}
                   onChange={(e) => setPayAmount(e.target.value)}
-                  className="w-full bg-slate-100 border border-slate-200 px-3 py-2 text-xl text-slate-700 font-mono font-black rounded-lg outline-none focus:border-emerald-500 focus:bg-white text-emerald-700"
+                  className="w-full rounded-lg border border-counter-700 bg-counter-950 px-3 py-2.5 font-mono text-xl font-black text-emerald-300 outline-none focus:border-emerald-400"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] uppercase font-mono text-slate-500 mb-2">
-                  Forma de Pagamento <span className="text-rose-600">*</span>
+                <label className="mb-2 block text-xs font-bold text-cream-400">
+                  Forma de Pagamento <span className="text-rose-400">*</span>
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
@@ -392,10 +392,10 @@ export default function Fiados({
                       key={item.id}
                       type="button"
                       onClick={() => setPayMethod(item.id as any)}
-                      className={`px-2 py-1.5 text-[11px] rounded font-bold border transition cursor-pointer ${
+                      className={`rounded border px-2 py-2 text-xs font-bold transition ${
                         payMethod === item.id
-                          ? 'bg-emerald-600 border-emerald-300 text-white shadow-xs'
-                          : 'bg-white border-emerald-200 text-emerald-700 hover:bg-emerald-100'
+                          ? 'border-emerald-400 bg-emerald-500 text-white shadow-xs'
+                          : 'border-emerald-400/30 bg-counter-950 text-emerald-300 hover:bg-emerald-400/10'
                       }`}
                     >
                       {item.label}
@@ -405,23 +405,23 @@ export default function Fiados({
               </div>
 
               <div>
-                <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
+                <label className="mb-1 block text-xs font-bold text-cream-400">
                   Motivo / Observação
                 </label>
                 <input
                   type="text"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  className="w-full bg-slate-100 border border-slate-200 px-3 py-2 text-xs text-slate-700 rounded-lg outline-none focus:border-emerald-500 focus:bg-white"
+                  className="w-full rounded-lg border border-counter-700 bg-counter-950 px-3 py-2 text-sm text-cream-100 outline-none focus:border-emerald-400"
                   placeholder="Ex: Pagou parte em dinheiro"
                 />
               </div>
 
               {/* Simulated resulting balance limit warning */}
-              <div className="bg-slate-100 border border-slate-200 p-3 rounded-xl mt-4">
-                <div className="flex justify-between items-center text-xs font-bold text-slate-500">
+              <div className="mt-4 rounded-xl border border-counter-700 bg-counter-800 p-3">
+                <div className="flex items-center justify-between text-xs font-bold text-cream-400">
                   <span>Restará de saldo devedor:</span>
-                  <span className="font-mono text-slate-900">
+                  <span className="font-mono text-cream-100">
                     {fmt(
                       Math.max(
                         0,
@@ -435,7 +435,7 @@ export default function Fiados({
 
               <button
                 type="submit"
-                className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs transition cursor-pointer mt-2 shadow-md"
+                className="mt-2 w-full rounded-xl bg-emerald-500 py-3 text-xs font-black text-white shadow-md transition hover:bg-emerald-400"
               >
                 COMFIRMAR PAGAMENTO
               </button>

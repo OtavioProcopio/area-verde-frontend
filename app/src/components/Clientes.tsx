@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Customer, CustomerHistoryEntry, Fiado } from '../types';
+import { Customer, Fiado } from '../types';
 import Fiados from './Fiados';
 import {
   Users,
@@ -31,7 +31,7 @@ interface ClientesProps {
     active: boolean;
   }) => Promise<OperationResult>;
   onUpdateCustomer: (c: Customer) => Promise<OperationResult>;
-  onDeleteCustomer: (id: string) => void | Promise<void>;
+  onDeleteCustomer: (id: string) => unknown;
   onPagarFiado: (
     customerId: string,
     amount: number,
@@ -184,14 +184,14 @@ export default function Clientes({
     `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   return (
-    <div id="clientes-module" className="space-y-6 animate-fade-in pb-10">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div id="clientes-module" className="space-y-5 pb-10">
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <span className="text-xs uppercase tracking-widest font-mono text-emerald-600 font-bold block mb-1">
+          <span className="mb-1 block text-xs font-bold text-gold-400">
             Caderneta de Contas
           </span>
-          <h2 className="text-3xl font-display font-bold text-slate-900 tracking-tight">
-            Clientes & <span className="text-emerald-600">Fiado</span>
+          <h2 className="font-display text-3xl font-bold tracking-tight text-cream-100">
+            Clientes & <span className="text-gold-400">Fiado</span>
           </h2>
         </div>
 
@@ -199,24 +199,24 @@ export default function Clientes({
           {mainTab === 'cadastro' && viewState === 'list' && (
             <button
               onClick={handleAddNewTrigger}
-              className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow-md transition"
+              className="flex items-center gap-1.5 rounded-xl bg-gold-500 px-4 py-2.5 text-sm font-bold text-counter-950 shadow-md transition hover:bg-gold-400"
             >
-              <UserPlus size={14} /> Novo Cliente
+              <UserPlus size={19} /> Novo Cliente
             </button>
           )}
 
-          <div className="flex bg-slate-200/60 p-1 rounded-xl shadow-inner border border-slate-200">
+          <div className="flex rounded-xl border border-counter-700 bg-counter-900 p-1">
             <button
               id="clientes-subtab-cadastro"
               onClick={() => setMainTab('cadastro')}
-              className={`px-4 py-2 text-xs font-bold font-mono uppercase tracking-wider rounded-lg transition-all ${mainTab === 'cadastro' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-900 cursor-pointer'}`}
+              className={`rounded-lg px-4 py-2.5 text-sm font-bold transition-all ${mainTab === 'cadastro' ? 'bg-gold-500 text-counter-950' : 'text-cream-300 hover:text-cream-100'}`}
             >
               Cadastro
             </button>
             <button
               id="clientes-subtab-fiados"
               onClick={() => setMainTab('fiados')}
-              className={`px-4 py-2 text-xs font-bold font-mono uppercase tracking-wider rounded-lg transition-all ${mainTab === 'fiados' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-900 cursor-pointer'}`}
+              className={`rounded-lg px-4 py-2.5 text-sm font-bold transition-all ${mainTab === 'fiados' ? 'bg-gold-500 text-counter-950' : 'text-cream-300 hover:text-cream-100'}`}
             >
               Fiado &amp; Pendências
             </button>
@@ -235,23 +235,23 @@ export default function Clientes({
 
       {mainTab === 'cadastro' && viewState === 'list' && (
         <>
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
+          <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-counter-700 bg-counter-900 p-4 sm:flex-row">
             <div className="relative w-full sm:w-1/2 md:w-1/3">
               <Search
-                size={16}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+                size={19}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-cream-400"
               />
               <input
                 type="text"
                 placeholder="Busca por nome, apelido, telefone..."
-                className="w-full pl-9 pr-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none focus:border-emerald-500"
+                className="w-full rounded-xl border border-counter-700 bg-counter-950 py-2.5 pl-9 pr-3 text-sm text-cream-100 outline-none focus:border-gold-500"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <div className="w-full sm:w-auto">
               <select
-                className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none focus:border-emerald-500 cursor-pointer text-slate-600 font-bold"
+                className="w-full cursor-pointer rounded-xl border border-counter-700 bg-counter-950 px-3 py-2.5 text-sm font-bold text-cream-200 outline-none focus:border-gold-500"
                 value={filterActive}
                 onChange={(e) => setFilterActive(e.target.value as any)}
               >
@@ -262,11 +262,11 @@ export default function Clientes({
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+          <div className="overflow-hidden rounded-2xl border border-counter-700 bg-counter-900">
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-sm text-slate-600">
+              <table className="w-full border-collapse text-left">
                 <thead>
-                  <tr className="border-b border-slate-200 text-xs uppercase font-mono tracking-wider text-slate-500 bg-slate-100">
+                  <tr className="border-b border-counter-700 bg-counter-950 text-xs font-bold uppercase tracking-wide text-cream-400">
                     <th className="px-5 py-3.5">Cliente</th>
                     <th className="px-4 py-3.5">Contato</th>
                     <th className="px-4 py-3.5 text-center">Status</th>
@@ -276,7 +276,7 @@ export default function Clientes({
                     <th className="px-5 py-3.5 text-right">Ações</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200">
+                <tbody className="divide-y divide-counter-800">
                   {filteredCustomers.map((c) => {
                     const pendencyCount = c.history.filter(
                       (h) => h.amount > 0 && h.type !== 'payment',
@@ -285,28 +285,28 @@ export default function Clientes({
                     return (
                       <tr
                         key={c.id}
-                        className={`hover:bg-slate-100/80 transition ${!isAct ? 'opacity-60 bg-slate-100' : ''} ${c.balance > 0 ? 'bg-rose-50/10' : ''}`}
+                        className={`transition hover:bg-counter-800 ${!isAct ? 'bg-counter-950/60 opacity-60' : ''} ${c.balance > 0 ? 'bg-rose-400/5' : ''}`}
                       >
                         <td className="px-5 py-3.5">
-                          <span className="font-bold text-slate-700 block text-sm truncate max-w-[200px]">
+                          <span className="block max-w-[200px] truncate text-sm font-bold text-cream-100">
                             {c.name}
                           </span>
                           {c.nickname && (
-                            <span className="text-xs text-slate-500 mt-0.5 inline-flex font-mono bg-slate-200 px-1.5 py-0.5 rounded uppercase">
+                            <span className="mt-0.5 inline-flex rounded bg-counter-800 px-1.5 py-0.5 font-mono text-xs uppercase text-cream-300">
                               {c.nickname}
                             </span>
                           )}
                         </td>
-                        <td className="px-4 py-3.5 font-mono text-xs text-slate-500">
+                        <td className="px-4 py-3.5 font-mono text-xs text-cream-400">
                           {c.phone || '--'}
                         </td>
                         <td className="px-4 py-3.5 text-center">
                           {isAct ? (
-                            <span className="px-2 py-0.5 rounded text-[11px] uppercase font-bold font-mono border bg-emerald-50 text-emerald-700 border-emerald-200">
+                            <span className="rounded border border-emerald-400/30 bg-emerald-400/10 px-2 py-0.5 text-xs font-bold uppercase text-emerald-400">
                               ATIVO
                             </span>
                           ) : (
-                            <span className="px-2 py-0.5 rounded text-[11px] uppercase font-bold font-mono border bg-slate-100 text-slate-500 border-slate-200">
+                            <span className="rounded border border-counter-700 bg-counter-800 px-2 py-0.5 text-xs font-bold uppercase text-cream-400">
                               INATIVO
                             </span>
                           )}
@@ -314,50 +314,50 @@ export default function Clientes({
                         <td className="px-4 py-3.5 text-right">
                           {c.balance > 0 ? (
                             <div>
-                              <span className="font-mono text-sm font-black text-rose-600 block">
+                              <span className="block font-mono text-sm font-black text-rose-400">
                                 {fmt(c.balance)}
                               </span>
                               {pendencyCount > 0 && (
-                                <span className="text-xs text-rose-700 font-bold uppercase">
+                                <span className="text-xs font-bold uppercase text-rose-400">
                                   {pendencyCount} pendências
                                 </span>
                               )}
                             </div>
                           ) : (
-                            <span className="font-mono text-sm font-bold text-slate-600">
+                            <span className="font-mono text-sm font-bold text-cream-300">
                               Quitado
                             </span>
                           )}
                         </td>
                         <td className="px-5 py-3.5 text-right">
-                          <div className="flex items-center justify-end gap-1.5 inline-flex">
+                          <div className="inline-flex items-center justify-end gap-1.5">
                             <button
                               onClick={() => viewDetails(c)}
-                              className="w-7 h-7 flex items-center justify-center bg-slate-100 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 text-slate-500 hover:text-emerald-700 rounded transition cursor-pointer"
+                              className="flex h-8 w-8 items-center justify-center rounded border border-counter-700 bg-counter-800 text-cream-300 transition hover:border-gold-500/50 hover:text-gold-300"
                               title="Ver Detalhes"
                             >
-                              <Eye size={14} />
+                              <Eye size={17} />
                             </button>
                             <button
                               onClick={() => handleEditTrigger(c)}
-                              className="w-7 h-7 flex items-center justify-center bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-500 rounded transition cursor-pointer"
+                              className="flex h-8 w-8 items-center justify-center rounded border border-counter-700 bg-counter-800 text-cream-300 transition hover:bg-counter-700"
                               title="Editar"
                             >
-                              <Edit3 size={14} />
+                              <Edit3 size={17} />
                             </button>
                             <button
                               onClick={() => handleToggleStatus(c)}
-                              className={`w-7 h-7 flex items-center justify-center border rounded transition cursor-pointer ${
+                              className={`flex h-8 w-8 items-center justify-center rounded border transition ${
                                 isAct
-                                  ? 'bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-100'
-                                  : 'bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-100'
+                                  ? 'border-rose-400/30 bg-rose-400/10 text-rose-400 hover:bg-rose-400/20'
+                                  : 'border-emerald-400/30 bg-emerald-400/10 text-emerald-400 hover:bg-emerald-400/20'
                               }`}
                               title={isAct ? 'Inativar' : 'Ativar'}
                             >
                               {isAct ? (
-                                <ToggleRight size={14} />
+                                <ToggleRight size={17} />
                               ) : (
-                                <ToggleLeft size={14} />
+                                <ToggleLeft size={17} />
                               )}
                             </button>
                           </div>
@@ -369,7 +369,7 @@ export default function Clientes({
                     <tr>
                       <td
                         colSpan={5}
-                        className="text-center py-12 text-slate-500 italic text-xs bg-slate-100/30"
+                        className="bg-counter-950/40 py-12 text-center text-sm italic text-cream-400"
                       >
                         Nenhum cliente atende aos critérios de busca.
                       </td>
@@ -384,77 +384,77 @@ export default function Clientes({
 
       {/* DETALHES DO CLIENTE VIEW */}
       {mainTab === 'cadastro' && viewState === 'detail' && selectedCustomer && (
-        <div className="animate-fade-in space-y-4">
+        <div className="space-y-4">
           {/* Detail header */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-counter-700 bg-counter-900 p-5 md:flex-row md:items-center">
             <div>
               <button
                 onClick={() => setViewState('list')}
-                className="text-[11px] uppercase font-mono font-bold text-slate-500 hover:text-slate-900 transition block mb-2 cursor-pointer flex items-center gap-1"
+                className="mb-2 flex items-center gap-1 text-xs font-bold uppercase text-cream-400 transition hover:text-cream-100"
               >
-                <ArrowLeft size={12} /> Voltar para lista
+                <ArrowLeft size={14} /> Voltar para lista
               </button>
               <div className="flex items-center gap-3">
-                <h2 className="text-2xl font-display font-bold text-slate-900">
+                <h2 className="font-display text-2xl font-bold text-cream-100">
                   {selectedCustomer.name}
                 </h2>
                 {selectedCustomer.nickname && (
-                  <span className="text-[11px] font-mono text-slate-500 bg-slate-200 px-2 py-0.5 rounded-full uppercase border border-slate-200">
+                  <span className="rounded-full border border-counter-700 bg-counter-800 px-2 py-0.5 text-xs uppercase text-cream-300">
                     {selectedCustomer.nickname}
                   </span>
                 )}
               </div>
-              <div className="text-xs text-slate-500 mt-1 flex gap-4">
+              <div className="mt-1 flex gap-4 text-sm text-cream-400">
                 <span>Telefone: {selectedCustomer.phone || '--'}</span>
                 <span
-                  className={`font-mono uppercase text-[11px] items-center flex gap-1 font-bold ${(selectedCustomer.active ?? true) ? 'text-emerald-600' : 'text-slate-500'}`}
+                  className={`flex items-center gap-1 text-xs font-bold uppercase ${(selectedCustomer.active ?? true) ? 'text-emerald-400' : 'text-cream-400'}`}
                 >
                   {(selectedCustomer.active ?? true) ? '• Ativo' : '• Inativo'}
                 </span>
               </div>
             </div>
 
-            <div className="flex gap-2 w-full md:w-auto">
+            <div className="flex w-full gap-2 md:w-auto">
               <button
                 onClick={() => handleEditTrigger(selectedCustomer)}
-                className="flex-1 md:flex-initial px-4 py-2 border border-slate-200 bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-600 rounded-xl cursor-pointer transition text-center"
+                className="flex-1 rounded-xl border border-counter-700 bg-counter-800 px-4 py-2.5 text-center text-sm font-bold text-cream-200 transition hover:bg-counter-700 md:flex-initial"
               >
                 Editar Cadastro
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
             {/* Financial panel */}
-            <div className="lg:col-span-5 flex flex-col gap-5">
+            <div className="flex flex-col gap-5 lg:col-span-5">
               {/* Balance & Info */}
-              <div className="bg-slate-100 border border-slate-200 p-5 rounded-2xl shadow-sm">
-                <h3 className="text-xs uppercase font-mono font-bold text-slate-500 mb-3 block">
+              <div className="rounded-2xl border border-counter-700 bg-counter-900 p-5">
+                <h3 className="mb-3 block text-xs font-bold uppercase text-cream-400">
                   Dados Financeiros / Fiado
                 </h3>
 
-                <div className="flex justify-between items-end border-b border-slate-200 pb-3 mb-3">
-                  <span className="text-sm font-bold text-slate-600">
+                <div className="mb-3 flex items-end justify-between border-b border-counter-700 pb-3">
+                  <span className="text-sm font-bold text-cream-200">
                     Saldo Pendente (Dívida)
                   </span>
                   <span
-                    className={`text-2xl font-mono font-black ${selectedCustomer.balance > 0 ? 'text-rose-600' : 'text-emerald-600'}`}
+                    className={`font-mono text-2xl font-black ${selectedCustomer.balance > 0 ? 'text-rose-400' : 'text-emerald-400'}`}
                   >
                     {fmt(selectedCustomer.balance)}
                   </span>
                 </div>
 
-                <div className="text-xs text-slate-500">
+                <div className="text-sm text-cream-400">
                   A API atual não trabalha com limite de crédito por cliente. O
                   controle disponível aqui é o saldo pendente real das comandas
                   em fiado.
                 </div>
 
-                <div className="mt-5 p-3 bg-white border border-slate-200 rounded-lg text-xs">
-                  <span className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
+                <div className="mt-5 rounded-lg border border-counter-700 bg-counter-800 p-3">
+                  <span className="mb-1 block text-xs font-bold uppercase text-cream-400">
                     Anotações
                   </span>
-                  <p className="text-slate-600 italic">
+                  <p className="text-sm italic text-cream-300">
                     {selectedCustomer.notes ||
                       'Nenhuma anotação registrada para o cliente.'}
                   </p>
@@ -462,11 +462,11 @@ export default function Clientes({
               </div>
 
               {/* Payment Action */}
-              <div className="bg-emerald-50 border border-emerald-200 p-5 rounded-2xl shadow-sm">
-                <h4 className="text-sm font-display font-bold text-emerald-800 mb-2 flex items-center gap-1.5">
-                  <Coins size={16} /> Registrar Pagamento de Fiado
+              <div className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-5">
+                <h4 className="mb-2 flex items-center gap-1.5 font-display text-base font-bold text-emerald-300">
+                  <Coins size={22} /> Registrar Pagamento de Fiado
                 </h4>
-                <p className="text-[11px] text-emerald-700/80 mb-4 leading-relaxed">
+                <p className="mb-4 text-sm leading-relaxed text-emerald-300/80">
                   Abata o saldo devedor recebendo o valor do cliente agora. Se
                   em dinheiro, garanta que o Caixa esteja aberto.
                 </p>
@@ -476,7 +476,7 @@ export default function Clientes({
                     type="number"
                     step="0.01"
                     min="0.01"
-                    className="w-full bg-white border border-emerald-200 py-2 px-3 text-sm font-mono text-emerald-800 rounded-lg outline-none focus:border-emerald-500 font-bold"
+                    className="w-full rounded-lg border border-emerald-400/30 bg-counter-950 px-3 py-2.5 font-mono text-sm font-bold text-emerald-200 outline-none focus:border-emerald-400"
                     placeholder="Quantia (R$)"
                     value={payAmount}
                     onChange={(e) => setPayAmount(e.target.value)}
@@ -493,10 +493,10 @@ export default function Clientes({
                         key={item.id}
                         type="button"
                         onClick={() => setPayMethod(item.id as any)}
-                        className={`px-2 py-1.5 text-[11px] rounded font-bold border transition cursor-pointer ${
+                        className={`rounded border px-2 py-2 text-xs font-bold transition ${
                           payMethod === item.id
-                            ? 'bg-emerald-600 border-emerald-300 text-white shadow-xs'
-                            : 'bg-white border-emerald-200 text-emerald-700 hover:bg-emerald-100'
+                            ? 'border-emerald-400 bg-emerald-500 text-white shadow-xs'
+                            : 'border-emerald-400/30 bg-counter-950 text-emerald-300 hover:bg-emerald-400/10'
                         }`}
                       >
                         {item.label}
@@ -507,7 +507,7 @@ export default function Clientes({
                   <button
                     type="submit"
                     disabled={selectedCustomer.balance <= 0}
-                    className="w-full text-center py-2.5 text-xs font-bold rounded-lg transition duration-150 bg-emerald-700 hover:bg-emerald-600 text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+                    className="w-full rounded-lg bg-emerald-500 py-2.5 text-center text-sm font-bold text-white shadow-md transition duration-150 hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Lançar Pagamento
                   </button>
@@ -516,25 +516,25 @@ export default function Clientes({
             </div>
 
             {/* History / Transactions Panel */}
-            <div className="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col h-[550px]">
-              <h3 className="text-sm font-display font-bold text-slate-700 mb-4 border-b border-slate-200 pb-3 flex items-center gap-2">
-                <FileText size={16} className="text-slate-500" /> Histórico de
+            <div className="flex h-[550px] flex-col rounded-2xl border border-counter-700 bg-counter-900 p-5 lg:col-span-7">
+              <h3 className="mb-4 flex items-center gap-2 border-b border-counter-700 pb-3 font-display text-base font-bold text-cream-100">
+                <FileText size={22} className="text-cream-400" /> Histórico de
                 Fiados e Pendências
               </h3>
 
-              <div className="flex-1 overflow-y-auto pr-2 space-y-3">
+              <div className="flex-1 space-y-3 overflow-y-auto pr-2">
                 {selectedCustomer.history.map((hist) => {
                   const isCharge = hist.amount > 0;
                   return (
                     <div
                       key={hist.id}
-                      className={`p-3 border rounded-xl flex justify-between items-start text-xs ${isCharge ? 'bg-amber-50/30 border-amber-200' : 'bg-emerald-50/50 border-emerald-200'}`}
+                      className={`flex items-start justify-between rounded-xl border p-3.5 ${isCharge ? 'border-gold-500/30 bg-gold-500/10' : 'border-emerald-400/30 bg-emerald-400/10'}`}
                     >
                       <div>
-                        <span className="font-bold text-slate-700 block text-sm">
+                        <span className="block text-sm font-bold text-cream-100">
                           {hist.description}
                         </span>
-                        <span className="text-[11px] text-slate-500 font-mono mt-1 opacity-80 block">
+                        <span className="mt-1 block font-mono text-xs text-cream-400">
                           {new Date(hist.timestamp).toLocaleString('pt-BR')} •
                           Tipo:{' '}
                           {hist.type === 'sale'
@@ -546,7 +546,7 @@ export default function Clientes({
                       </div>
 
                       <div
-                        className={`font-mono font-black text-right shrink-0 ${isCharge ? 'text-amber-600' : 'text-emerald-600'}`}
+                        className={`shrink-0 text-right font-mono font-black ${isCharge ? 'text-gold-400' : 'text-emerald-400'}`}
                       >
                         {isCharge ? '+' : ''} {fmt(hist.amount)}
                       </div>
@@ -555,8 +555,8 @@ export default function Clientes({
                 })}
 
                 {selectedCustomer.history.length === 0 && (
-                  <div className="text-center py-20 text-slate-500 text-xs italic flex flex-col items-center">
-                    <AlertOctagon size={32} className="text-slate-700 mb-3" />
+                  <div className="flex flex-col items-center py-20 text-center text-sm italic text-cream-400">
+                    <AlertOctagon size={38} className="mb-3 text-cream-400" />
                     <p>
                       Ainda não há nenhum histórico financeiro ou fiado
                       cadastrado.
@@ -571,20 +571,20 @@ export default function Clientes({
 
       {/* FORM MODAL: Create/Edit Customer */}
       {mainTab === 'cadastro' && showForm && (
-        <div className="fixed inset-0 bg-slate-50 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
-          <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="relative w-full max-w-md rounded-2xl border-2 border-counter-700 bg-counter-900 p-5 shadow-2xl">
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              className="absolute top-4 right-4 text-slate-500 hover:text-slate-900 cursor-pointer"
+              className="absolute right-4 top-4 text-cream-400 hover:text-cream-100"
             >
-              <X size={18} />
+              <X size={22} />
             </button>
-            <h3 className="text-lg font-display font-bold text-slate-700 mb-1 flex items-center gap-2">
-              <Users className="text-emerald-600" size={20} />
+            <h3 className="mb-1 flex items-center gap-2 font-display text-lg font-bold text-cream-100">
+              <Users className="text-gold-400" size={24} />
               {formMode === 'create' ? 'Novo Cliente' : 'Editar Cliente'}
             </h3>
-            <p className="text-[11px] font-mono text-slate-500 mb-4 block">
+            <p className="mb-4 block text-xs text-cream-400">
               Cadastro operacional de clientes e acompanhamento de pendências.
             </p>
 
@@ -594,70 +594,70 @@ export default function Clientes({
               </div>
             )}
 
-            <form onSubmit={handleSaveCustomer} className="space-y-4">
+            <form onSubmit={handleSaveCustomer} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2 sm:col-span-1">
-                  <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
-                    Nome Completo <span className="text-rose-600">*</span>
+                  <label className="mb-1 block text-xs font-bold text-cream-400">
+                    Nome Completo <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-slate-100 border border-slate-200 px-3 py-2 text-sm text-slate-700 rounded-lg outline-none focus:border-emerald-500 focus:bg-white font-bold"
+                    className="w-full rounded-lg border border-counter-700 bg-counter-950 px-3 py-2.5 text-sm font-bold text-cream-100 outline-none focus:border-gold-500"
                     required
                     placeholder="Ex: João Silva"
                   />
                 </div>
                 <div className="col-span-2 sm:col-span-1">
-                  <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
+                  <label className="mb-1 block text-xs font-bold text-cream-400">
                     Apelido
                   </label>
                   <input
                     type="text"
                     value={nickname}
                     onChange={(e) => setNickname(e.target.value)}
-                    className="w-full bg-slate-100 border border-slate-200 px-3 py-2 text-sm text-slate-700 rounded-lg outline-none focus:border-emerald-500 focus:bg-white"
+                    className="w-full rounded-lg border border-counter-700 bg-counter-950 px-3 py-2.5 text-sm text-cream-100 outline-none focus:border-gold-500"
                     placeholder="Ex: Joãozinho"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
-                  <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
+                  <label className="mb-1 block text-xs font-bold text-cream-400">
                     Telefone
                   </label>
                   <input
                     type="text"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full bg-slate-100 border border-slate-200 px-3 py-2 text-xs text-slate-700 rounded-lg outline-none focus:border-emerald-500 focus:bg-white font-mono"
+                    className="w-full rounded-lg border border-counter-700 bg-counter-950 px-3 py-2.5 font-mono text-sm text-cream-100 outline-none focus:border-gold-500"
                     placeholder="(31) 90000-0000"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[11px] uppercase font-mono text-slate-500 mb-1">
+                <label className="mb-1 block text-xs font-bold text-cream-400">
                   Motivo / Observação
                 </label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="w-full bg-slate-100 border border-slate-200 px-3 py-2 text-xs text-slate-700 rounded-lg outline-none focus:border-emerald-500 focus:bg-white resize-none h-16"
+                  className="h-16 w-full resize-none rounded-lg border border-counter-700 bg-counter-950 px-3 py-2 text-sm text-cream-100 outline-none focus:border-gold-500"
                   placeholder="Alguma nota sobre o cliente ou restrição..."
                 />
               </div>
 
-              <div className="flex items-center gap-3 p-3 bg-slate-100 border border-slate-200 rounded-xl">
-                <p className="text-[11px] font-mono font-bold text-slate-500 uppercase flex-1">
+              <div className="flex items-center gap-3 rounded-xl border border-counter-700 bg-counter-800 p-3">
+                <p className="flex-1 text-xs font-bold uppercase text-cream-300">
                   Status do Cliente
                 </p>
                 <select
                   value={active ? 'true' : 'false'}
                   onChange={(e) => setActive(e.target.value === 'true')}
-                  className="text-xs bg-white border border-slate-300 rounded px-2 py-1 outline-none text-slate-600 font-bold"
+                  className="rounded border border-counter-700 bg-counter-950 px-2 py-1.5 text-xs font-bold text-cream-100 outline-none"
                 >
                   <option value="true">ATIVO</option>
                   <option value="false">INATIVO</option>
@@ -666,7 +666,7 @@ export default function Clientes({
 
               <button
                 type="submit"
-                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition cursor-pointer mt-2 shadow-md"
+                className="mt-2 w-full rounded-xl bg-gold-500 py-2.5 text-sm font-bold text-counter-950 shadow-md transition hover:bg-gold-400"
               >
                 Salvar Cliente
               </button>
