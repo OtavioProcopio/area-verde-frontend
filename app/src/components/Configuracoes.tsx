@@ -183,21 +183,21 @@ export default function Configuracoes({
   };
 
   return (
-    <div id="settings-module" className="space-y-6 animate-fade-in pb-10">
+    <div id="settings-module" className="space-y-5 pb-10">
       <div>
-        <span className="text-xs uppercase tracking-widest font-mono text-emerald-500 font-bold block mb-1">
+        <span className="mb-1 block text-xs font-bold text-gold-400">
           Ajustes do Sistema
         </span>
-        <h2 className="text-3xl font-display font-bold text-slate-50 tracking-tight">
-          Configuracoes <span className="text-emerald-500">Gerais</span>
+        <h2 className="font-display text-3xl font-bold tracking-tight text-cream-100">
+          Configuracoes <span className="text-gold-400">Gerais</span>
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        <div className="lg:col-span-12 xl:col-span-6 space-y-6">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm">
-            <h4 className="text-base font-display font-bold text-slate-200 mb-4 flex items-center gap-1.5 border-b border-slate-800 pb-2">
-              <Store size={18} className="text-emerald-500" />
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-12">
+        <div className="space-y-5 lg:col-span-12 xl:col-span-6">
+          <div className="rounded-2xl border border-counter-700 bg-counter-900 p-5">
+            <h4 className="mb-4 flex items-center gap-1.5 border-b border-counter-700 pb-3 font-display text-base font-bold text-cream-100">
+              <Store size={22} className="text-gold-400" />
               Sistema
             </h4>
 
@@ -216,11 +216,11 @@ export default function Configuracoes({
               </div>
             )}
 
-            <form onSubmit={handleSaveConfiguracoes} className="space-y-5">
+            <form onSubmit={handleSaveConfiguracoes} className="space-y-4">
               <div>
                 <label
                   htmlFor="input-bar-name"
-                  className="block text-[10px] uppercase font-mono text-slate-500 font-bold mb-1"
+                  className="mb-1 block text-xs font-bold text-cream-400"
                 >
                   Nome do estabelecimento
                 </label>
@@ -233,18 +233,18 @@ export default function Configuracoes({
                     setLocalConfigError(null);
                     onClearConfiguracaoFeedback();
                   }}
-                  className="w-full bg-slate-800/50 border border-slate-800 px-3.5 py-2 text-xs text-slate-200 rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900 font-bold transition"
+                  className="w-full rounded-lg border border-counter-700 bg-counter-950 px-3.5 py-2.5 text-sm font-bold text-cream-100 outline-none transition focus:border-gold-500"
                   placeholder="Ex: Buteco do Primo - Area Verde"
                   required
                 />
               </div>
 
-              <div className="space-y-4 rounded-xl border border-slate-800 bg-slate-800/20 p-4">
+              <div className="space-y-4 rounded-xl border border-counter-700 bg-counter-800 p-4">
                 <div>
-                  <label className="flex items-center gap-2 text-[10px] uppercase font-mono text-slate-500 mb-1 font-bold">
+                  <label className="mb-1 flex items-center gap-2 text-xs font-bold text-cream-400">
                     Permitir estoque fisico negativo
                   </label>
-                  <p className="text-xs text-slate-500 mb-2">
+                  <p className="mb-2 text-sm text-cream-400">
                     Quando ativo, o backend permite venda mesmo sem saldo,
                     deixando a quantidade negativa para conferencia posterior.
                   </p>
@@ -256,31 +256,31 @@ export default function Configuracoes({
                       setLocalConfigError(null);
                       onClearConfiguracaoFeedback();
                     }}
-                    className={`flex items-center gap-1 px-3 py-1.5 rounded-lg border text-xs font-bold transition cursor-pointer ${
+                    className={`flex items-center gap-1 rounded-lg border px-3 py-2 text-xs font-bold transition ${
                       allowNegativeStock
-                        ? 'bg-amber-950/40 text-amber-400 border-amber-800/60'
-                        : 'bg-slate-800/50 text-slate-500 border-slate-800 hover:bg-slate-800'
+                        ? 'border-gold-500/30 bg-gold-500/10 text-gold-300'
+                        : 'border-counter-700 bg-counter-950 text-cream-300 hover:bg-counter-700'
                     }`}
                   >
                     {allowNegativeStock ? (
-                      <ToggleRight size={16} />
+                      <ToggleRight size={19} />
                     ) : (
-                      <ToggleLeft size={16} />
+                      <ToggleLeft size={19} />
                     )}
                     {allowNegativeStock ? 'PERMITIDO' : 'BLOQUEADO'}
                   </button>
                 </div>
 
                 <div>
-                  <label className="flex items-center gap-2 text-[10px] uppercase font-mono text-slate-500 mb-1 font-bold">
+                  <label className="mb-1 flex items-center gap-2 text-xs font-bold text-cream-400">
                     Dias para alerta de fiado
                   </label>
-                  <p className="text-[10px] text-slate-500 mb-2">
+                  <p className="mb-2 text-xs text-cream-400">
                     Novas pendencias usam este prazo padrao para destacar
                     vencimentos e alertas.
                   </p>
 
-                  <div className="flex gap-2 items-center">
+                  <div className="flex items-center gap-2">
                     <input
                       type="number"
                       value={fiadoDays}
@@ -289,18 +289,18 @@ export default function Configuracoes({
                         setLocalConfigError(null);
                         onClearConfiguracaoFeedback();
                       }}
-                      className="w-24 bg-slate-800/50 border border-slate-800 px-3 py-1.5 text-xs font-mono font-bold text-slate-200 rounded-lg outline-none focus:border-emerald-600"
+                      className="w-24 rounded-lg border border-counter-700 bg-counter-950 px-3 py-2 font-mono text-sm font-bold text-cream-100 outline-none focus:border-gold-500"
                       min="1"
                       step="1"
                     />
-                    <span className="text-xs font-bold text-slate-500 flex items-center">
+                    <span className="flex items-center text-sm font-bold text-cream-400">
                       dias
                     </span>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] uppercase font-mono text-slate-500 font-bold mb-1">
+                  <label className="mb-1 block text-xs font-bold text-cream-400">
                     Observacao interna
                   </label>
                   <textarea
@@ -310,7 +310,7 @@ export default function Configuracoes({
                       setLocalConfigError(null);
                       onClearConfiguracaoFeedback();
                     }}
-                    className="w-full min-h-24 resize-none rounded-lg border border-slate-800 bg-slate-800/50 px-3 py-2 text-xs text-slate-200 outline-none transition focus:border-emerald-600 focus:bg-slate-900"
+                    className="min-h-24 w-full resize-none rounded-lg border border-counter-700 bg-counter-950 px-3 py-2 text-sm text-cream-100 outline-none transition focus:border-gold-500"
                     placeholder="Anotacoes operacionais do estabelecimento."
                   />
                 </div>
@@ -319,12 +319,12 @@ export default function Configuracoes({
               <button
                 type="submit"
                 disabled={isSavingConfiguracao || !configuracao}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-emerald-500 disabled:bg-emerald-900/50 disabled:text-emerald-200"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-gold-500 px-4 py-2.5 text-sm font-bold text-counter-950 transition hover:bg-gold-400 disabled:bg-counter-800 disabled:text-cream-400"
               >
                 {isSavingConfiguracao ? (
-                  <Loader2 size={14} className="animate-spin" />
+                  <Loader2 size={17} className="animate-spin" />
                 ) : (
-                  <Settings size={14} />
+                  <Settings size={17} />
                 )}
                 Salvar configuracoes
               </button>
@@ -332,32 +332,32 @@ export default function Configuracoes({
           </div>
         </div>
 
-        <div className="lg:col-span-12 xl:col-span-6 space-y-6">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm">
-            <h4 className="text-base font-display font-bold text-slate-200 mb-4 flex items-center gap-1.5 border-b border-slate-800 pb-2">
-              <Key size={18} className="text-emerald-500" />
+        <div className="space-y-5 lg:col-span-12 xl:col-span-6">
+          <div className="rounded-2xl border border-counter-700 bg-counter-900 p-5">
+            <h4 className="mb-4 flex items-center gap-1.5 border-b border-counter-700 pb-3 font-display text-base font-bold text-cream-100">
+              <Key size={22} className="text-gold-400" />
               Acesso e seguranca
             </h4>
 
-            <div className="mb-4 flex items-center justify-between rounded-xl border border-slate-800 bg-slate-800/20 p-3">
+            <div className="mb-4 flex items-center justify-between rounded-xl border border-counter-700 bg-counter-800 p-3">
               <div>
-                <span className="block text-[10px] uppercase font-mono font-bold text-slate-500">
+                <span className="block text-xs font-bold uppercase text-cream-400">
                   Status da senha
                 </span>
-                <span className="text-sm font-semibold text-slate-200">
+                <span className="text-sm font-semibold text-cream-100">
                   {configuracao?.senhaConfigurada
                     ? 'Senha configurada'
                     : 'Senha pendente'}
                 </span>
               </div>
               <span
-                className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase ${
+                className={`rounded-full px-3 py-1 text-xs font-bold uppercase ${
                   configuracao?.senhaConfigurada
-                    ? 'border border-emerald-800/60 bg-emerald-950/40 text-emerald-400'
-                    : 'border border-amber-800/60 bg-amber-950/40 text-amber-400'
+                    ? 'border border-emerald-400/30 bg-emerald-400/10 text-emerald-400'
+                    : 'border border-gold-500/30 bg-gold-500/10 text-gold-300'
                 }`}
               >
-                <ShieldCheck size={12} className="inline mr-1" />
+                <ShieldCheck size={14} className="mr-1 inline" />
                 {configuracao?.senhaConfigurada ? 'Ativa' : 'A definir'}
               </span>
             </div>
@@ -381,7 +381,7 @@ export default function Configuracoes({
               <div>
                 <label
                   htmlFor="ipt-current-pin"
-                  className="block text-[10px] font-mono text-slate-500 uppercase font-bold mb-1"
+                  className="mb-1 block text-xs font-bold text-cream-400"
                 >
                   Senha atual
                 </label>
@@ -389,7 +389,7 @@ export default function Configuracoes({
                   id="ipt-current-pin"
                   type="password"
                   placeholder="****"
-                  className="w-full bg-slate-800/50 border border-slate-800 p-2.5 rounded-lg text-sm text-center text-slate-200 font-mono tracking-widest outline-none focus:border-emerald-600 focus:bg-slate-900 transition"
+                  className="w-full rounded-lg border border-counter-700 bg-counter-950 p-2.5 text-center font-mono text-sm tracking-widest text-cream-100 outline-none transition focus:border-gold-500"
                   value={currentPassword}
                   onChange={(event) => {
                     setCurrentPassword(event.target.value);
@@ -404,7 +404,7 @@ export default function Configuracoes({
                 <div>
                   <label
                     htmlFor="ipt-new-pin"
-                    className="block text-[10px] font-mono text-slate-500 uppercase font-bold mb-1"
+                    className="mb-1 block text-xs font-bold text-cream-400"
                   >
                     Nova senha
                   </label>
@@ -412,7 +412,7 @@ export default function Configuracoes({
                     id="ipt-new-pin"
                     type="password"
                     placeholder="****"
-                    className="w-full bg-slate-800/50 border border-slate-800 p-2.5 rounded-lg text-sm text-center text-slate-200 font-mono tracking-widest outline-none focus:border-emerald-600 focus:bg-slate-900 transition"
+                    className="w-full rounded-lg border border-counter-700 bg-counter-950 p-2.5 text-center font-mono text-sm tracking-widest text-cream-100 outline-none transition focus:border-gold-500"
                     value={newPassword}
                     onChange={(event) => {
                       setNewPassword(event.target.value);
@@ -426,7 +426,7 @@ export default function Configuracoes({
                 <div>
                   <label
                     htmlFor="ipt-confirm-pin"
-                    className="block text-[10px] font-mono text-slate-500 uppercase font-bold mb-1"
+                    className="mb-1 block text-xs font-bold text-cream-400"
                   >
                     Confirmar nova
                   </label>
@@ -434,7 +434,7 @@ export default function Configuracoes({
                     id="ipt-confirm-pin"
                     type="password"
                     placeholder="****"
-                    className="w-full bg-slate-800/50 border border-slate-800 p-2.5 rounded-lg text-sm text-center text-slate-200 font-mono tracking-widest outline-none focus:border-emerald-600 focus:bg-slate-900 transition"
+                    className="w-full rounded-lg border border-counter-700 bg-counter-950 p-2.5 text-center font-mono text-sm tracking-widest text-cream-100 outline-none transition focus:border-gold-500"
                     value={confirmPassword}
                     onChange={(event) => {
                       setConfirmPassword(event.target.value);
@@ -449,11 +449,11 @@ export default function Configuracoes({
               <button
                 type="submit"
                 disabled={isUpdatingPassword}
-                className="w-full mt-2 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-[10px] uppercase transition cursor-pointer shadow-sm disabled:bg-emerald-900/50 disabled:text-emerald-200"
+                className="mt-2 w-full rounded-lg bg-gold-500 py-2.5 text-xs font-bold uppercase text-counter-950 shadow-sm transition hover:bg-gold-400 disabled:bg-counter-800 disabled:text-cream-400"
               >
                 {isUpdatingPassword ? (
                   <span className="inline-flex items-center gap-2">
-                    <Loader2 size={14} className="animate-spin" />
+                    <Loader2 size={17} className="animate-spin" />
                     Salvando senha
                   </span>
                 ) : (
@@ -463,12 +463,12 @@ export default function Configuracoes({
             </form>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-sm">
-            <h4 className="text-base font-display font-bold text-slate-200 mb-2 flex items-center gap-1.5 border-b border-slate-800 pb-2">
-              <FolderSync size={18} className="text-emerald-500" />
+          <div className="space-y-4 rounded-2xl border border-counter-700 bg-counter-900 p-5">
+            <h4 className="mb-2 flex items-center gap-1.5 border-b border-counter-700 pb-3 font-display text-base font-bold text-cream-100">
+              <FolderSync size={22} className="text-gold-400" />
               Backup Geral e Recuperacao
             </h4>
-            <p className="text-[10px] text-slate-500 leading-relaxed font-mono">
+            <p className="text-sm leading-relaxed text-cream-400">
               Enquanto a aplicacao usa a API real, o backup exportado serve como
               leitura operacional dos dados carregados no frontend.
             </p>
@@ -484,20 +484,20 @@ export default function Configuracoes({
               <button
                 type="button"
                 onClick={() => void handleCopyBackup()}
-                className="flex-1 py-2.5 px-3 border border-slate-800 hover:border-emerald-600 bg-slate-800/50 text-xs font-bold rounded-lg text-slate-300 hover:text-emerald-400 transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-counter-700 bg-counter-800 px-3 py-2.5 text-sm font-bold text-cream-200 transition hover:border-gold-500/50 hover:text-gold-300"
               >
-                <Download size={14} /> Exportar Backup (copiar JSON)
+                <Download size={17} /> Exportar Backup (copiar JSON)
               </button>
             </div>
 
             <form
               onSubmit={handleImport}
-              className="space-y-3.5 border-t border-slate-800 pt-4"
+              className="space-y-3.5 border-t border-counter-700 pt-4"
             >
               <div>
                 <label
                   htmlFor="tx-import-backup"
-                  className="block text-[10px] uppercase font-mono text-slate-500 font-bold mb-1"
+                  className="mb-1 block text-xs font-bold text-cream-400"
                 >
                   Cole o JSON do backup para restaurar
                 </label>
@@ -505,7 +505,7 @@ export default function Configuracoes({
                   id="tx-import-backup"
                   value={backupText}
                   onChange={(event) => setBackupText(event.target.value)}
-                  className="w-full bg-slate-800/50 border border-slate-800 p-2.5 rounded-lg text-[10px] text-slate-300 h-28 resize-none font-mono outline-none focus:border-emerald-600 focus:bg-slate-900 transition"
+                  className="h-28 w-full resize-none rounded-lg border border-counter-700 bg-counter-950 p-2.5 font-mono text-xs text-cream-200 outline-none transition focus:border-gold-500"
                   placeholder="Cole seu objeto JSON de backup aqui..."
                   required
                 />
@@ -513,27 +513,27 @@ export default function Configuracoes({
 
               <button
                 type="submit"
-                className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-[10px] uppercase transition cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
+                className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-gold-500 py-2.5 text-xs font-bold uppercase text-counter-950 shadow-sm transition hover:bg-gold-400"
               >
-                <Upload size={14} />
+                <Upload size={17} />
                 Importar backup no frontend
               </button>
             </form>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm">
-            <h4 className="text-base font-display font-bold text-rose-500 mb-2 flex items-center gap-1.5 border-b border-rose-900 pb-2">
-              <RotateCcw size={16} />
+          <div className="rounded-2xl border border-counter-700 bg-counter-900 p-5">
+            <h4 className="mb-2 flex items-center gap-1.5 border-b border-rose-400/30 pb-3 font-display text-base font-bold text-rose-400">
+              <RotateCcw size={19} />
               Redefinicao de sessao
             </h4>
-            <p className="text-[10px] text-slate-500 mb-4 font-mono leading-relaxed">
+            <p className="mb-4 text-sm leading-relaxed text-cream-400">
               Encerra a sessao atual e recarrega os dados reais da API.
             </p>
 
             <button
               id="btn-master-purge"
               onClick={() => void handleMasterPurge()}
-              className="px-4 py-2 bg-rose-950/40 hover:bg-rose-900/50 text-rose-500 font-bold border border-rose-800/60 hover:border-rose-300 transition text-[11px] rounded-lg cursor-pointer shadow-xs w-full text-center"
+              className="w-full rounded-lg border border-rose-400/30 bg-rose-400/10 px-4 py-2.5 text-center text-sm font-bold text-rose-400 transition hover:bg-rose-400/20"
             >
               Recarregar sessao do sistema
             </button>

@@ -10,20 +10,17 @@ const Dashboard = lazy(() => import('./components/Dashboard'));
 const Comandas = lazy(() => import('./components/Comandas'));
 const Caixa = lazy(() => import('./components/Caixa'));
 const Produtos = lazy(() => import('./components/Produtos'));
-const Estoque = lazy(() => import('./components/Estoque'));
 const Clientes = lazy(() => import('./components/Clientes'));
-const Fiados = lazy(() => import('./components/Fiados'));
 const Relatorios = lazy(() => import('./components/Relatorios'));
 const Configuracoes = lazy(() => import('./components/Configuracoes'));
 
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, type Variants } from 'motion/react';
 import {
   LayoutDashboard,
   ShoppingBag,
   Coins,
   Package,
   Users,
-  Wallet,
   BarChart3,
   Settings,
   LogOut,
@@ -86,6 +83,14 @@ export default function App() {
   // Active module tab
   const [activeTab, setActiveTab] = useState('dashboard');
 
+  // Tela de venda ocupa a largura toda (sem menu lateral) enquanto o
+  // operador está atendendo uma comanda — evita layout de dashboard
+  // "sobrando" espaço no momento em que a tela mais importa: o balcão.
+  const [isImmersive, setIsImmersive] = useState(false);
+  useEffect(() => {
+    if (activeTab !== 'comandas') setIsImmersive(false);
+  }, [activeTab]);
+
   // Real-time dynamic clock tracking state
   const [time, setTime] = useState(new Date());
 
@@ -96,10 +101,10 @@ export default function App() {
   }, []);
 
   const moduleFallback = (
-    <div className="min-h-[400px] flex items-center justify-center">
-      <div className="text-center space-y-3">
-        <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto" />
-        <span className="text-xs font-mono text-slate-500">
+    <div className="flex min-h-[400px] items-center justify-center">
+      <div className="space-y-3 text-center">
+        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gold-500 border-t-transparent" />
+        <span className="block font-mono text-sm text-cream-400">
           Carregando módulo...
         </span>
       </div>
@@ -108,10 +113,10 @@ export default function App() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#090d13]">
-        <div className="text-center space-y-4">
-          <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mr-2 inline-block"></div>
-          <span className="text-gray-400 text-sm font-mono block">
+      <div className="flex min-h-screen items-center justify-center bg-counter-950">
+        <div className="space-y-4 text-center">
+          <div className="mx-auto mr-2 inline-block h-10 w-10 animate-spin rounded-full border-4 border-gold-500 border-t-transparent"></div>
+          <span className="block font-mono text-sm text-cream-300">
             Iniciando sistema Area Verde...
           </span>
         </div>
@@ -121,19 +126,19 @@ export default function App() {
 
   if (!configuracao && bootstrapError) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#090d13] p-6">
-        <div className="w-full max-w-md rounded-3xl border border-rose-900 bg-slate-900 p-8 text-center shadow-2xl">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-rose-800/60 bg-rose-950/40 text-rose-500">
-            <Lock size={20} />
+      <div className="flex min-h-screen items-center justify-center bg-counter-950 p-6">
+        <div className="w-full max-w-md rounded-2xl border-2 border-rose-500/30 bg-counter-900 p-8 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-400">
+            <Lock size={24} />
           </div>
-          <h1 className="text-2xl font-display font-bold text-slate-50">
+          <h1 className="font-display text-2xl font-bold text-cream-100">
             Nao foi possivel iniciar o sistema
           </h1>
-          <p className="mt-3 text-sm text-slate-400">{bootstrapError}</p>
+          <p className="mt-3 text-sm text-cream-400">{bootstrapError}</p>
           <button
             type="button"
             onClick={() => void refreshState()}
-            className="mt-6 inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-emerald-500"
+            className="mt-6 inline-flex items-center justify-center rounded-xl bg-gold-500 px-4 py-3 text-sm font-bold text-counter-950 transition hover:bg-gold-400"
           >
             Tentar novamente
           </button>
@@ -159,7 +164,7 @@ export default function App() {
   }
 
   // Tab switching animations specs
-  const tabVariants = {
+  const tabVariants: Variants = {
     hidden: { opacity: 0, y: 12 },
     visible: {
       opacity: 1,
@@ -184,41 +189,39 @@ export default function App() {
     }, 0);
 
   return (
-    <div className="min-h-screen bg-slate-800 flex flex-col text-slate-200 antialiased selection:bg-emerald-600 selection:text-white">
-      {/* GEOMETRIC BALANCE THEME CONTAINER */}
-
+    <div className="flex min-h-screen flex-col bg-counter-950 text-cream-200 antialiased selection:bg-gold-500 selection:text-counter-950">
       {/* TOP HEADER STATUS PANEL */}
-      <header className="bg-slate-900 border-b border-slate-800 sticky top-0 z-30 px-6 py-3.5 flex flex-col md:flex-row justify-between items-center gap-4 shadow-sm">
+      <header className="sticky top-0 z-30 flex flex-col items-center justify-between gap-3 border-b-2 border-counter-700 bg-counter-900 px-6 py-3 md:flex-row md:gap-4">
         {/* Brand identity area */}
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-gradient-to-br from-emerald-600 to-emerald-800 text-white rounded-xl shadow-lg shadow-emerald-600/15">
-            <Sprout size={20} className="animate-spin-slow" />
+          <div className="rounded-lg bg-gold-500 p-2 text-counter-950">
+            <Sprout size={24} />
           </div>
           <div>
-            <span className="text-[10px] uppercase font-mono text-emerald-500 font-bold block leading-normal">
+            <span className="block text-xs font-bold leading-normal text-gold-400">
               Boteco Familiar S.O.
             </span>
-            <h1 className="text-lg font-display font-bold text-slate-50 tracking-tight">
+            <h1 className="font-display text-lg font-bold tracking-tight text-cream-100">
               {configuracao?.nomeBar || 'Area Verde - Balcao Principal'}
             </h1>
           </div>
         </div>
 
         {/* Dynamic micro widgets & status badges */}
-        <div className="flex flex-wrap items-center gap-3 md:gap-5 text-xs text-slate-500 font-mono">
+        <div className="flex flex-wrap items-center gap-2 text-sm text-cream-300">
           {/* Caixa Status Widget */}
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/50 border border-slate-800 rounded-xl select-none">
+          <div className="flex items-center gap-2 rounded-lg border border-counter-700 bg-counter-800 px-3 py-2 select-none">
             {caixa.isOpen ? (
               <>
-                <Unlock size={14} className="text-emerald-500 animate-pulse" />
+                <Unlock size={19} className="text-emerald-400" />
                 <span className="font-semibold text-emerald-400">
                   Caixa Aberto: {`R$ ${caixa.currentCashInMoney.toFixed(2)}`}
                 </span>
               </>
             ) : (
               <>
-                <Lock size={14} className="text-rose-500" />
-                <span className="font-semibold text-rose-500">
+                <Lock size={19} className="text-rose-400" />
+                <span className="font-semibold text-rose-400">
                   Caixa Fechado
                 </span>
               </>
@@ -227,8 +230,8 @@ export default function App() {
 
           {/* Comanda Status Widget */}
           {activeComandasCount > 0 && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-950/40 border border-amber-800/60 text-amber-400 rounded-xl">
-              <ShoppingBag size={14} />
+            <div className="flex items-center gap-1.5 rounded-lg border border-gold-500/30 bg-gold-500/10 px-3 py-2 text-gold-300">
+              <ShoppingBag size={19} />
               <span className="font-semibold">
                 {activeComandasCount} Comandas (R${' '}
                 {activeComandasSum.toFixed(2)})
@@ -237,8 +240,8 @@ export default function App() {
           )}
 
           {/* Clock tracker badge */}
-          <div className="flex items-center gap-1.5 text-slate-300 font-semibold bg-slate-800/50 px-3 py-1.5 border border-slate-800 rounded-xl select-none">
-            <Clock size={14} className="text-emerald-500" />
+          <div className="flex items-center gap-1.5 rounded-lg border border-counter-700 bg-counter-800 px-3 py-2 font-semibold text-cream-200 select-none">
+            <Clock size={19} className="text-gold-400" />
             <span>{time.toLocaleTimeString('pt-BR')}</span>
           </div>
 
@@ -251,73 +254,84 @@ export default function App() {
                 logout();
               }
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/50 hover:bg-rose-950/40 border border-slate-800 hover:border-rose-800/60 text-slate-500 hover:text-rose-500 font-bold rounded-xl cursor-pointer duration-150 shrink-0"
+            className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-counter-700 bg-counter-800 px-3 py-2 font-bold text-cream-300 transition duration-150 hover:border-rose-500/30 hover:bg-rose-500/10 hover:text-rose-400"
             title="Sair do Sistema"
           >
-            <LogOut size={14} />
+            <LogOut size={19} />
             Sair
           </button>
         </div>
       </header>
 
-      {/* SYSTEM BODY CONTAINER */}
-      <div className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+      {/* SYSTEM BODY CONTAINER — sem max-width: usa a largura real da tela */}
+      <div
+        className={`flex-1 w-full grid grid-cols-1 ${
+          isImmersive ? '' : 'gap-5 p-4 md:p-6 lg:grid-cols-12 2xl:p-8'
+        }`}
+      >
         {/* NAV SYTEM BAR: Left Drawer style on desktop, top scrolling bar on mobile */}
-        <aside
-          className="lg:col-span-3 lg:sticky lg:top-24 h-auto lg:max-h-[calc(100vh-140px)] flex flex-col justify-between"
-          id="side-drawer"
+        {!isImmersive && (
+          <aside
+            className="lg:col-span-2 lg:sticky lg:top-[68px] h-auto lg:max-h-[calc(100vh-88px)] flex flex-col justify-between"
+            id="side-drawer"
+          >
+            <nav className="grid select-none grid-cols-3 gap-1.5 rounded-xl border border-counter-700 bg-counter-900 p-2 sm:grid-cols-4 lg:flex lg:grid-cols-none lg:flex-col">
+              {[
+                {
+                  id: 'dashboard',
+                  label: 'Painel Geral',
+                  icon: LayoutDashboard,
+                },
+                { id: 'comandas', label: 'Comandas POS', icon: ShoppingBag },
+                { id: 'caixa', label: 'Controle Caixa', icon: Coins },
+                {
+                  id: 'produtos',
+                  label: 'Produtos & Estoque',
+                  icon: Package,
+                },
+                { id: 'clientes', label: 'Clientes & Fiado', icon: Users },
+                { id: 'relatorios', label: 'Relatórios', icon: BarChart3 },
+                { id: 'configuracoes', label: 'Ajustes', icon: Settings },
+              ].map((tab) => {
+                const TabIcon = tab.icon;
+                const isActive = activeTab === tab.id;
+
+                return (
+                  <button
+                    key={tab.id}
+                    id={`nav-link-${tab.id}`}
+                    onClick={() => {
+                      setActiveTab(tab.id);
+                    }}
+                    className={`flex cursor-pointer flex-col items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-3 text-center text-xs font-bold transition duration-150 lg:flex-row lg:justify-start lg:gap-3 lg:px-3.5 lg:text-left lg:text-sm ${
+                      isActive
+                        ? 'bg-gold-500 text-counter-950'
+                        : 'text-cream-300 hover:bg-counter-800 hover:text-cream-100'
+                    }`}
+                  >
+                    <TabIcon size={24} />
+                    <span className="leading-tight">{tab.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+
+            {/* Quick legal credentials attribution inside navigation margins - NO tech larp indicators */}
+            <div className="mt-3 hidden rounded-xl border border-counter-700 bg-counter-900 p-3 text-xs leading-normal text-cream-400 lg:block">
+              <span className="mb-1 block font-bold text-gold-400">
+                Area Verde S.O.
+              </span>
+              Gestão simplificada e ágil para o balcão. Todos os direitos
+              reservados.
+            </div>
+          </aside>
+        )}
+
+        {/* WORKSPACE CONTENT AREA */}
+        <main
+          className={isImmersive ? '' : 'lg:col-span-10'}
+          id="main-workspace-box"
         >
-          <nav className="flex overflow-x-auto lg:overflow-visible lg:flex-col gap-2 bg-emerald-950 border border-emerald-900 p-3 lg:p-4 rounded-2xl shadow-xl select-none no-scrollbar snap-x">
-            {[
-              { id: 'dashboard', label: 'Painel Geral', icon: LayoutDashboard },
-              { id: 'comandas', label: 'Comandas POS', icon: ShoppingBag },
-              { id: 'caixa', label: 'Controle Caixa', icon: Coins },
-              { id: 'estoque', label: 'Estoque do Balcão', icon: Package },
-              {
-                id: 'produtos',
-                label: 'Catálogo de Produtos',
-                icon: LayoutDashboard,
-              },
-              { id: 'clientes', label: 'Clientes', icon: Users },
-              { id: 'fiados', label: 'Fiado / Pendências', icon: Wallet },
-              { id: 'relatorios', label: 'Relatórios', icon: BarChart3 },
-              { id: 'configuracoes', label: 'Ajustes', icon: Settings },
-            ].map((tab) => {
-              const TabIcon = tab.icon;
-              const isActive = activeTab === tab.id;
-
-              return (
-                <button
-                  key={tab.id}
-                  id={`nav-link-${tab.id}`}
-                  onClick={() => {
-                    setActiveTab(tab.id);
-                  }}
-                  className={`flex items-center gap-2 lg:gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl text-xs font-bold transition duration-155 cursor-pointer text-left whitespace-nowrap shrink-0 snap-center ${
-                    isActive
-                      ? 'bg-emerald-800 text-white shadow-lg shadow-emerald-950/20'
-                      : 'text-emerald-200/80 hover:text-white hover:bg-emerald-900/60'
-                  }`}
-                >
-                  <TabIcon size={16} />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </nav>
-
-          {/* Quick legal credentials attribution inside navigation margins - NO tech larp indicators */}
-          <div className="hidden lg:block p-4 border border-slate-800 rounded-2xl bg-slate-900 text-[10px] text-slate-500 font-mono mt-4 leading-normal shadow-sm">
-            <span className="text-emerald-400 font-bold block mb-1">
-              Area Verde S.O.
-            </span>
-            Gestão simplificada e ágil para o balcão. Todos os direitos
-            reservados.
-          </div>
-        </aside>
-
-        {/* WORKSPACE CONTENT AREA (9 cols) */}
-        <main className="lg:col-span-9" id="main-workspace-box">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
@@ -349,6 +363,7 @@ export default function App() {
                     permitirEstoqueNegativo={
                       configuracao?.permitirEstoqueNegativo ?? false
                     }
+                    onImmersiveChange={setIsImmersive}
                     onAddComanda={addComanda}
                     onUpdateComanda={(id, updates) => {
                       const c = comandas.find((com) => com.id === id);
@@ -374,15 +389,6 @@ export default function App() {
                   />
                 )}
 
-                {activeTab === 'estoque' && (
-                  <Estoque
-                    products={products}
-                    categories={categories}
-                    onUpdateProduct={updateProduct}
-                    onRefreshState={refreshState}
-                  />
-                )}
-
                 {activeTab === 'produtos' && (
                   <Produtos
                     products={products}
@@ -399,19 +405,11 @@ export default function App() {
                 {activeTab === 'clientes' && (
                   <Clientes
                     customers={customers}
+                    fiados={fiados}
                     caixaIsOpen={caixa.isOpen}
                     onAddCustomer={addCustomer}
                     onUpdateCustomer={updateCustomer}
                     onDeleteCustomer={deleteCustomer}
-                    onPagarFiado={pagarFiado}
-                  />
-                )}
-
-                {activeTab === 'fiados' && (
-                  <Fiados
-                    fiados={fiados}
-                    customers={customers}
-                    caixaIsOpen={caixa.isOpen}
                     onPagarFiado={pagarFiado}
                   />
                 )}

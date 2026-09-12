@@ -5,31 +5,58 @@
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-display: 'Outfit', sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Balcão: paleta do balcão de atendimento, usada na tela de venda —
+     ambiente escuro, alto contraste, foco no dinheiro. Verde vivo (não
+     musgo/opaco) + dourado saturado. Telas de retaguarda seguem em
+     slate/emerald. */
+  --color-counter-950: #05221a;
+  --color-counter-900: #073a2b;
+  --color-counter-800: #0b5940;
+  --color-counter-700: #117a56;
+  --color-counter-600: #17a06d;
+
+  --color-gold-300: #ffe29a;
+  --color-gold-400: #ffc94d;
+  --color-gold-500: #f5a623;
+  --color-gold-600: #d98a12;
+  --color-gold-700: #b06f0a;
+
+  --color-cream-100: #f7f2e7;
+  --color-cream-200: #efe6d2;
+  --color-cream-300: #ddd3ba;
+  --color-cream-400: #beb298;
 }
 
-/* Custom scrollbars for POS items */
+/* Custom scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.5); /* dark track */
-  border-radius: 4px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(16, 185, 129, 0.4);
+  background: rgb(203 213 225); /* slate-300 */
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(16, 185, 129, 0.7);
+  background: rgb(148 163 184); /* slate-400 */
+}
+
+/* Base maior em toda a tela (~ equivalente a um zoom de 20%): escala texto,
+   padding, gap e demais utilitários em rem de uma vez, sem precisar tocar
+   classe por classe em cada componente. */
+html {
+  font-size: 120%;
 }
 
 body {
-  background-color: #020617; /* bg-slate-950 */
-  color: #f8fafc; /* text-slate-50 */
+  background-color: #05221a; /* counter-950 */
+  color: #efe6d2; /* cream-200 */
   font-family: var(--font-sans);
 }
 

@@ -34,6 +34,18 @@ test('cria um produto composto e adiciona um componente na composição', async 
     .selectOption({ label: `Categoria Composto ${runId}` });
   await page.getByTestId('produto-preco-venda-input').fill('15.00');
   await page.locator('#checkbox-is-composite').check();
+
+  // A composição agora é montada no próprio formulário de criação — produto
+  // composto não pode ser salvo sem pelo menos um componente.
+  await page
+    .getByTestId('produto-composicao-select-ingrediente')
+    .selectOption({ label: `Cachaca E2E ${runId} (un)` });
+  await page.getByTestId('produto-composicao-qtd-input').fill('0.05');
+  await page.getByTestId('produto-composicao-add-btn').click();
+  await expect(
+    page.getByTestId('produto-composicao-lista').getByText(`Cachaca E2E ${runId}`),
+  ).toBeVisible();
+
   await page.getByRole('button', { name: 'Salvar Ficha' }).click();
 
   await expect(page.getByText(`Caipirinha E2E ${runId}`)).toBeVisible({
@@ -44,15 +56,6 @@ test('cria um produto composto e adiciona um componente na composição', async 
     .locator('tr', { hasText: `Caipirinha E2E ${runId}` })
     .getByRole('button', { name: 'Gerenciar Composição' })
     .click();
-
-  await page.getByRole('button', { name: 'Adicionar Componente' }).click();
-  await page
-    .locator('form')
-    .filter({ hasText: 'Insumo Físico' })
-    .locator('select')
-    .selectOption({ label: `Cachaca E2E ${runId}` });
-  await page.getByPlaceholder('Ex: 50').fill('0.05');
-  await page.getByRole('button', { name: 'Salvar Componente' }).click();
 
   await expect(page.getByText(`Cachaca E2E ${runId}`)).toBeVisible({
     timeout: 10_000,
@@ -128,7 +131,7 @@ test('ativa e inativa uma categoria pela listagem', async ({ page }) => {
   });
   const toggleButton = card.locator('button').first();
 
-  await expect(card).toHaveClass(/border-slate-800/);
+  await expect(card).toHaveClass(/border-slate-200/);
   await toggleButton.click();
   await expect(card).toHaveClass(/opacity-60/);
 
@@ -160,6 +163,14 @@ test('edita a quantidade e remove um componente da composição', async ({
     .selectOption({ label: `Categoria Comp ${runId}` });
   await page.getByTestId('produto-preco-venda-input').fill('18.00');
   await page.locator('#checkbox-is-composite').check();
+
+  // Produto composto precisa nascer com pelo menos um componente.
+  await page
+    .getByTestId('produto-composicao-select-ingrediente')
+    .selectOption({ label: `Xarope E2E ${runId} (un)` });
+  await page.getByTestId('produto-composicao-qtd-input').fill('0.03');
+  await page.getByTestId('produto-composicao-add-btn').click();
+
   await page.getByRole('button', { name: 'Salvar Ficha' }).click();
 
   await expect(page.getByText(`Drink Composto E2E ${runId}`)).toBeVisible({
@@ -170,15 +181,6 @@ test('edita a quantidade e remove um componente da composição', async ({
     .locator('tr', { hasText: `Drink Composto E2E ${runId}` })
     .getByRole('button', { name: 'Gerenciar Composição' })
     .click();
-
-  await page.getByRole('button', { name: 'Adicionar Componente' }).click();
-  await page
-    .locator('form')
-    .filter({ hasText: 'Insumo Físico' })
-    .locator('select')
-    .selectOption({ label: `Xarope E2E ${runId}` });
-  await page.getByPlaceholder('Ex: 50').fill('0.03');
-  await page.getByRole('button', { name: 'Salvar Componente' }).click();
 
   const row = page.locator('tr', { hasText: `Xarope E2E ${runId}` });
   await expect(row).toBeVisible({ timeout: 10_000 });
@@ -275,7 +277,7 @@ test('filtra produtos por busca, categoria, tipo e status', async ({
   ).toHaveCount(0);
 });
 
-test('restock rápido registra uma entrada de estoque auditável', async ({
+test('entrada de estoque pela aba Estoque registra movimento auditável', async ({
   page,
 }) => {
   const runId = Date.now().toString(36);
@@ -289,27 +291,26 @@ test('restock rápido registra uma entrada de estoque auditável', async ({
 
   await loginUI(page, SENHA);
   await page.locator('#nav-link-produtos').click();
+  await page.locator('#produtos-subtab-estoque').click();
 
   const row = page.locator('tr', { hasText: `Produto Restock ${runId}` });
-  await row.locator('input[type="number"]').fill('7');
-  await row.getByRole('button', { name: '+', exact: true }).click();
+  await row.getByTitle('Dar Entrada').click();
+  await page.getByPlaceholder('Ex: 10').fill('7');
+  await page.getByPlaceholder('Ex: Nota fiscal 1234').fill('Restock E2E');
+  await page.getByRole('button', { name: 'Confirmar Entrada' }).click();
 
   await expect(row.getByText('27', { exact: true })).toBeVisible({
     timeout: 10_000,
   });
 
-  // O restock rápido precisa criar um movimento de estoque de verdade
-  // (não só sobrescrever o saldo direto no produto), senão o extrato de
-  // estoque não bate com o histórico real.
-  await page.locator('#nav-link-estoque').click();
-  const estoqueRow = page.locator('tr', {
-    hasText: `Produto Restock ${runId}`,
-  });
-  await estoqueRow.getByTitle('Histórico').click();
+  // A entrada precisa criar um movimento de estoque de verdade (não só
+  // sobrescrever o saldo direto no produto), senão o extrato de estoque
+  // não bate com o histórico real.
+  await row.getByTitle('Histórico').click();
   await expect(page.getByText('Extrato de Estoque')).toBeVisible({
     timeout: 10_000,
   });
-  await expect(page.getByText('Restock rápido')).toBeVisible();
+  await expect(page.getByText('Restock E2E')).toBeVisible();
 });
 
 test('bloqueia adicionar o mesmo componente duas vezes na composição', async ({
@@ -336,6 +337,14 @@ test('bloqueia adicionar o mesmo componente duas vezes na composição', async (
     .selectOption({ label: `Categoria Dup ${runId}` });
   await page.getByTestId('produto-preco-venda-input').fill('12.00');
   await page.locator('#checkbox-is-composite').check();
+
+  // Produto composto precisa nascer com pelo menos um componente.
+  await page
+    .getByTestId('produto-composicao-select-ingrediente')
+    .selectOption({ label: `Gelo E2E ${runId} (un)` });
+  await page.getByTestId('produto-composicao-qtd-input').fill('0.1');
+  await page.getByTestId('produto-composicao-add-btn').click();
+
   await page.getByRole('button', { name: 'Salvar Ficha' }).click();
 
   await expect(page.getByText(`Drink Dup E2E ${runId}`)).toBeVisible({
@@ -345,15 +354,6 @@ test('bloqueia adicionar o mesmo componente duas vezes na composição', async (
     .locator('tr', { hasText: `Drink Dup E2E ${runId}` })
     .getByRole('button', { name: 'Gerenciar Composição' })
     .click();
-
-  await page.getByRole('button', { name: 'Adicionar Componente' }).click();
-  await page
-    .locator('form')
-    .filter({ hasText: 'Insumo Físico' })
-    .locator('select')
-    .selectOption({ label: `Gelo E2E ${runId}` });
-  await page.getByPlaceholder('Ex: 50').fill('0.1');
-  await page.getByRole('button', { name: 'Salvar Componente' }).click();
   await expect(page.getByText(`Gelo E2E ${runId}`)).toBeVisible({
     timeout: 10_000,
   });

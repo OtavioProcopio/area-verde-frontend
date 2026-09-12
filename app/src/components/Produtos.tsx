@@ -2,11 +2,9 @@ import React, { useState } from 'react';
 import { Product, RecipeItem, Category } from '../types';
 import {
   Package,
-  Plus,
   Edit3,
   Trash2,
   Save,
-  TrendingUp,
   Layers,
   PlusCircle,
   X,
@@ -19,8 +17,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { InlineFeedback } from '../features/shared/components/InlineFeedback';
-import { createStockEntry } from '../features/estoque/services/estoqueService';
-import { getApiErrorMessage } from '../features/shared/utils/getApiErrorMessage';
+import Estoque from './Estoque';
 
 type OperationResult = { success: boolean; msg: string };
 
@@ -40,13 +37,13 @@ export default function Produtos({
   categories,
   onAddProduct,
   onUpdateProduct,
-  onDeleteProduct,
+  onDeleteProduct: _onDeleteProduct,
   onAddCategory,
   onUpdateCategory,
   onRefreshState,
 }: ProdutosProps) {
   const [activeTab, setActiveTab] = useState<
-    'produtos' | 'categorias' | 'composicao'
+    'produtos' | 'estoque' | 'categorias' | 'composicao'
   >('produtos');
   const [compositionProductId, setCompositionProductId] = useState<
     string | null
@@ -88,9 +85,6 @@ export default function Produtos({
   // Recipe Builder Help States
   const [selectedIngredientId, setSelectedIngredientId] = useState('');
   const [ingredientQty, setIngredientQty] = useState('');
-
-  // Quick Restock state
-  const [quickRestockAmount, setQuickRestockAmount] = useState<string>('12');
 
   // Category State
   const [showCatForm, setShowCatForm] = useState(false);
@@ -148,6 +142,13 @@ export default function Produtos({
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim() === '') return;
+
+    if (isComposite && recipe.length === 0) {
+      setProductFormError(
+        'Produto composto precisa de pelo menos um componente na composição antes de salvar.',
+      );
+      return;
+    }
 
     const parsedPrice = parseFloat(price) || 0;
     const parsedCostPrice = parseFloat(costPrice) || 0;
@@ -215,17 +216,6 @@ export default function Produtos({
     setRecipe(recipe.filter((item) => item.ingredientId !== ingredientId));
   };
 
-  const handleQuickRestock = async (productId: string, amount: number) => {
-    try {
-      await createStockEntry(productId, amount, 'Restock rápido');
-      await onRefreshState();
-    } catch (error) {
-      window.alert(
-        getApiErrorMessage(error, 'Não foi possível registrar a entrada.'),
-      );
-    }
-  };
-
   const handleToggleProductStatus = (p: Product) => {
     onUpdateProduct({
       ...p,
@@ -270,7 +260,7 @@ export default function Produtos({
       return;
     }
 
-    let updatedRecipe = [...(activeComposite.recipe || [])];
+    const updatedRecipe = [...(activeComposite.recipe || [])];
 
     if (compEditIndex !== null) {
       if (
@@ -305,7 +295,7 @@ export default function Produtos({
     if (!activeComposite) return;
     if (!window.confirm('Remover este componente da composição?')) return;
 
-    let updatedRecipe = [...(activeComposite.recipe || [])];
+    const updatedRecipe = [...(activeComposite.recipe || [])];
     updatedRecipe.splice(idx, 1);
 
     onUpdateProduct({
@@ -388,28 +378,36 @@ export default function Produtos({
     `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   return (
-    <div id="produtos-module" className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div id="produtos-module" className="space-y-5">
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <span className="text-xs uppercase tracking-widest font-mono text-emerald-500 font-semibold block mb-1">
+          <span className="mb-1 block text-xs font-semibold text-gold-400">
             Catálogo de Vendas
           </span>
-          <h2 className="text-3xl font-display font-bold text-slate-50 tracking-tight animate-fade-in">
-            Estoque &{' '}
-            <span className="text-emerald-500 font-bold">Produtos</span>
+          <h2 className="font-display text-3xl font-bold tracking-tight text-cream-100">
+            Estoque & <span className="text-gold-400">Produtos</span>
           </h2>
         </div>
 
-        <div className="flex bg-slate-700/60 p-1 rounded-xl shadow-inner border border-slate-800">
+        <div className="flex rounded-xl border border-counter-700 bg-counter-900 p-1">
           <button
+            id="produtos-subtab-produtos"
             onClick={() => setActiveTab('produtos')}
-            className={`px-4 py-2 text-xs font-bold font-mono uppercase tracking-wider rounded-lg transition-all ${activeTab === 'produtos' ? 'bg-slate-900 text-emerald-400 shadow-sm' : 'text-slate-500 hover:text-slate-300 cursor-pointer'}`}
+            className={`rounded-lg px-4 py-2.5 text-sm font-bold transition-all ${activeTab === 'produtos' ? 'bg-gold-500 text-counter-950' : 'text-cream-300 hover:text-cream-100'}`}
           >
             Produtos
           </button>
           <button
+            id="produtos-subtab-estoque"
+            onClick={() => setActiveTab('estoque')}
+            className={`rounded-lg px-4 py-2.5 text-sm font-bold transition-all ${activeTab === 'estoque' ? 'bg-gold-500 text-counter-950' : 'text-cream-300 hover:text-cream-100'}`}
+          >
+            Estoque
+          </button>
+          <button
+            id="produtos-subtab-categorias"
             onClick={() => setActiveTab('categorias')}
-            className={`px-4 py-2 text-xs font-bold font-mono uppercase tracking-wider rounded-lg transition-all ${activeTab === 'categorias' ? 'bg-slate-900 text-emerald-400 shadow-sm' : 'text-slate-500 hover:text-slate-300 cursor-pointer'}`}
+            className={`rounded-lg px-4 py-2.5 text-sm font-bold transition-all ${activeTab === 'categorias' ? 'bg-gold-500 text-counter-950' : 'text-cream-300 hover:text-cream-100'}`}
           >
             Categorias
           </button>
@@ -417,19 +415,19 @@ export default function Produtos({
       </div>
 
       {activeTab === 'produtos' && (
-        <div className="space-y-4 animate-fade-in">
+        <div className="space-y-4">
           {/* Action Bar & Filters */}
-          <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-sm flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between">
-            <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-counter-700 bg-counter-900 p-4 xl:flex-row xl:items-center">
+            <div className="grid w-full flex-1 grid-cols-1 gap-3 md:grid-cols-4">
               <div className="relative">
                 <Search
-                  size={16}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+                  size={19}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-cream-400"
                 />
                 <input
                   type="text"
                   placeholder="Buscar pelo nome..."
-                  className="w-full pl-9 pr-3 py-2 bg-slate-800/50 border border-slate-800 rounded-xl text-xs outline-none focus:border-emerald-500"
+                  className="w-full rounded-xl border border-counter-700 bg-counter-950 py-2.5 pl-9 pr-3 text-sm text-cream-100 outline-none focus:border-gold-500"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -437,7 +435,7 @@ export default function Produtos({
 
               <div className="relative">
                 <select
-                  className="w-full px-3 py-2 bg-slate-800/50 border border-slate-800 rounded-xl text-xs outline-none focus:border-emerald-500 cursor-pointer appearance-none text-slate-300"
+                  className="w-full cursor-pointer appearance-none rounded-xl border border-counter-700 bg-counter-950 px-3 py-2.5 text-sm text-cream-200 outline-none focus:border-gold-500"
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
                 >
@@ -449,14 +447,14 @@ export default function Produtos({
                   ))}
                 </select>
                 <Filter
-                  size={14}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"
+                  size={17}
+                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-cream-400"
                 />
               </div>
 
               <div className="relative">
                 <select
-                  className="w-full px-3 py-2 bg-slate-800/50 border border-slate-800 rounded-xl text-xs outline-none focus:border-emerald-500 cursor-pointer appearance-none text-slate-300"
+                  className="w-full cursor-pointer appearance-none rounded-xl border border-counter-700 bg-counter-950 px-3 py-2.5 text-sm text-cream-200 outline-none focus:border-gold-500"
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value as any)}
                 >
@@ -465,14 +463,14 @@ export default function Produtos({
                   <option value="Composto">Apenas Compostos</option>
                 </select>
                 <Filter
-                  size={14}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"
+                  size={17}
+                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-cream-400"
                 />
               </div>
 
               <div className="relative">
                 <select
-                  className="w-full px-3 py-2 bg-slate-800/50 border border-slate-800 rounded-xl text-xs outline-none focus:border-emerald-500 cursor-pointer appearance-none text-slate-300"
+                  className="w-full cursor-pointer appearance-none rounded-xl border border-counter-700 bg-counter-950 px-3 py-2.5 text-sm text-cream-200 outline-none focus:border-gold-500"
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value as any)}
                 >
@@ -481,44 +479,44 @@ export default function Produtos({
                   <option value="Inativos">Apenas Inativos</option>
                 </select>
                 <Filter
-                  size={14}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"
+                  size={17}
+                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-cream-400"
                 />
               </div>
             </div>
 
             <button
               onClick={handleStartCreate}
-              className="w-full xl:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-950/400 text-white font-bold rounded-xl text-xs flex justify-center items-center gap-1.5 cursor-pointer shadow-md transition shrink-0 whitespace-nowrap"
+              className="flex w-full shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl bg-gold-500 px-5 py-3 text-sm font-bold text-counter-950 shadow-md transition hover:bg-gold-400 xl:w-auto"
             >
-              <PlusCircle size={14} />
+              <PlusCircle size={19} />
               Novo Produto
             </button>
           </div>
 
           {/* Products Table */}
-          <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-sm">
-            <div className="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50/50">
-              <h4 className="text-sm font-display font-bold text-slate-200 flex items-center gap-2">
-                <Package size={16} className="text-emerald-500" />
+          <div className="overflow-hidden rounded-2xl border border-counter-700 bg-counter-900">
+            <div className="flex items-center justify-between border-b border-counter-700 bg-counter-950 p-4">
+              <h4 className="flex items-center gap-2 font-display text-base font-bold text-cream-100">
+                <Package size={22} className="text-gold-400" />
                 Destaque ({filteredProducts.length})
               </h4>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse leading-normal text-xs text-slate-300">
+              <table className="w-full border-collapse text-left leading-normal">
                 <thead>
-                  <tr className="border-b border-slate-800 text-[10px] uppercase font-mono tracking-wider text-slate-500 bg-slate-800/50">
-                    <th className="px-5 py-3">Nome & Categoria</th>
-                    <th className="px-3 py-3 text-center">Und</th>
-                    <th className="px-3 py-3 text-center">Tipo</th>
-                    <th className="px-4 py-3 text-center">Estoque</th>
-                    <th className="px-4 py-3 text-right">Preço</th>
-                    <th className="px-4 py-3 text-center">Status</th>
-                    <th className="px-5 py-3 text-right text-slate-300">#</th>
+                  <tr className="border-b border-counter-700 bg-counter-950 text-xs font-bold uppercase tracking-wide text-cream-400">
+                    <th className="px-5 py-3.5">Nome & Categoria</th>
+                    <th className="px-3 py-3.5 text-center">Und</th>
+                    <th className="px-3 py-3.5 text-center">Tipo</th>
+                    <th className="px-4 py-3.5 text-center">Estoque</th>
+                    <th className="px-4 py-3.5 text-right">Preço</th>
+                    <th className="px-4 py-3.5 text-center">Status</th>
+                    <th className="px-5 py-3.5 text-right">#</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 bg-slate-900">
+                <tbody className="divide-y divide-counter-800">
                   {filteredProducts.map((p) => {
                     const isUnderMin = !p.isComposite && p.stock <= p.minStock;
                     const isOutOfStock = !p.isComposite && p.stock === 0;
@@ -527,35 +525,35 @@ export default function Produtos({
                     return (
                       <tr
                         key={p.id}
-                        className={`transition duration-150 ${!pActive ? 'bg-slate-800/50/50 opacity-60 grayscale-[30%]' : 'hover:bg-slate-800/50/80'}`}
+                        className={`transition duration-150 ${!pActive ? 'bg-counter-950/60 opacity-60' : 'hover:bg-counter-800'}`}
                       >
-                        <td className="px-5 py-3 align-middle max-w-[200px]">
+                        <td className="max-w-[220px] px-5 py-3.5 align-middle">
                           <div>
                             <span
-                              className="font-bold text-slate-200 block text-xs truncate"
+                              className="block truncate text-sm font-bold text-cream-100"
                               title={p.name}
                             >
                               {p.name}
                             </span>
-                            <span className="text-[10px] text-slate-500 mt-0.5 inline-flex items-center gap-1 font-mono uppercase">
+                            <span className="mt-0.5 inline-flex items-center gap-1 text-xs uppercase tracking-wide text-cream-400">
                               {p.category}
                             </span>
                           </div>
                         </td>
 
-                        <td className="px-3 py-3 text-center font-mono align-middle">
-                          <span className="text-[10px] font-bold text-slate-500">
+                        <td className="px-3 py-3.5 text-center align-middle">
+                          <span className="font-mono text-xs font-bold text-cream-300">
                             {p.unit.toUpperCase()}
                           </span>
                         </td>
 
                         <td className="px-3 py-3 text-center align-middle">
                           {p.isComposite ? (
-                            <span className="px-2 py-0.5 bg-blue-950/40 border border-blue-800/60 rounded text-[9px] font-bold font-mono text-blue-400">
+                            <span className="rounded border border-sky-400/30 bg-sky-400/10 px-2 py-0.5 text-xs font-bold text-sky-400">
                               COMP
                             </span>
                           ) : (
-                            <span className="px-2 py-0.5 bg-slate-800 border border-slate-800 rounded text-[9px] font-bold font-mono text-slate-500">
+                            <span className="rounded border border-counter-700 bg-counter-800 px-2 py-0.5 text-xs font-bold text-cream-300">
                               SIMPLES
                             </span>
                           )}
@@ -563,18 +561,18 @@ export default function Produtos({
 
                         <td className="px-4 py-3 text-center align-middle">
                           {p.isComposite ? (
-                            <span className="text-[10px] text-slate-500 font-mono">
+                            <span className="font-mono text-xs text-cream-400">
                               --
                             </span>
                           ) : (
                             <div className="inline-flex flex-col items-center justify-center">
                               <span
-                                className={`px-2 py-0.5 rounded font-mono font-bold text-xs ${
+                                className={`rounded px-2 py-0.5 font-mono text-xs font-bold ${
                                   isOutOfStock
-                                    ? 'bg-rose-950/40 text-rose-500 border border-rose-150'
+                                    ? 'border border-rose-400/30 bg-rose-400/10 text-rose-400'
                                     : isUnderMin
-                                      ? 'bg-amber-950/40 text-amber-800 border border-amber-800/60'
-                                      : 'bg-emerald-950/40 text-emerald-400 border border-emerald-150'
+                                      ? 'border border-gold-500/30 bg-gold-500/10 text-gold-300'
+                                      : 'border border-emerald-400/30 bg-emerald-400/10 text-emerald-400'
                                 }`}
                               >
                                 {p.stock}
@@ -583,70 +581,45 @@ export default function Produtos({
                           )}
                         </td>
 
-                        <td className="px-4 py-3 text-right font-bold font-mono text-slate-200 align-middle">
+                        <td className="px-4 py-3 text-right align-middle font-mono font-bold text-cream-100">
                           {fmt(p.price)}
                         </td>
 
                         <td className="px-4 py-3 text-center align-middle">
                           <button
                             onClick={() => handleToggleProductStatus(p)}
-                            className={`inline-flex items-center gap-1 font-mono text-[9px] uppercase font-bold px-2 py-1 rounded transition border cursor-pointer ${
+                            className={`inline-flex items-center gap-1 rounded border px-2.5 py-1.5 text-xs font-bold uppercase transition ${
                               pActive
-                                ? 'bg-emerald-950/40 border-emerald-800/60 text-emerald-400 hover:bg-emerald-900/50 hover:border-emerald-300'
-                                : 'bg-slate-800 border-slate-800 text-slate-500 hover:bg-slate-700'
+                                ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-400 hover:bg-emerald-400/20'
+                                : 'border-counter-700 bg-counter-800 text-cream-400 hover:bg-counter-700'
                             }`}
                           >
                             {pActive ? (
-                              <CheckCircle2 size={10} />
+                              <CheckCircle2 size={14} />
                             ) : (
-                              <XCircle size={10} />
+                              <XCircle size={14} />
                             )}
                             {pActive ? 'Ativo' : 'Inativo'}
                           </button>
                         </td>
 
                         <td className="px-5 py-3 text-right align-middle">
-                          <div className="flex items-center justify-end gap-1.5 flex-nowrap">
-                            {!p.isComposite && pActive && (
-                              <div className="flex items-center bg-slate-800/50 p-0.5 border border-slate-800 rounded-lg">
-                                <input
-                                  type="number"
-                                  value={quickRestockAmount}
-                                  onChange={(e) =>
-                                    setQuickRestockAmount(e.target.value)
-                                  }
-                                  className="w-8 shrink-0 bg-transparent text-center font-bold text-[10px] font-mono border-none outline-none text-slate-500"
-                                  title="Quantidade restoque"
-                                />
-                                <button
-                                  onClick={() =>
-                                    void handleQuickRestock(
-                                      p.id,
-                                      parseFloat(quickRestockAmount) || 12,
-                                    )
-                                  }
-                                  className="px-2 py-0.5 rounded bg-emerald-900/50 hover:bg-emerald-600 text-emerald-400 hover:text-white font-mono text-[9px] font-bold transition cursor-pointer"
-                                >
-                                  +
-                                </button>
-                              </div>
-                            )}
-
+                          <div className="flex flex-nowrap items-center justify-end gap-1.5">
                             {p.isComposite && (
                               <button
                                 onClick={() => handleManageComposition(p)}
-                                className="w-7 h-7 flex items-center justify-center bg-blue-950/40 hover:bg-blue-900/50 border border-blue-800/60 hover:border-blue-300 text-blue-500 rounded transition cursor-pointer"
+                                className="flex h-8 w-8 items-center justify-center rounded border border-sky-400/30 bg-sky-400/10 text-sky-400 transition hover:bg-sky-400/20"
                                 title="Gerenciar Composição"
                               >
-                                <Layers size={13} />
+                                <Layers size={17} />
                               </button>
                             )}
                             <button
                               onClick={() => handleStartEdit(p)}
-                              className="w-7 h-7 flex items-center justify-center bg-slate-800/50 hover:bg-emerald-950/40 border border-slate-800 hover:border-emerald-800/60 text-slate-500 hover:text-emerald-400 rounded transition cursor-pointer"
+                              className="flex h-8 w-8 items-center justify-center rounded border border-counter-700 bg-counter-800 text-cream-300 transition hover:border-gold-500/50 hover:text-gold-300"
                               title="Editar Produto"
                             >
-                              <Edit3 size={13} />
+                              <Edit3 size={17} />
                             </button>
                           </div>
                         </td>
@@ -657,7 +630,7 @@ export default function Produtos({
                     <tr>
                       <td
                         colSpan={7}
-                        className="text-center py-12 text-slate-500 italic text-xs bg-slate-800/50/30"
+                        className="bg-counter-950/40 py-12 text-center text-sm italic text-cream-400"
                       >
                         Nenhum produto atende aos filtros atuais.
                       </td>
@@ -670,56 +643,69 @@ export default function Produtos({
         </div>
       )}
 
+      {activeTab === 'estoque' && (
+        <div className="-mt-2">
+          <Estoque
+            products={products}
+            categories={categories}
+            onUpdateProduct={onUpdateProduct}
+            onRefreshState={onRefreshState}
+          />
+        </div>
+      )}
+
       {activeTab === 'categorias' && (
-        <div className="space-y-4 animate-fade-in">
-          <div className="flex justify-between items-center bg-slate-900 p-4 rounded-xl border border-slate-800 shadow-sm">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between rounded-xl border border-counter-700 bg-counter-900 p-4">
             <div className="flex-1">
-              <h3 className="font-display font-bold text-slate-200">
+              <h3 className="font-display font-bold text-cream-100">
                 Categorias
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-sm text-cream-400">
                 Classificação para filtros e PDV
               </p>
             </div>
             <button
               onClick={handleStartCreateCat}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 cursor-pointer shadow-md transition"
+              className="flex items-center gap-1.5 rounded-lg bg-gold-500 px-4 py-2.5 text-sm font-bold text-counter-950 shadow-md transition hover:bg-gold-400"
             >
-              <PlusCircle size={14} /> Nova
+              <PlusCircle size={19} /> Nova
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {categories.map((c) => (
               <div
                 key={c.id}
-                className={`bg-slate-900 rounded-xl border p-4 shadow-2xs flex flex-col justify-between transition ${c.active ? 'border-slate-800' : 'border-slate-800 bg-slate-800/50/50 opacity-60'}`}
+                className={`flex flex-col justify-between rounded-xl border p-4 transition ${c.active ? 'border-counter-700 bg-counter-900' : 'border-counter-700 bg-counter-950/60 opacity-60'}`}
               >
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex items-center gap-2 text-slate-200">
+                <div className="mb-4 flex items-start justify-between">
+                  <div className="flex items-center gap-2 text-cream-100">
                     <Tags
-                      size={16}
-                      className={
-                        c.active ? 'text-emerald-500' : 'text-slate-500'
-                      }
+                      size={22}
+                      className={c.active ? 'text-gold-400' : 'text-cream-400'}
                     />
-                    <h4 className="font-bold font-display">{c.name}</h4>
+                    <h4 className="font-display font-bold">{c.name}</h4>
                   </div>
                   <button
                     onClick={() => handleToggleCatStatus(c)}
-                    className={`cursor-pointer ${c.active ? 'text-emerald-500 hover:text-emerald-500' : 'text-slate-500 hover:text-slate-500'}`}
+                    className={
+                      c.active
+                        ? 'text-gold-400 hover:text-gold-300'
+                        : 'text-cream-400 hover:text-cream-200'
+                    }
                   >
                     {c.active ? (
-                      <ToggleRight size={20} />
+                      <ToggleRight size={26} />
                     ) : (
-                      <ToggleLeft size={20} />
+                      <ToggleLeft size={26} />
                     )}
                   </button>
                 </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleStartEditCat(c)}
-                    className="flex-1 py-1.5 text-[10px] font-bold font-mono uppercase bg-slate-800 hover:bg-slate-700 text-slate-500 rounded transition cursor-pointer border border-slate-800"
+                    className="flex-1 rounded border border-counter-700 bg-counter-800 py-2 text-xs font-bold uppercase text-cream-300 transition hover:bg-counter-700"
                   >
                     Editar Nome
                   </button>
@@ -731,45 +717,45 @@ export default function Produtos({
       )}
 
       {activeTab === 'composicao' && activeComposite && (
-        <div className="space-y-4 animate-fade-in pb-10">
-          <div className="flex justify-between items-center bg-slate-900 p-4 rounded-xl border border-blue-800/60 shadow-sm flex-wrap gap-2">
+        <div className="space-y-4 pb-10">
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-sky-400/30 bg-counter-900 p-4">
             <div>
               <button
                 onClick={() => setActiveTab('produtos')}
-                className="text-[10px] uppercase font-mono font-bold text-slate-500 hover:text-slate-200 transition block mb-1 cursor-pointer"
+                className="mb-1 block text-xs font-bold uppercase text-cream-400 transition hover:text-cream-100"
               >
                 &larr; Voltar
               </button>
-              <h3 className="font-display font-bold text-slate-200 text-xl flex items-center gap-2">
+              <h3 className="flex items-center gap-2 font-display text-xl font-bold text-cream-100">
                 {activeComposite.name}
-                <span className="text-[9px] uppercase font-mono font-bold bg-blue-900/50 text-blue-800 px-2 py-0.5 rounded border border-blue-800/60">
+                <span className="rounded border border-sky-400/30 bg-sky-400/10 px-2 py-0.5 text-xs font-bold uppercase text-sky-400">
                   Produto Composto
                 </span>
               </h3>
             </div>
             <button
               onClick={startAddComp}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-950/400 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 cursor-pointer shadow-md transition"
+              className="flex items-center gap-1.5 rounded-lg bg-sky-500 px-4 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-sky-400"
             >
-              <PlusCircle size={14} /> Adicionar Componente
+              <PlusCircle size={19} /> Adicionar Componente
             </button>
           </div>
 
-          <div className="bg-blue-950/40/50 border border-blue-900 rounded-xl p-4 text-xs text-blue-800 shadow-sm flex items-start gap-4 mx-1">
-            <div className="hidden sm:flex w-10 h-10 rounded-full bg-blue-900/50 items-center justify-center shrink-0 border border-blue-800/60">
-              <Layers className="text-blue-500" size={18} />
+          <div className="mx-1 flex items-start gap-4 rounded-xl border border-sky-400/30 bg-sky-400/10 p-4 text-sm text-sky-300">
+            <div className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-sky-400/30 bg-sky-400/15 sm:flex">
+              <Layers className="text-sky-400" size={22} />
             </div>
             <div>
-              <h4 className="font-bold mb-1 font-display">
+              <h4 className="mb-1 font-display font-bold text-sky-200">
                 Como funciona a composição da receita?
               </h4>
-              <p className="text-blue-400/80 leading-relaxed font-mono mt-2">
+              <p className="mt-2 leading-relaxed text-sky-300/90">
                 Ao vender{' '}
-                <strong className="text-blue-900 border-b border-blue-300 pb-0.5">
+                <strong className="border-b border-sky-400/40 pb-0.5 text-sky-100">
                   1 {activeComposite.unit}
                 </strong>{' '}
                 de{' '}
-                <strong className="text-blue-900 border-b border-blue-300 pb-0.5">
+                <strong className="border-b border-sky-400/40 pb-0.5 text-sky-100">
                   {activeComposite.name}
                 </strong>
                 , o sistema descontará automaticamente do estoque físico as
@@ -779,23 +765,23 @@ export default function Produtos({
           </div>
 
           {!activeComposite.recipe || activeComposite.recipe.length === 0 ? (
-            <div className="text-center bg-slate-900 border border-slate-800 rounded-xl p-12 shadow-sm text-slate-500 mt-2 mx-1">
-              <Layers size={48} className="mx-auto text-slate-200 mb-4" />
-              <h5 className="font-bold text-slate-300 mb-2">
+            <div className="mx-1 mt-2 rounded-xl border border-counter-700 bg-counter-900 p-12 text-center text-cream-400">
+              <Layers size={58} className="mx-auto mb-4 text-cream-400" />
+              <h5 className="mb-2 font-bold text-cream-200">
                 Composição Vazia
               </h5>
-              <p className="text-xs max-w-sm mx-auto">
+              <p className="mx-auto max-w-sm text-sm">
                 Este produto composto não tem componentes. Se ele for vendido
                 agora, nenhum estoque extra será baixado. Adicione componentes
                 para ligar o controle de estoque.
               </p>
             </div>
           ) : (
-            <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-sm mt-2 mx-1">
+            <div className="mx-1 mt-2 overflow-hidden rounded-xl border border-counter-700 bg-counter-900">
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse leading-normal text-xs text-slate-300">
+                <table className="w-full border-collapse text-left leading-normal">
                   <thead>
-                    <tr className="border-b border-slate-800 text-[10px] uppercase font-mono tracking-wider text-slate-500 bg-slate-800/50">
+                    <tr className="border-b border-counter-700 bg-counter-950 text-xs font-bold uppercase tracking-wide text-cream-400">
                       <th className="px-5 py-3">Produto Componente</th>
                       <th className="px-4 py-3 text-center">Unidade</th>
                       <th className="px-4 py-3 text-right">Quantidade Baixa</th>
@@ -803,7 +789,7 @@ export default function Produtos({
                       <th className="px-5 py-3 text-right">Ações</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 bg-slate-900">
+                  <tbody className="divide-y divide-counter-800">
                     {activeComposite.recipe.map((r, idx) => {
                       const ingr = products.find(
                         (p) => p.id === r.ingredientId,
@@ -811,27 +797,27 @@ export default function Produtos({
                       return (
                         <tr
                           key={idx}
-                          className="hover:bg-slate-800/50/50 transition duration-150"
+                          className="transition duration-150 hover:bg-counter-800"
                         >
                           <td className="px-5 py-3">
-                            <span className="font-bold text-slate-200">
+                            <span className="font-bold text-cream-100">
                               {ingr ? ingr.name : 'Desconhecido'}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-center font-mono font-bold text-slate-500 bg-slate-800/50/30">
+                          <td className="px-4 py-3 text-center font-mono font-bold text-cream-400">
                             {ingr ? ingr.unit.toUpperCase() : '--'}
                           </td>
-                          <td className="px-4 py-3 text-right font-mono font-black text-blue-400 text-sm bg-blue-950/40/10">
+                          <td className="px-4 py-3 text-right font-mono text-sm font-black text-sky-400">
                             {r.quantity}
                           </td>
                           <td className="px-4 py-3 text-center">
                             {ingr ? (
                               (ingr.active ?? true) ? (
-                                <span className="px-2 py-0.5 rounded text-[9px] uppercase font-bold font-mono bg-emerald-950/40 text-emerald-400 border border-emerald-800/60 shadow-2xs">
+                                <span className="rounded border border-emerald-400/30 bg-emerald-400/10 px-2 py-0.5 text-xs font-bold uppercase text-emerald-400">
                                   ATIVO
                                 </span>
                               ) : (
-                                <span className="px-2 py-0.5 rounded text-[9px] uppercase font-bold font-mono bg-rose-950/40 text-rose-400 border border-rose-800/60 shadow-2xs">
+                                <span className="rounded border border-rose-400/30 bg-rose-400/10 px-2 py-0.5 text-xs font-bold uppercase text-rose-400">
                                   INATIVO
                                 </span>
                               )
@@ -843,15 +829,15 @@ export default function Produtos({
                             <div className="flex items-center justify-end gap-2">
                               <button
                                 onClick={() => startEditComp(idx, r)}
-                                className="w-7 h-7 flex flex-col justify-center items-center bg-slate-800/50 hover:bg-slate-800 text-slate-500 rounded border border-slate-800 transition cursor-pointer"
+                                className="flex h-8 w-8 flex-col items-center justify-center rounded border border-counter-700 bg-counter-800 text-cream-300 transition hover:bg-counter-700"
                               >
-                                <Edit3 size={12} />
+                                <Edit3 size={16} />
                               </button>
                               <button
                                 onClick={() => handleRemoveComp(idx)}
-                                className="w-7 h-7 flex flex-col justify-center items-center bg-slate-800/50 hover:bg-rose-950/40 border border-slate-800 hover:border-rose-800/60 text-slate-500 hover:text-rose-500 rounded transition cursor-pointer"
+                                className="flex h-8 w-8 flex-col items-center justify-center rounded border border-counter-700 bg-counter-800 text-cream-300 transition hover:border-rose-400/40 hover:text-rose-400"
                               >
-                                <Trash2 size={12} />
+                                <Trash2 size={16} />
                               </button>
                             </div>
                           </td>
@@ -867,30 +853,30 @@ export default function Produtos({
       )}
 
       {showCompModal && (
-        <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
-          <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="relative w-full max-w-sm rounded-2xl border-2 border-counter-700 bg-counter-900 p-5 shadow-2xl">
             <button
               type="button"
               onClick={() => setShowCompModal(false)}
-              className="absolute top-4 right-4 text-slate-500 hover:text-slate-200 cursor-pointer"
+              className="absolute right-4 top-4 text-cream-400 hover:text-cream-100"
             >
-              <X size={18} />
+              <X size={22} />
             </button>
-            <h3 className="text-lg font-display font-bold text-slate-200 mb-4">
+            <h3 className="mb-4 font-display text-lg font-bold text-cream-100">
               {compEditIndex !== null
                 ? 'Editar Componente'
                 : 'Adicionar Componente'}
             </h3>
 
-            <form onSubmit={handleSaveComp} className="space-y-4">
+            <form onSubmit={handleSaveComp} className="space-y-3">
               <div>
-                <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
-                  Insumo Físico <span className="text-rose-500">*</span>
+                <label className="mb-1 block text-xs font-bold text-cream-400">
+                  Insumo Físico <span className="text-rose-400">*</span>
                 </label>
                 <select
                   value={compIngrId}
                   onChange={(e) => setCompIngrId(e.target.value)}
-                  className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2 text-sm text-slate-200 rounded-lg outline-none focus:border-blue-600 focus:bg-slate-900 cursor-pointer font-bold"
+                  className="w-full cursor-pointer rounded-lg border border-counter-700 bg-counter-950 px-3 py-2 text-sm font-bold text-cream-100 outline-none focus:border-sky-400"
                   required
                 >
                   <option value="">Selecione um produto...</option>
@@ -902,27 +888,27 @@ export default function Produtos({
                       </option>
                     ))}
                 </select>
-                <span className="text-[9px] text-slate-500 block mt-1">
+                <span className="mt-1 block text-xs text-cream-400">
                   Apenas produtos simples e ativos.
                 </span>
               </div>
 
               <div>
-                <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
-                  Quantidade a Baixar <span className="text-rose-500">*</span>
+                <label className="mb-1 block text-xs font-bold text-cream-400">
+                  Quantidade a Baixar <span className="text-rose-400">*</span>
                 </label>
-                <div className="flex relative">
+                <div className="relative flex">
                   <input
                     type="number"
                     step="0.001"
                     min="0.001"
                     value={compQty}
                     onChange={(e) => setCompQty(e.target.value)}
-                    className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2 pr-12 text-sm text-slate-200 font-mono rounded-lg outline-none focus:border-blue-600 focus:bg-slate-900 font-bold"
+                    className="w-full rounded-lg border border-counter-700 bg-counter-950 px-3 py-2 pr-12 font-mono text-sm font-bold text-cream-100 outline-none focus:border-sky-400"
                     placeholder="Ex: 50"
                     required
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] uppercase font-mono font-bold text-slate-500">
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 font-mono text-xs font-bold uppercase text-cream-400">
                     {compIngrId
                       ? products.find((p) => p.id === compIngrId)?.unit || 'UN'
                       : 'UN'}
@@ -932,7 +918,7 @@ export default function Produtos({
 
               <button
                 type="submit"
-                className="w-full py-2.5 bg-blue-600 hover:bg-blue-950/400 text-white font-bold rounded-xl text-xs transition cursor-pointer"
+                className="w-full rounded-xl bg-sky-500 py-2.5 text-sm font-bold text-white transition hover:bg-sky-400"
               >
                 Salvar Componente
               </button>
@@ -943,15 +929,15 @@ export default function Produtos({
 
       {/* FORM MODAL: Create or Edit Category */}
       {showCatForm && (
-        <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
-          <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="relative w-full max-w-sm rounded-2xl border-2 border-counter-700 bg-counter-900 p-5 shadow-2xl">
             <button
               onClick={() => setShowCatForm(false)}
-              className="absolute top-4 right-4 text-slate-500 hover:text-slate-200 cursor-pointer"
+              className="absolute right-4 top-4 text-cream-400 hover:text-cream-100"
             >
-              <X size={18} />
+              <X size={22} />
             </button>
-            <h3 className="text-lg font-display font-bold text-slate-200 mb-4">
+            <h3 className="mb-4 font-display text-lg font-bold text-cream-100">
               {catFormMode === 'create'
                 ? 'Nova Categoria'
                 : 'Renomear Categoria'}
@@ -963,23 +949,23 @@ export default function Produtos({
               </div>
             )}
 
-            <form onSubmit={handleSaveCat} className="space-y-4">
+            <form onSubmit={handleSaveCat} className="space-y-3">
               <div>
-                <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
+                <label className="mb-1 block text-xs font-bold text-cream-400">
                   Nome:
                 </label>
                 <input
                   type="text"
                   value={catName}
                   onChange={(e) => setCatName(e.target.value)}
-                  className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2 text-sm text-slate-200 rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900"
+                  className="w-full rounded-lg border border-counter-700 bg-counter-950 px-3 py-2 text-sm text-cream-100 outline-none focus:border-gold-500"
                   data-testid="categoria-nome-input"
                   required
                 />
               </div>
               <button
                 type="submit"
-                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-950/400 text-white font-bold rounded-xl text-xs transition cursor-pointer"
+                className="w-full rounded-xl bg-gold-500 py-2.5 text-sm font-bold text-counter-950 transition hover:bg-gold-400"
               >
                 Salvar
               </button>
@@ -990,25 +976,25 @@ export default function Produtos({
 
       {/* FORM MODAL: Create or Edit Product */}
       {showProductForm && (
-        <div className="fixed inset-0 bg-slate-900/45 flex items-center justify-center p-4 z-50 animate-fade-in backdrop-blur-xs">
-          <div className="w-full max-w-3xl bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl relative max-h-[95vh] flex flex-col">
-            <div className="flex justify-between items-center mb-4 shrink-0">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="relative flex max-h-[95vh] w-full max-w-3xl flex-col rounded-2xl border-2 border-counter-700 bg-counter-900 p-5 shadow-2xl">
+            <div className="mb-4 flex shrink-0 items-center justify-between">
               <div>
-                <h3 className="text-xl font-display font-bold text-slate-850 flex items-center gap-1.5">
-                  <Package size={20} className="text-emerald-500" />
+                <h3 className="flex items-center gap-1.5 font-display text-xl font-bold text-cream-100">
+                  <Package size={24} className="text-gold-400" />
                   {formMode === 'create'
                     ? 'Cadastrar Novo Item'
                     : 'Editar Ficha do Produto'}
                 </h3>
-                <p className="text-xs text-slate-500 font-mono">
+                <p className="text-xs text-cream-400">
                   Controle preciso de custo, venda e estoque seguro do balcão.
                 </p>
               </div>
               <button
                 onClick={() => setShowProductForm(false)}
-                className="text-slate-500 hover:text-slate-200 cursor-pointer p-2 bg-slate-800/50 rounded-lg"
+                className="rounded-lg bg-counter-800 p-2 text-cream-300 hover:text-cream-100"
               >
-                <X size={18} />
+                <X size={22} />
               </button>
             </div>
 
@@ -1020,18 +1006,18 @@ export default function Produtos({
 
             <form
               onSubmit={handleSaveProduct}
-              className="flex-1 overflow-y-auto pr-2 space-y-6 form-scrollbar"
+              className="form-scrollbar flex-1 space-y-5 overflow-y-auto pr-2"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                 {/* Basic fields */}
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
-                      Nome do Produto <span className="text-rose-500">*</span>
+                    <label className="mb-1 block text-xs font-bold text-cream-400">
+                      Nome do Produto <span className="text-rose-400">*</span>
                     </label>
                     <input
                       type="text"
-                      className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2 text-xs text-slate-200 rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900 font-bold"
+                      className="w-full rounded-lg border border-counter-700 bg-counter-950 px-3 py-2.5 text-sm font-bold text-cream-100 outline-none focus:border-gold-500"
                       placeholder="Ex: Bohemia Long Neck 355ml"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
@@ -1042,11 +1028,11 @@ export default function Produtos({
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
-                        Categoria <span className="text-rose-500">*</span>
+                      <label className="mb-1 block text-xs font-bold text-cream-400">
+                        Categoria <span className="text-rose-400">*</span>
                       </label>
                       <select
-                        className="w-full bg-slate-800/50 border border-slate-800 px-2 py-2 text-xs text-slate-200 rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900 cursor-pointer"
+                        className="w-full cursor-pointer rounded-lg border border-counter-700 bg-counter-950 px-2 py-2.5 text-sm text-cream-100 outline-none focus:border-gold-500"
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                         data-testid="produto-categoria-select"
@@ -1061,11 +1047,11 @@ export default function Produtos({
                     </div>
 
                     <div>
-                      <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
+                      <label className="mb-1 block text-xs font-bold text-cream-400">
                         Status
                       </label>
                       <select
-                        className="w-full bg-slate-800/50 border border-slate-800 px-2 py-2 text-xs text-slate-200 rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900 cursor-pointer font-bold"
+                        className="w-full cursor-pointer rounded-lg border border-counter-700 bg-counter-950 px-2 py-2.5 text-sm font-bold text-cream-100 outline-none focus:border-gold-500"
                         value={active ? 'true' : 'false'}
                         onChange={(e) => setActive(e.target.value === 'true')}
                       >
@@ -1075,16 +1061,16 @@ export default function Produtos({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 pb-3 border-b border-slate-800">
+                  <div className="grid grid-cols-2 gap-3 border-b border-counter-700 pb-3">
                     <div>
-                      <label className="block text-[10px] uppercase font-mono text-slate-500 mb-1">
+                      <label className="mb-1 block text-xs font-bold text-cream-400">
                         Preço Custo (R$)
                       </label>
                       <input
                         type="number"
                         step="0.01"
                         min="0"
-                        className="w-full bg-slate-800/50 border border-slate-800 px-3 py-2 text-xs font-mono text-slate-200 rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900"
+                        className="w-full rounded-lg border border-counter-700 bg-counter-950 px-3 py-2.5 font-mono text-sm text-cream-100 outline-none focus:border-gold-500"
                         value={costPrice}
                         onChange={(e) => setCostPrice(e.target.value)}
                         data-testid="produto-preco-custo-input"
@@ -1093,14 +1079,14 @@ export default function Produtos({
                     </div>
 
                     <div>
-                      <label className="block text-[10px] uppercase font-mono text-emerald-300 mb-1 font-bold">
-                        Venda (R$) <span className="text-rose-500">*</span>
+                      <label className="mb-1 block text-xs font-bold text-gold-400">
+                        Venda (R$) <span className="text-rose-400">*</span>
                       </label>
                       <input
                         type="number"
                         step="0.01"
                         min="0"
-                        className="w-full bg-emerald-950/40 border border-emerald-800/60 px-3 py-2 text-sm font-mono text-emerald-200 rounded-lg outline-none focus:border-emerald-600 focus:bg-slate-900 font-bold"
+                        className="w-full rounded-lg border border-gold-500/40 bg-gold-500/10 px-3 py-2.5 font-mono text-base font-bold text-gold-300 outline-none focus:border-gold-500"
                         value={price}
                         onChange={(e) => setPrice(e.target.value)}
                         data-testid="produto-preco-venda-input"
@@ -1111,20 +1097,20 @@ export default function Produtos({
 
                   {/* Toggle IsComposite product */}
                   <div
-                    className={`flex items-start gap-2.5 p-3 border rounded-xl transition ${isComposite ? 'bg-blue-950/40 border-blue-800/60' : 'bg-slate-800/50 border-slate-800'}`}
+                    className={`flex items-start gap-2.5 rounded-xl border p-3 transition ${isComposite ? 'border-sky-400/30 bg-sky-400/10' : 'border-counter-700 bg-counter-800'}`}
                   >
                     <input
                       id="checkbox-is-composite"
                       type="checkbox"
                       checked={isComposite}
                       onChange={(e) => setIsComposite(e.target.checked)}
-                      className="w-4 h-4 mt-0.5 text-blue-500 border-slate-600 rounded focus:ring-blue-600 cursor-pointer"
+                      className="mt-0.5 h-4 w-4 cursor-pointer rounded border-counter-700 text-sky-500 focus:ring-sky-400"
                     />
                     <label
                       htmlFor="checkbox-is-composite"
-                      className="text-xs text-slate-300 cursor-pointer"
+                      className="cursor-pointer text-sm text-cream-300"
                     >
-                      <span className="font-bold block text-slate-50 mb-0.5">
+                      <span className="mb-0.5 block font-bold text-cream-100">
                         Produto Composto? (Receita)
                       </span>
                       Ex: Caipirinha. A venda desconta estoque proporcionalmente
@@ -1134,13 +1120,13 @@ export default function Produtos({
 
                   {/* Stock configs (If not composite product) */}
                   {!isComposite && (
-                    <div className="grid grid-cols-3 gap-3 p-3 bg-slate-900 shadow-xs rounded-xl border border-slate-800">
+                    <div className="grid grid-cols-3 gap-3 rounded-xl border border-counter-700 bg-counter-800 p-3">
                       <div>
-                        <label className="block text-[9px] uppercase font-mono text-slate-500 mb-1">
+                        <label className="mb-1 block text-xs font-bold text-cream-400">
                           Unidade
                         </label>
                         <select
-                          className="w-full bg-slate-800/50 border border-slate-800 px-2 py-1.5 text-xs text-slate-200 rounded-lg outline-none focus:border-emerald-600 cursor-pointer"
+                          className="w-full cursor-pointer rounded-lg border border-counter-700 bg-counter-950 px-2 py-1.5 text-sm text-cream-100 outline-none focus:border-gold-500"
                           value={unit}
                           onChange={(e) =>
                             setUnit(e.target.value as 'un' | 'ml')
@@ -1152,13 +1138,13 @@ export default function Produtos({
                       </div>
 
                       <div>
-                        <label className="block text-[9px] uppercase font-mono text-slate-500 mb-1">
+                        <label className="mb-1 block text-xs font-bold text-cream-400">
                           Estoque
                         </label>
                         <input
                           type="number"
                           step="0.01"
-                          className="w-full bg-slate-800/50 border border-slate-800 px-2 py-1.5 text-xs font-mono text-slate-200 rounded-lg outline-none focus:border-emerald-600"
+                          className="w-full rounded-lg border border-counter-700 bg-counter-950 px-2 py-1.5 font-mono text-sm text-cream-100 outline-none focus:border-gold-500"
                           value={stock}
                           onChange={(e) => setStock(e.target.value)}
                           data-testid="produto-estoque-input"
@@ -1166,13 +1152,13 @@ export default function Produtos({
                       </div>
 
                       <div>
-                        <label className="block text-[9px] uppercase font-mono text-slate-500 mb-1">
+                        <label className="mb-1 block text-xs font-bold text-cream-400">
                           Alerta Mín
                         </label>
                         <input
                           type="number"
                           step="1"
-                          className="w-full bg-slate-800/50 border border-slate-800 px-2 py-1.5 text-xs font-mono text-slate-200 rounded-lg outline-none focus:border-emerald-600"
+                          className="w-full rounded-lg border border-counter-700 bg-counter-950 px-2 py-1.5 font-mono text-sm text-cream-100 outline-none focus:border-gold-500"
                           value={minStock}
                           onChange={(e) => setMinStock(e.target.value)}
                         />
@@ -1180,8 +1166,8 @@ export default function Produtos({
                     </div>
                   )}
                   {isComposite && (
-                    <div className="grid grid-cols-1 gap-3 p-3 bg-slate-800/50 rounded-xl border border-slate-800">
-                      <div className="text-[11px] text-slate-400 leading-relaxed">
+                    <div className="grid grid-cols-1 gap-3 rounded-xl border border-counter-700 bg-counter-800 p-3">
+                      <div className="text-sm leading-relaxed text-cream-400">
                         Produto composto na API não possui unidade de estoque
                         própria. A baixa acontece pelos componentes cadastrados
                         na composição.
@@ -1193,28 +1179,111 @@ export default function Produtos({
                 {/* Right block */}
                 <div className="flex flex-col">
                   {isComposite ? (
-                    <div className="rounded-2xl border-2 border-dashed border-slate-800 h-full flex flex-col justify-center items-center text-center p-6 text-slate-500 bg-blue-950/40/10">
-                      <Layers size={36} className="text-blue-300 mb-3" />
-                      <h5 className="text-sm font-bold text-slate-500">
-                        Produto Composto
-                      </h5>
-                      <p className="text-[10px] text-slate-500 mt-2 max-w-[200px] leading-relaxed">
-                        Este produto é formado por outros insumos. Para
-                        incluí-los ou removê-los, volte para a lista de
-                        produtos, encontre-o e clique no botão{' '}
-                        <span className="font-bold text-blue-500">
-                          azul de composição
-                        </span>
-                        .
-                      </p>
+                    <div className="flex h-full flex-col gap-3 overflow-hidden rounded-2xl border border-sky-400/30 bg-counter-950 p-4">
+                      <div className="flex items-center gap-2 text-cream-200">
+                        <Layers size={19} className="shrink-0 text-sky-400" />
+                        <h5 className="text-xs font-bold uppercase tracking-wide">
+                          Composição da receita
+                        </h5>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <select
+                          className="min-w-0 flex-1 cursor-pointer rounded-lg border border-counter-700 bg-counter-900 px-2 py-2 text-sm text-cream-100 outline-none focus:border-sky-400"
+                          value={selectedIngredientId}
+                          onChange={(e) =>
+                            setSelectedIngredientId(e.target.value)
+                          }
+                          data-testid="produto-composicao-select-ingrediente"
+                        >
+                          <option value="">Selecione um componente...</option>
+                          {products
+                            .filter(
+                              (p) =>
+                                !p.isComposite &&
+                                p.id !== editingProductId &&
+                                (p.active ?? true),
+                            )
+                            .map((p) => (
+                              <option key={p.id} value={p.id}>
+                                {p.name} ({p.unit})
+                              </option>
+                            ))}
+                        </select>
+                        <input
+                          type="number"
+                          step="0.001"
+                          min="0"
+                          placeholder="Qtd."
+                          className="w-16 rounded-lg border border-counter-700 bg-counter-900 px-2 py-2 font-mono text-sm text-cream-100 outline-none focus:border-sky-400"
+                          value={ingredientQty}
+                          onChange={(e) => setIngredientQty(e.target.value)}
+                          data-testid="produto-composicao-qtd-input"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddRecipeIngredient}
+                          disabled={
+                            !selectedIngredientId ||
+                            isNaN(parseFloat(ingredientQty))
+                          }
+                          className="shrink-0 rounded-lg bg-sky-500 px-3 text-white transition hover:bg-sky-400 disabled:bg-sky-500/20 disabled:text-sky-400/50"
+                          data-testid="produto-composicao-add-btn"
+                        >
+                          <PlusCircle size={19} />
+                        </button>
+                      </div>
+
+                      {recipe.length === 0 ? (
+                        <div className="flex flex-1 flex-col items-center justify-center px-4 py-6 text-center text-sm text-cream-400">
+                          <Layers size={34} className="mb-2 text-cream-400" />
+                          Nenhum componente adicionado ainda. Adicione pelo
+                          menos um para poder salvar este produto composto.
+                        </div>
+                      ) : (
+                        <ul
+                          className="flex-1 space-y-1.5 overflow-y-auto pr-1"
+                          data-testid="produto-composicao-lista"
+                        >
+                          {recipe.map((item) => {
+                            const ingr = products.find(
+                              (p) => p.id === item.ingredientId,
+                            );
+                            return (
+                              <li
+                                key={item.ingredientId}
+                                className="flex items-center justify-between gap-2 rounded-lg border border-counter-700 bg-counter-900 px-3 py-2 text-sm"
+                              >
+                                <span className="truncate font-semibold text-cream-100">
+                                  {ingr ? ingr.name : 'Desconhecido'}
+                                </span>
+                                <span className="shrink-0 font-mono font-bold text-sky-400">
+                                  {item.quantity} {ingr?.unit.toUpperCase()}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleRemoveRecipeIngredient(
+                                      item.ingredientId,
+                                    )
+                                  }
+                                  className="shrink-0 text-cream-400 transition hover:text-rose-400"
+                                >
+                                  <Trash2 size={17} />
+                                </button>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
                     </div>
                   ) : (
-                    <div className="rounded-2xl border-2 border-dashed border-slate-800 h-full flex flex-col justify-center items-center text-center p-6 text-slate-500 bg-slate-800/50/50">
-                      <Layers size={36} className="text-slate-300 mb-3" />
-                      <h5 className="text-sm font-bold text-slate-500">
+                    <div className="flex h-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-counter-700 bg-counter-950 p-6 text-center text-cream-400">
+                      <Layers size={43} className="mb-3 text-cream-400" />
+                      <h5 className="text-sm font-bold text-cream-300">
                         Configuração de Físico
                       </h5>
-                      <p className="text-[10px] text-slate-500 mt-2 max-w-[200px] leading-relaxed">
+                      <p className="mt-2 max-w-[200px] text-xs leading-relaxed text-cream-400">
                         Este produto deduzirá o estoque direto dele mesmo na
                         hora venda.
                       </p>
@@ -1224,19 +1293,19 @@ export default function Produtos({
               </div>
 
               {/* Action operations buttons */}
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-800 shrink-0">
+              <div className="flex shrink-0 justify-end gap-3 border-t border-counter-700 pt-4">
                 <button
                   type="button"
                   onClick={() => setShowProductForm(false)}
-                  className="px-6 py-2.5 text-xs font-semibold rounded-xl bg-slate-900 border border-slate-800 text-slate-500 hover:bg-slate-800/50 transition duration-150 cursor-pointer"
+                  className="rounded-xl border border-counter-700 bg-counter-800 px-6 py-2.5 text-sm font-semibold text-cream-200 transition duration-150 hover:bg-counter-700"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-8 py-2.5 bg-emerald-600 hover:bg-emerald-950/400 text-white font-bold rounded-xl text-xs transition duration-150 shadow-md shadow-emerald-500/10 cursor-pointer flex items-center gap-1.5"
+                  className="flex items-center gap-1.5 rounded-xl bg-gold-500 px-8 py-2.5 text-sm font-bold text-counter-950 shadow-md shadow-gold-500/10 transition duration-150 hover:bg-gold-400"
                 >
-                  <Save size={14} />
+                  <Save size={17} />
                   Salvar Ficha
                 </button>
               </div>

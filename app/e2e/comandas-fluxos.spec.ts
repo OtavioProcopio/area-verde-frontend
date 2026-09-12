@@ -30,11 +30,13 @@ test('fecha comanda com pagamento via Pix', async ({ page }) => {
   await loginUI(page, SENHA);
   await page.locator('#nav-link-comandas').click();
   await page
-    .locator('tr', { hasText: `Comanda Pix ${runId}` })
+    .locator('[data-testid="comanda-card"]', {
+      hasText: `Comanda Pix ${runId}`,
+    })
     .getByRole('button', { name: 'Abrir' })
     .click();
 
-  await page.getByRole('button', { name: /PAGAMENTO & FECHAMENTO/ }).click();
+  await page.getByRole('button', { name: /Pagamento e fechamento/i }).click();
   await page.getByRole('button', { name: '⚡ Pix Manual' }).click();
   await page.locator('#btn-confirm-pos-payment').click();
 
@@ -53,11 +55,13 @@ test('fecha comanda com pagamento via Cartão', async ({ page }) => {
   await loginUI(page, SENHA);
   await page.locator('#nav-link-comandas').click();
   await page
-    .locator('tr', { hasText: `Comanda Cartao ${runId}` })
+    .locator('[data-testid="comanda-card"]', {
+      hasText: `Comanda Cartao ${runId}`,
+    })
     .getByRole('button', { name: 'Abrir' })
     .click();
 
-  await page.getByRole('button', { name: /PAGAMENTO & FECHAMENTO/ }).click();
+  await page.getByRole('button', { name: /Pagamento e fechamento/i }).click();
   await page.getByRole('button', { name: '💳 Cartão' }).click();
   await page.locator('#btn-confirm-pos-payment').click();
 
@@ -98,15 +102,19 @@ test('cancela uma comanda ativa', async ({ page }) => {
   await loginUI(page, SENHA);
   await page.locator('#nav-link-comandas').click();
   await page
-    .locator('tr', { hasText: `Comanda Cancelar ${runId}` })
+    .locator('[data-testid="comanda-card"]', {
+      hasText: `Comanda Cancelar ${runId}`,
+    })
     .getByRole('button', { name: 'Abrir' })
     .click();
 
-  page.once('dialog', (dialog) => dialog.accept());
-  await page.getByRole('button', { name: 'CANCELAR CONTA' }).click();
-  // onClick do botão já chama setViewMode('list') após confirmar, então
+  await page.getByRole('button', { name: 'Cancelar conta' }).click();
+  await page
+    .getByRole('button', { name: 'Cancelar comanda', exact: true })
+    .click();
+  // onConfirm do dialog já chama setViewMode('list') após confirmar, então
   // caímos direto na lista — confere que o status mudou pra cancelada
-  const row = page.locator('tr', {
+  const row = page.locator('[data-testid="comanda-card"]', {
     hasText: `Comanda Cancelar ${runId}`,
   });
   await expect(row.getByText(/cancelad/i)).toBeVisible({ timeout: 10_000 });
@@ -124,7 +132,9 @@ test('incrementa e decrementa a quantidade de um item na comanda', async ({
   await loginUI(page, SENHA);
   await page.locator('#nav-link-comandas').click();
   await page
-    .locator('tr', { hasText: `Comanda Qty ${runId}` })
+    .locator('[data-testid="comanda-card"]', {
+      hasText: `Comanda Qty ${runId}`,
+    })
     .getByRole('button', { name: 'Abrir' })
     .click();
 
@@ -156,7 +166,9 @@ test('remove um item da comanda pelo ícone de lixeira', async ({ page }) => {
   await loginUI(page, SENHA);
   await page.locator('#nav-link-comandas').click();
   await page
-    .locator('tr', { hasText: `Comanda Trash ${runId}` })
+    .locator('[data-testid="comanda-card"]', {
+      hasText: `Comanda Trash ${runId}`,
+    })
     .getByRole('button', { name: 'Abrir' })
     .click();
 
@@ -165,8 +177,8 @@ test('remove um item da comanda pelo ícone de lixeira', async ({ page }) => {
   });
   await expect(itemRow).toBeVisible({ timeout: 10_000 });
 
-  page.once('dialog', (dialog) => dialog.accept());
   await itemRow.locator('button').nth(2).click();
+  await page.getByRole('button', { name: 'Remover', exact: true }).click();
 
   await expect(page.getByText(`Produto E2E ${runId}`)).toHaveCount(0);
 });
@@ -183,7 +195,9 @@ test('remove um item decrementando a quantidade até 0 (com confirmação)', asy
   await loginUI(page, SENHA);
   await page.locator('#nav-link-comandas').click();
   await page
-    .locator('tr', { hasText: `Comanda Zero ${runId}` })
+    .locator('[data-testid="comanda-card"]', {
+      hasText: `Comanda Zero ${runId}`,
+    })
     .getByRole('button', { name: 'Abrir' })
     .click();
 
@@ -192,8 +206,8 @@ test('remove um item decrementando a quantidade até 0 (com confirmação)', asy
   });
   await expect(itemRow).toBeVisible({ timeout: 10_000 });
 
-  page.once('dialog', (dialog) => dialog.accept());
   await itemRow.locator('button').nth(0).click();
+  await page.getByRole('button', { name: 'Remover', exact: true }).click();
 
   await expect(page.getByText(`Produto E2E ${runId}`)).toHaveCount(0);
 });
@@ -227,13 +241,13 @@ test('picker de produtos limita a grade quando o catálogo é grande', async ({
   await loginUI(page, SENHA);
   await page.locator('#nav-link-comandas').click();
   await page
-    .locator('tr', { hasText: `Comanda Catalogo Grande ${runId}` })
+    .locator('[data-testid="comanda-card"]', {
+      hasText: `Comanda Catalogo Grande ${runId}`,
+    })
     .getByRole('button', { name: 'Abrir' })
     .click();
 
-  await page
-    .getByRole('button', { name: `Categoria Grande ${runId}` })
-    .click();
+  await page.getByRole('button', { name: `Categoria Grande ${runId}` }).click();
 
   await expect(page.getByText(/Mostrando 60 de 61 produtos/)).toBeVisible({
     timeout: 10_000,
@@ -242,9 +256,9 @@ test('picker de produtos limita a grade quando o catálogo é grande', async ({
   await expect(page.getByRole('button', { name: alvo })).toHaveCount(0);
 
   await page.getByPlaceholder('Ex: Skol').fill(alvo);
-  await expect(
-    page.getByRole('button', { name: alvo }).first(),
-  ).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByRole('button', { name: alvo }).first()).toBeVisible({
+    timeout: 10_000,
+  });
 });
 
 test('adicionar produto com estoque zerado avisa com confirm antes de lançar', async ({
@@ -267,26 +281,25 @@ test('adicionar produto com estoque zerado avisa com confirm antes de lançar', 
   await loginUI(page, SENHA);
   await page.locator('#nav-link-comandas').click();
   await page
-    .locator('tr', { hasText: `Comanda Estoque Zero ${runId}` })
+    .locator('[data-testid="comanda-card"]', {
+      hasText: `Comanda Estoque Zero ${runId}`,
+    })
     .getByRole('button', { name: 'Abrir' })
     .click();
 
   await page.getByRole('button', { name: 'Tudo', exact: true }).click();
-  await page
-    .getByPlaceholder('Ex: Skol')
-    .fill(`Produto Zerado ${runId}`);
+  await page.getByPlaceholder('Ex: Skol').fill(`Produto Zerado ${runId}`);
 
-  let message = '';
-  page.once('dialog', (dialog) => {
-    message = dialog.message();
-    void dialog.accept();
-  });
   await page
     .getByRole('button', { name: `Produto Zerado ${runId}` })
     .first()
     .click();
-  await expect.poll(() => message, { timeout: 10_000 }).not.toBe('');
-  expect(message.toLowerCase()).toContain('estoque zerado');
+
+  await expect(page.getByText('Estoque zerado')).toBeVisible({
+    timeout: 10_000,
+  });
+  await expect(page.getByText(/está com estoque zerado/i)).toBeVisible();
+  await page.getByRole('button', { name: 'Registrar mesmo assim' }).click();
 
   const itemRow = page.locator('div.rounded-lg.p-3.flex', {
     hasText: `Produto Zerado ${runId}`,
@@ -312,14 +325,14 @@ test('produto com estoque zerado fica bloqueado quando a config não permite est
   await loginUI(page, SENHA);
   await page.locator('#nav-link-comandas').click();
   await page
-    .locator('tr', { hasText: `Comanda Estoque Bloq ${runId}` })
+    .locator('[data-testid="comanda-card"]', {
+      hasText: `Comanda Estoque Bloq ${runId}`,
+    })
     .getByRole('button', { name: 'Abrir' })
     .click();
 
   await page.getByRole('button', { name: 'Tudo', exact: true }).click();
-  await page
-    .getByPlaceholder('Ex: Skol')
-    .fill(`Produto Bloqueado ${runId}`);
+  await page.getByPlaceholder('Ex: Skol').fill(`Produto Bloqueado ${runId}`);
 
   await expect(
     page.getByRole('button', { name: `Produto Bloqueado ${runId}` }).first(),
@@ -332,35 +345,27 @@ test('filtra a lista de comandas por status', async ({ page }) => {
   const runId = Date.now().toString(36);
   await apiAbrirCaixa();
   const comandaAberta = await apiCriarComanda(`Comanda Aberta ${runId}`);
-  const comandaCancelada = await apiCriarComanda(
-    `Comanda Cancelada ${runId}`,
-  );
+  const comandaCancelada = await apiCriarComanda(`Comanda Cancelada ${runId}`);
   await apiCancelarComanda(comandaCancelada.id);
   void comandaAberta;
 
   await loginUI(page, SENHA);
   await page.locator('#nav-link-comandas').click();
 
-  await expect(
-    page.getByText(`Comanda Aberta ${runId}`),
-  ).toBeVisible({ timeout: 10_000 });
-  await expect(
-    page.getByText(`Comanda Cancelada ${runId}`),
-  ).toBeVisible();
+  await expect(page.getByText(`Comanda Aberta ${runId}`)).toBeVisible({
+    timeout: 10_000,
+  });
+  await expect(page.getByText(`Comanda Cancelada ${runId}`)).toBeVisible();
 
   await page.getByRole('button', { name: 'Canceladas' }).click();
-  await expect(
-    page.getByText(`Comanda Cancelada ${runId}`),
-  ).toBeVisible({ timeout: 10_000 });
-  await expect(
-    page.getByText(`Comanda Aberta ${runId}`),
-  ).toHaveCount(0);
+  await expect(page.getByText(`Comanda Cancelada ${runId}`)).toBeVisible({
+    timeout: 10_000,
+  });
+  await expect(page.getByText(`Comanda Aberta ${runId}`)).toHaveCount(0);
 
   await page.getByRole('button', { name: 'Abertas' }).click();
-  await expect(
-    page.getByText(`Comanda Aberta ${runId}`),
-  ).toBeVisible({ timeout: 10_000 });
-  await expect(
-    page.getByText(`Comanda Cancelada ${runId}`),
-  ).toHaveCount(0);
+  await expect(page.getByText(`Comanda Aberta ${runId}`)).toBeVisible({
+    timeout: 10_000,
+  });
+  await expect(page.getByText(`Comanda Cancelada ${runId}`)).toHaveCount(0);
 });

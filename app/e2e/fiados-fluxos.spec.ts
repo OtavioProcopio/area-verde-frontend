@@ -37,7 +37,8 @@ test('quita um fiado via Pix', async ({ page }) => {
   const { cliente } = await criarFiadoDe(runId);
 
   await loginUI(page, SENHA);
-  await page.locator('#nav-link-fiados').click();
+  await page.locator('#nav-link-clientes').click();
+  await page.locator('#clientes-subtab-fiados').click();
 
   const row = page.locator('tr', { hasText: cliente.nome });
   await row.getByTitle('Quitar Valor').click();
@@ -56,7 +57,8 @@ test('quita um fiado via Cartão', async ({ page }) => {
   const { cliente } = await criarFiadoDe(runId);
 
   await loginUI(page, SENHA);
-  await page.locator('#nav-link-fiados').click();
+  await page.locator('#nav-link-clientes').click();
+  await page.locator('#clientes-subtab-fiados').click();
 
   const row = page.locator('tr', { hasText: cliente.nome });
   await row.getByTitle('Quitar Valor').click();
@@ -77,7 +79,8 @@ test('bloqueia quitação com valor menor que o saldo (pagamento parcial)', asyn
   const { cliente } = await criarFiadoDe(runId, 20);
 
   await loginUI(page, SENHA);
-  await page.locator('#nav-link-fiados').click();
+  await page.locator('#nav-link-clientes').click();
+  await page.locator('#clientes-subtab-fiados').click();
 
   const row = page.locator('tr', { hasText: cliente.nome });
   await row.getByTitle('Quitar Valor').click();
@@ -106,7 +109,8 @@ test('bloqueia quitação com valor maior que o saldo devedor', async ({
   const { cliente } = await criarFiadoDe(runId, 10);
 
   await loginUI(page, SENHA);
-  await page.locator('#nav-link-fiados').click();
+  await page.locator('#nav-link-clientes').click();
+  await page.locator('#clientes-subtab-fiados').click();
 
   const row = page.locator('tr', { hasText: cliente.nome });
   await row.getByTitle('Quitar Valor').click();
@@ -138,7 +142,8 @@ test('quitar remove o fiado da lista de abertos e mostra no histórico de quitad
   const { cliente } = await criarFiadoDe(runId);
 
   await loginUI(page, SENHA);
-  await page.locator('#nav-link-fiados').click();
+  await page.locator('#nav-link-clientes').click();
+  await page.locator('#clientes-subtab-fiados').click();
 
   const row = page.locator('tr', { hasText: cliente.nome });
   await row.getByTitle('Quitar Valor').click();
@@ -175,7 +180,8 @@ test('filtro "Apenas Vencidos" mostra só o fiado com vencimento no passado', as
   const { cliente: clienteEmDia } = await criarFiadoDe(runIdEmDia, 10);
 
   await loginUI(page, SENHA);
-  await page.locator('#nav-link-fiados').click();
+  await page.locator('#nav-link-clientes').click();
+  await page.locator('#clientes-subtab-fiados').click();
 
   await expect(
     page.locator('tr', { hasText: clienteVencido.nome }),
@@ -207,7 +213,8 @@ test('bloqueia quitação de fiado quando o caixa está fechado', async ({
   if (caixaAberto) await apiFecharCaixaForcado(caixaAberto.id);
 
   await loginUI(page, SENHA);
-  await page.locator('#nav-link-fiados').click();
+  await page.locator('#nav-link-clientes').click();
+  await page.locator('#clientes-subtab-fiados').click();
 
   const row = page.locator('tr', { hasText: cliente.nome });
   await row.getByTitle('Quitar Valor').click();

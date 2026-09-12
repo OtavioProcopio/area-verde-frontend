@@ -20,3 +20,8 @@ export type ApiProductComposition = {
     quantidadeBaixa: string;
   }>;
 };
+
+export type ApiProdutoCompostoResponse = {
+  produto: ApiProduct;
+  componentes: ApiProductComposition['componentes'];
+};
