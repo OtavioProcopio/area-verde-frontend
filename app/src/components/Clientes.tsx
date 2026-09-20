@@ -16,6 +16,7 @@ import {
   Coins,
 } from 'lucide-react';
 import { InlineFeedback } from '../features/shared/components/InlineFeedback';
+import { useToast } from '../features/shared/contexts/ToastContext';
 
 type OperationResult = { success: boolean; msg: string };
 
@@ -47,6 +48,7 @@ export default function Clientes({
   onUpdateCustomer,
   onPagarFiado,
 }: ClientesProps) {
+  const { showToast } = useToast();
   const [mainTab, setMainTab] = useState<'cadastro' | 'fiados'>('cadastro');
   const [viewState, setViewState] = useState<'list' | 'detail'>('list');
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(
@@ -81,6 +83,7 @@ export default function Clientes({
   const [payMethod, setPayMethod] = useState<'dinheiro' | 'pix' | 'cartao'>(
     'dinheiro',
   );
+  const [paymentError, setPaymentError] = useState<string | null>(null);
 
   const selectedCustomer = customers.find((c) => c.id === selectedCustomerId);
 
@@ -124,8 +127,9 @@ export default function Clientes({
     setShowForm(true);
   };
 
-  const handleToggleStatus = (c: Customer) => {
-    onUpdateCustomer({ ...c, active: !(c.active ?? true) });
+  const handleToggleStatus = async (c: Customer) => {
+    const res = await onUpdateCustomer({ ...c, active: !(c.active ?? true) });
+    showToast(res.success ? 'success' : 'error', res.msg);
   };
 
   const handleSaveCustomer = async (e: React.FormEvent) => {
@@ -153,6 +157,7 @@ export default function Clientes({
       setCustomerFormError(res.msg);
       return;
     }
+    if (res) showToast('success', res.msg);
     setShowForm(false);
   };
 
@@ -160,6 +165,7 @@ export default function Clientes({
     setSelectedCustomerId(c.id);
     setViewState('detail');
     setPayAmount('');
+    setPaymentError(null);
   };
 
   const handleRegisterPayment = async (e: React.FormEvent) => {
@@ -169,15 +175,16 @@ export default function Clientes({
     if (isNaN(amountVal) || amountVal <= 0) return;
 
     if (!caixaIsOpen && payMethod === 'dinheiro') {
-      alert(
+      setPaymentError(
         'Atenção: O caixa do bar está FECHADO! Abra o caixa para receber pagamentos em dinheiro.',
       );
       return;
     }
 
+    setPaymentError(null);
     const result = await onPagarFiado(selectedCustomerId, amountVal, payMethod);
     setPayAmount('');
-    alert(result.msg);
+    showToast(result.success ? 'success' : 'error', result.msg);
   };
 
   const fmt = (v: number) =>
@@ -472,6 +479,9 @@ export default function Clientes({
                 </p>
 
                 <form onSubmit={handleRegisterPayment} className="space-y-3">
+                  {paymentError && (
+                    <InlineFeedback tone="error" message={paymentError} />
+                  )}
                   <input
                     type="number"
                     step="0.01"

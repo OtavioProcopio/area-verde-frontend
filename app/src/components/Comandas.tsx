@@ -13,9 +13,10 @@ import { NewComandaModal } from './comandas/NewComandaModal';
 import { CheckoutModal } from './comandas/CheckoutModal';
 import { ReceiptModal } from './comandas/ReceiptModal';
 import { ConfirmDialog, ConfirmDialogRequest } from './comandas/ConfirmDialog';
-import { OperationNotice } from './comandas/OperationNotice';
+import { useToast } from '../features/shared/contexts/ToastContext';
 
 type PaymentMethod = 'dinheiro' | 'pix' | 'cartao' | 'fiado';
+type OperationResult = { success: boolean; msg: string };
 
 interface ComandasProps {
   comandas: Comanda[];
@@ -32,13 +33,19 @@ interface ComandasProps {
     id: string,
     updates: Partial<Comanda>,
   ) => void | Promise<void>;
-  onAddItemToComanda: (comandaId: string, item: Omit<TabItem, 'id'>) => unknown;
+  onAddItemToComanda: (
+    comandaId: string,
+    item: Omit<TabItem, 'id'>,
+  ) => Promise<OperationResult>;
   onUpdateComandaItemQty: (
     comandaId: string,
     itemId: string,
     qty: number,
-  ) => unknown;
-  onRemoveItemFromComanda: (comandaId: string, itemId: string) => unknown;
+  ) => Promise<OperationResult>;
+  onRemoveItemFromComanda: (
+    comandaId: string,
+    itemId: string,
+  ) => Promise<OperationResult>;
   onCancelarComanda: (comandaId: string) => unknown;
   onPagarComanda: (
     comandaId: string,
@@ -54,8 +61,6 @@ interface ComandasProps {
   }) => unknown;
   onImmersiveChange?: (immersive: boolean) => void;
 }
-
-const NOTICE_DURATION_MS = 3200;
 
 export default function Comandas({
   comandas,
@@ -95,17 +100,10 @@ export default function Comandas({
 
   const [confirmRequest, setConfirmRequest] =
     useState<ConfirmDialogRequest | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { showToast } = useToast();
 
   const activeComandas = comandas.filter((c) => c.status === 'active');
   const selectedComanda = comandas.find((c) => c.id === selectedComandaId);
-
-  const showNotice = (message: string) => {
-    setNotice(message);
-    setTimeout(() => {
-      setNotice((current) => (current === message ? null : current));
-    }, NOTICE_DURATION_MS);
-  };
 
   const handleCreateComanda = async (
     name: string,
@@ -119,23 +117,28 @@ export default function Comandas({
       return;
     }
 
+    showToast('success', res.msg);
     setSelectedComandaId(res.comanda.id);
     setViewMode('pos');
     setShowNewComandaModal(false);
   };
 
-  const addItem = (comandaId: string, product: Product) => {
-    onAddItemToComanda(comandaId, {
+  const addItem = async (comandaId: string, product: Product) => {
+    const res = await onAddItemToComanda(comandaId, {
       productId: product.id,
       productName: product.name,
       quantity: 1,
       price: product.price,
     });
+    showToast(res.success ? 'success' : 'error', res.msg);
   };
 
   const handleAddProductToComanda = (product: Product) => {
     if (!selectedComandaId) {
-      showNotice('Selecione ou abra uma comanda ativa antes de lançar itens.');
+      showToast(
+        'info',
+        'Selecione ou abra uma comanda ativa antes de lançar itens.',
+      );
       return;
     }
 
@@ -157,11 +160,12 @@ export default function Comandas({
     if (!selectedComanda) return;
 
     if (selectedComanda.items.length === 0) {
-      showNotice('Impossível fechar uma comanda vazia.');
+      showToast('info', 'Impossível fechar uma comanda vazia.');
       return;
     }
     if (!caixaIsOpen) {
-      showNotice(
+      showToast(
+        'info',
         'O caixa diário está fechado. Abra o caixa na aba "Controle de Caixa".',
       );
       return;
@@ -200,7 +204,10 @@ export default function Comandas({
       message: `Remover "${productName}" da comanda?`,
       tone: 'danger',
       confirmLabel: 'Remover',
-      onConfirm: () => onRemoveItemFromComanda(selectedComandaId, itemId),
+      onConfirm: async () => {
+        const res = await onRemoveItemFromComanda(selectedComandaId, itemId);
+        showToast(res.success ? 'success' : 'error', res.msg);
+      },
     });
   };
 
@@ -211,7 +218,6 @@ export default function Comandas({
 
   return (
     <div id="comandas-module">
-      <OperationNotice message={notice} />
 
       {viewMode === 'list' && (
         <ComandaListView
@@ -284,9 +290,14 @@ export default function Comandas({
                   products={products}
                   customers={customers}
                   onUpdateComanda={onUpdateComanda}
-                  onUpdateComandaItemQty={(itemId, qty) =>
-                    onUpdateComandaItemQty(selectedComanda.id, itemId, qty)
-                  }
+                  onUpdateComandaItemQty={async (itemId, qty) => {
+                    const res = await onUpdateComandaItemQty(
+                      selectedComanda.id,
+                      itemId,
+                      qty,
+                    );
+                    showToast(res.success ? 'success' : 'error', res.msg);
+                  }}
                   onRequestRemoveItem={requestRemoveItem}
                   onRequestCancelComanda={() =>
                     requestCancelComanda(

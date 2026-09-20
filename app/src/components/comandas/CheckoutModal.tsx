@@ -3,6 +3,7 @@ import { UserPlus, X } from 'lucide-react';
 import { Comanda, Customer } from '../../types';
 import { formatCurrency } from '../../features/shared/utils/formatCurrency';
 import { getComandaTotals } from './comandaCalculations';
+import { useToast } from '../../features/shared/contexts/ToastContext';
 
 type PaymentMethod = 'dinheiro' | 'pix' | 'cartao' | 'fiado';
 
@@ -42,6 +43,7 @@ export function CheckoutModal({
   const [showNewClientForm, setShowNewClientForm] = useState(false);
   const [newClientName, setNewClientName] = useState('');
   const [newClientPhone, setNewClientPhone] = useState('');
+  const { showToast } = useToast();
 
   const totals = getComandaTotals(comanda);
 
@@ -70,6 +72,7 @@ export function CheckoutModal({
       return;
     }
 
+    showToast('success', res.msg);
     onSuccess({
       ...comanda,
       status: 'paid',

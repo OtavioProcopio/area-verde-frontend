@@ -17,6 +17,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { InlineFeedback } from '../features/shared/components/InlineFeedback';
+import { useToast } from '../features/shared/contexts/ToastContext';
 import Estoque from './Estoque';
 
 type OperationResult = { success: boolean; msg: string };
@@ -42,6 +43,7 @@ export default function Produtos({
   onUpdateCategory,
   onRefreshState,
 }: ProdutosProps) {
+  const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState<
     'produtos' | 'estoque' | 'categorias' | 'composicao'
   >('produtos');
@@ -54,6 +56,7 @@ export default function Produtos({
   const [compEditIndex, setCompEditIndex] = useState<number | null>(null);
   const [compIngrId, setCompIngrId] = useState('');
   const [compQty, setCompQty] = useState('');
+  const [compFormError, setCompFormError] = useState<string | null>(null);
 
   // Product viewer state
   const [searchTerm, setSearchTerm] = useState('');
@@ -180,6 +183,7 @@ export default function Produtos({
       setProductFormError(res.msg);
       return;
     }
+    if (res) showToast('success', res.msg);
     setShowProductForm(false);
   };
 
@@ -189,7 +193,9 @@ export default function Produtos({
     if (parsedQty <= 0) return;
 
     if (editingProductId && selectedIngredientId === editingProductId) {
-      alert('Um item composto não pode conter ele mesmo como ingrediente!');
+      setProductFormError(
+        'Um item composto não pode conter ele mesmo como ingrediente!',
+      );
       return;
     }
 
@@ -216,11 +222,12 @@ export default function Produtos({
     setRecipe(recipe.filter((item) => item.ingredientId !== ingredientId));
   };
 
-  const handleToggleProductStatus = (p: Product) => {
-    onUpdateProduct({
+  const handleToggleProductStatus = async (p: Product) => {
+    const res = await onUpdateProduct({
       ...p,
       active: !(p.active ?? true),
     });
+    showToast(res.success ? 'success' : 'error', res.msg);
   };
 
   const handleManageComposition = (p: Product) => {
@@ -234,6 +241,7 @@ export default function Produtos({
     setCompEditIndex(null);
     setCompIngrId('');
     setCompQty('');
+    setCompFormError(null);
     setShowCompModal(true);
   };
 
@@ -241,22 +249,23 @@ export default function Produtos({
     setCompEditIndex(idx);
     setCompIngrId(item.ingredientId);
     setCompQty(item.quantity.toString());
+    setCompFormError(null);
     setShowCompModal(true);
   };
 
-  const handleSaveComp = (e: React.FormEvent) => {
+  const handleSaveComp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeComposite) return;
     if (!compIngrId || isNaN(parseFloat(compQty))) return;
 
     const parsedQty = parseFloat(compQty);
     if (parsedQty <= 0) {
-      alert('A quantidade deve ser maior que zero.');
+      setCompFormError('A quantidade deve ser maior que zero.');
       return;
     }
 
     if (compIngrId === activeComposite.id) {
-      alert('Produto componente não pode ser o próprio produto pai!');
+      setCompFormError('Produto componente não pode ser o próprio produto pai!');
       return;
     }
 
@@ -268,7 +277,7 @@ export default function Produtos({
           (r, i) => i !== compEditIndex && r.ingredientId === compIngrId,
         )
       ) {
-        alert('Este componente já está na receita!');
+        setCompFormError('Este componente já está na receita!');
         return;
       }
       updatedRecipe[compEditIndex] = {
@@ -277,17 +286,24 @@ export default function Produtos({
       };
     } else {
       if (updatedRecipe.some((r) => r.ingredientId === compIngrId)) {
-        alert('Este componente já está na receita!');
+        setCompFormError('Este componente já está na receita!');
         return;
       }
       updatedRecipe.push({ ingredientId: compIngrId, quantity: parsedQty });
     }
 
-    onUpdateProduct({
+    setCompFormError(null);
+    const res = await onUpdateProduct({
       ...activeComposite,
       recipe: updatedRecipe,
     });
 
+    if (!res.success) {
+      setCompFormError(res.msg);
+      return;
+    }
+
+    showToast('success', res.msg);
     setShowCompModal(false);
   };
 
@@ -341,14 +357,16 @@ export default function Produtos({
       setCatFormError(res.msg);
       return;
     }
+    if (res) showToast('success', res.msg);
     setShowCatForm(false);
   };
 
-  const handleToggleCatStatus = (c: Category) => {
-    onUpdateCategory({
+  const handleToggleCatStatus = async (c: Category) => {
+    const res = await onUpdateCategory({
       ...c,
       active: !c.active,
     });
+    showToast(res.success ? 'success' : 'error', res.msg);
   };
 
   // Filters calculation
@@ -869,6 +887,9 @@ export default function Produtos({
             </h3>
 
             <form onSubmit={handleSaveComp} className="space-y-3">
+              {compFormError && (
+                <InlineFeedback tone="error" message={compFormError} />
+              )}
               <div>
                 <label className="mb-1 block text-xs font-bold text-cream-400">
                   Insumo Físico <span className="text-rose-400">*</span>

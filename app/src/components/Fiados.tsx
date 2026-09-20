@@ -10,6 +10,8 @@ import {
   Clock,
   Eye,
 } from 'lucide-react';
+import { InlineFeedback } from '../features/shared/components/InlineFeedback';
+import { useToast } from '../features/shared/contexts/ToastContext';
 
 interface FiadosProps {
   fiados: Fiado[];
@@ -45,6 +47,8 @@ export default function Fiados({
     'dinheiro',
   );
   const [note, setNote] = useState('');
+  const [quitarError, setQuitarError] = useState<string | null>(null);
+  const { showToast } = useToast();
 
   // Filtering
   const now = new Date();
@@ -91,6 +95,7 @@ export default function Fiados({
     setPayAmount(f.remainingValue.toFixed(2));
     setPayMethod('dinheiro');
     setNote('');
+    setQuitarError(null);
     setActiveModal('quitar');
   };
 
@@ -99,12 +104,12 @@ export default function Fiados({
     if (!selectedFiado) return;
     const amountVal = parseFloat(payAmount);
     if (isNaN(amountVal) || amountVal <= 0) {
-      alert('Valor inválido.');
+      setQuitarError('Valor inválido.');
       return;
     }
 
     if (amountVal > selectedFiado.remainingValue) {
-      alert(
+      setQuitarError(
         'Valor não pode ser maior que o saldo devedor ($' +
           selectedFiado.remainingValue +
           ')',
@@ -113,7 +118,7 @@ export default function Fiados({
     }
 
     if (!caixaIsOpen && payMethod === 'dinheiro') {
-      alert(
+      setQuitarError(
         'Atenção: O caixa do bar está FECHADO! Abra o caixa para receber pagamentos em dinheiro.',
       );
       return;
@@ -122,14 +127,17 @@ export default function Fiados({
     if (!window.confirm(`Confirmar o pagamento de $${amountVal.toFixed(2)}?`))
       return;
 
+    setQuitarError(null);
     const result = await onPagarFiado(
       selectedFiado.customerId,
       amountVal,
       payMethod,
     );
-    alert(result.msg);
     if (result.success) {
+      showToast('success', result.msg);
       setActiveModal(null);
+    } else {
+      setQuitarError(result.msg);
     }
   };
 
@@ -305,8 +313,9 @@ export default function Fiados({
                       <div className="inline-flex items-center justify-end gap-1.5">
                         <button
                           onClick={() =>
-                            alert(
-                              `Comanda ID: ${f.comandaId}\nFuncionalidade em desenvolvimento.`,
+                            showToast(
+                              'info',
+                              `Comanda ID: ${f.comandaId} — funcionalidade em desenvolvimento.`,
                             )
                           }
                           className="flex items-center gap-1 rounded border border-counter-700 bg-counter-800 px-2.5 py-1.5 text-xs font-bold uppercase text-cream-300 transition hover:border-gold-500/50 hover:text-gold-300"
@@ -363,6 +372,9 @@ export default function Fiados({
             </p>
 
             <form onSubmit={handleQuitar} className="space-y-3">
+              {quitarError && (
+                <InlineFeedback tone="error" message={quitarError} />
+              )}
               <div>
                 <label className="mb-1 block text-xs font-bold text-cream-400">
                   Valor a Pagar (R$) <span className="text-rose-400">*</span>

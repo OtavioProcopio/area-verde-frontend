@@ -36,11 +36,14 @@ usuário.
   `useComandasState`) ganharam teste unitário Vitest
   (`test/hooks-tratamento-erro-vitest`), fechando o item que a política
   cobra ("Criar ou ajustar testes quando houver lógica extraída").
-- A política (seção 12) já classifica `window.alert()` como "dívida
-  temporária" e diz que a direção correta é feedback contextual na tela —
-  então os `alert()` que sobraram (guards de comanda vazia/caixa fechado,
-  sangria excedendo caixa, itens de comanda sem slot de UI dedicado) são
-  gaps conhecidos e aceitos pelo próprio projeto, não urgência nova.
+- A política (seção 12) já classificava `window.alert()` como "dívida
+  temporária" e dizia que a direção correta era feedback contextual na tela —
+  os `alert()` que sobravam (guards de comanda vazia/caixa fechado, sangria
+  excedendo caixa, itens de comanda sem slot de UI dedicado) foram corrigidos
+  na feature `feature/toast-feedback-formularios` (toast compartilhado
+  `ToastContext`/`ToastStack` para confirmações e avisos, `InlineFeedback`
+  para erro de validação dentro do próprio formulário/modal); não há mais
+  `alert()` de feedback de operação no código de produção.
 - Duas partes da política parecem desatualizadas frente ao código atual:
   diz que "Configurações ainda não possui endpoint backend oficial" e que o
   PIN é "provisório em localStorage" — mas hoje `Configuracoes.tsx` e o

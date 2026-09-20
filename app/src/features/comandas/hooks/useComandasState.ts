@@ -80,7 +80,6 @@ export function useComandasState(refreshRef: RefreshRef) {
   ): Promise<OperationResult> => {
     const productId = Number(item.productId);
     if (!Number.isFinite(productId)) {
-      window.alert('Itens manuais ainda não são suportados pela API real.');
       return { success: false, msg: 'Item manual não suportado.' };
     }
 
@@ -93,7 +92,6 @@ export function useComandasState(refreshRef: RefreshRef) {
         error,
         'Não foi possível adicionar o item.',
       );
-      window.alert(msg);
       return { success: false, msg };
     }
   };
@@ -126,7 +124,6 @@ export function useComandasState(refreshRef: RefreshRef) {
         error,
         'Não foi possível atualizar a quantidade do item.',
       );
-      window.alert(msg);
       return { success: false, msg };
     }
   };
@@ -141,7 +138,6 @@ export function useComandasState(refreshRef: RefreshRef) {
       return { success: true, msg: 'Item removido com sucesso.' };
     } catch (error) {
       const msg = getApiErrorMessage(error, 'Não foi possível remover o item.');
-      window.alert(msg);
       return { success: false, msg };
     }
   };
@@ -204,8 +200,11 @@ export function useComandasState(refreshRef: RefreshRef) {
     }
   };
 
-  const reativarComanda = async () => {
-    window.alert('Reabrir comanda não é suportado pela API atual.');
+  const reativarComanda = async (): Promise<OperationResult> => {
+    return {
+      success: false,
+      msg: 'Reabrir comanda não é suportado pela API atual.',
+    };
   };
 
   return {
