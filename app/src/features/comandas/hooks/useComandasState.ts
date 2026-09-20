@@ -6,6 +6,7 @@ import {
   createComanda,
   decrementComandaItem,
   deleteComandaItem,
+  fetchComandaById,
   incrementComandaItem,
   linkCustomerToComanda,
   markComandaAsFiado,
@@ -13,14 +14,21 @@ import {
 import { getApiErrorMessage } from '../../shared/utils/getApiErrorMessage';
 import type { Comanda, TabItem } from '../../../types';
 
-type RefreshRef = {
-  current: () => Promise<void>;
-};
-
 type OperationResult = { success: boolean; msg: string };
 
-export function useComandasState(refreshRef: RefreshRef) {
+export function useComandasState(
+  refreshCaixa: () => Promise<void>,
+  refreshFiados: () => Promise<void>,
+) {
   const [comandas, setComandas] = useState<Comanda[]>([]);
+
+  const upsertComanda = (updated: Comanda) =>
+    setComandas((prev) => {
+      const exists = prev.some((comanda) => comanda.id === updated.id);
+      return exists
+        ? prev.map((comanda) => (comanda.id === updated.id ? updated : comanda))
+        : [...prev, updated];
+    });
 
   const addComanda = async (
     code: string,
@@ -28,7 +36,7 @@ export function useComandasState(refreshRef: RefreshRef) {
   ): Promise<{ comanda: Comanda | null } & OperationResult> => {
     try {
       const created = await createComanda(code, customerId);
-      await refreshRef.current();
+      upsertComanda(created);
       return {
         comanda: created,
         success: true,
@@ -47,8 +55,11 @@ export function useComandasState(refreshRef: RefreshRef) {
     try {
       const original = comandas.find((comanda) => comanda.id === updated.id);
       if (original?.customerId !== updated.customerId && updated.customerId) {
-        await linkCustomerToComanda(updated.id, updated.customerId);
-        await refreshRef.current();
+        const saved = await linkCustomerToComanda(
+          updated.id,
+          updated.customerId,
+        );
+        upsertComanda(saved);
       }
       return { success: true, msg: 'Comanda atualizada com sucesso.' };
     } catch (error) {
@@ -63,8 +74,8 @@ export function useComandasState(refreshRef: RefreshRef) {
     comandaId: string,
   ): Promise<OperationResult> => {
     try {
-      await cancelComanda(comandaId);
-      await refreshRef.current();
+      const updated = await cancelComanda(comandaId);
+      upsertComanda(updated);
       return { success: true, msg: 'Comanda cancelada com sucesso.' };
     } catch (error) {
       return {
@@ -84,8 +95,8 @@ export function useComandasState(refreshRef: RefreshRef) {
     }
 
     try {
-      await createComandaItem(comandaId, item);
-      await refreshRef.current();
+      const updated = await createComandaItem(comandaId, item);
+      upsertComanda(updated);
       return { success: true, msg: 'Item adicionado com sucesso.' };
     } catch (error) {
       const msg = getApiErrorMessage(
@@ -109,15 +120,14 @@ export function useComandasState(refreshRef: RefreshRef) {
     if (delta === 0) return { success: true, msg: 'Nenhuma alteração.' };
 
     try {
-      if (quantity <= 0) {
-        await deleteComandaItem(comandaId, itemId);
-      } else if (delta > 0) {
-        await incrementComandaItem(comandaId, itemId, delta);
-      } else {
-        await decrementComandaItem(comandaId, itemId, Math.abs(delta));
-      }
+      const updated =
+        quantity <= 0
+          ? await deleteComandaItem(comandaId, itemId)
+          : delta > 0
+            ? await incrementComandaItem(comandaId, itemId, delta)
+            : await decrementComandaItem(comandaId, itemId, Math.abs(delta));
 
-      await refreshRef.current();
+      upsertComanda(updated);
       return { success: true, msg: 'Quantidade atualizada com sucesso.' };
     } catch (error) {
       const msg = getApiErrorMessage(
@@ -133,8 +143,8 @@ export function useComandasState(refreshRef: RefreshRef) {
     itemId: string,
   ): Promise<OperationResult> => {
     try {
-      await deleteComandaItem(comandaId, itemId);
-      await refreshRef.current();
+      const updated = await deleteComandaItem(comandaId, itemId);
+      upsertComanda(updated);
       return { success: true, msg: 'Item removido com sucesso.' };
     } catch (error) {
       const msg = getApiErrorMessage(error, 'Não foi possível remover o item.');
@@ -175,7 +185,14 @@ export function useComandasState(refreshRef: RefreshRef) {
 
       try {
         await markComandaAsFiado(comandaId, customerId);
-        await refreshRef.current();
+        // A resposta de /fiado tem um formato diferente do
+        // ComandaDetalheResponse (é PendenciaDetalheResponse) — refetch
+        // pontual da comanda em vez de tentar remapear a resposta.
+        const [updated] = await Promise.all([
+          fetchComandaById(comandaId),
+          refreshFiados(),
+        ]);
+        upsertComanda(updated);
         return { success: true, msg: 'Comanda marcada como fiado.' };
       } catch (error) {
         return {
@@ -190,7 +207,13 @@ export function useComandasState(refreshRef: RefreshRef) {
 
     try {
       await closeComanda(comandaId, metodo, total);
-      await refreshRef.current();
+      // Idem: resposta de /fechar (FecharComandaResponse) não traz itens —
+      // refetch pontual da comanda + do caixa (o pagamento impacta o caixa).
+      const [updated] = await Promise.all([
+        fetchComandaById(comandaId),
+        refreshCaixa(),
+      ]);
+      upsertComanda(updated);
       return { success: true, msg: 'Comanda finalizada com sucesso.' };
     } catch (error) {
       return {

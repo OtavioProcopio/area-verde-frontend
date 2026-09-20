@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { settleFiado } from '../services/fiadosService';
+import { fetchFiados, settleFiado } from '../services/fiadosService';
 import { getApiErrorMessage } from '../../shared/utils/getApiErrorMessage';
 import type { Fiado } from '../../../types';
 
-type RefreshRef = {
-  current: () => Promise<void>;
-};
-
-export function useFiadosState(refreshRef: RefreshRef) {
+export function useFiadosState(refreshCaixa: () => Promise<void>) {
   const [fiados, setFiados] = useState<Fiado[]>([]);
+
+  const refreshFiados = async () => {
+    setFiados(await fetchFiados());
+  };
 
   const pagarFiado = async (
     customerId: string,
@@ -43,7 +43,7 @@ export function useFiadosState(refreshRef: RefreshRef) {
       try {
         await settleFiado(pendencia.comandaId || '', saldo, metodo);
       } catch (error) {
-        await refreshRef.current();
+        await Promise.all([refreshFiados(), refreshCaixa()]);
         return {
           success: false,
           msg: getApiErrorMessage(error, 'Não foi possível quitar o fiado.'),
@@ -59,7 +59,7 @@ export function useFiadosState(refreshRef: RefreshRef) {
       };
     }
 
-    await refreshRef.current();
+    await Promise.all([refreshFiados(), refreshCaixa()]);
     return { success: true, msg: 'Fiado quitado com sucesso.' };
   };
 
@@ -67,5 +67,6 @@ export function useFiadosState(refreshRef: RefreshRef) {
     fiados,
     setFiados,
     pagarFiado,
+    refreshFiados,
   };
 }

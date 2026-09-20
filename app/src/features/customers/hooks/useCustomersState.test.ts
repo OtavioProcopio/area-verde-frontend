@@ -2,22 +2,27 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useCustomersState } from './useCustomersState';
 import * as customersService from '../services/customersService';
+import type { Customer } from '../../../types';
 
 vi.mock('../services/customersService');
 
-describe('useCustomersState', () => {
-  const refreshRef = { current: vi.fn().mockResolvedValue(undefined) };
+const CUSTOMER: Customer = {
+  id: '1',
+  name: 'João',
+  phone: '11999998888',
+  balance: 0,
+  history: [],
+  active: true,
+};
 
+describe('useCustomersState', () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    refreshRef.current = vi.fn().mockResolvedValue(undefined);
   });
 
-  it('addCustomer retorna sucesso quando a API funciona', async () => {
-    vi.mocked(customersService.createCustomer).mockResolvedValue(
-      undefined as never,
-    );
-    const { result } = renderHook(() => useCustomersState(refreshRef));
+  it('addCustomer retorna sucesso e adiciona o cliente retornado pela API', async () => {
+    vi.mocked(customersService.createCustomer).mockResolvedValue(CUSTOMER);
+    const { result } = renderHook(() => useCustomersState());
 
     let response;
     await act(async () => {
@@ -31,14 +36,14 @@ describe('useCustomersState', () => {
       success: true,
       msg: 'Cliente cadastrado com sucesso.',
     });
-    expect(refreshRef.current).toHaveBeenCalledTimes(1);
+    expect(result.current.customers).toEqual([CUSTOMER]);
   });
 
   it('addCustomer retorna erro tratado em vez de lançar quando a API falha', async () => {
     vi.mocked(customersService.createCustomer).mockRejectedValue(
       new Error('Telefone inválido'),
     );
-    const { result } = renderHook(() => useCustomersState(refreshRef));
+    const { result } = renderHook(() => useCustomersState());
 
     let response;
     await act(async () => {
@@ -49,14 +54,14 @@ describe('useCustomersState', () => {
     });
 
     expect(response).toEqual({ success: false, msg: 'Telefone inválido' });
-    expect(refreshRef.current).not.toHaveBeenCalled();
+    expect(result.current.customers).toEqual([]);
   });
 
   it('deleteCustomer retorna erro tratado quando a API falha', async () => {
     vi.mocked(customersService.inactivateCustomer).mockRejectedValue(
       new Error('erro ao inativar'),
     );
-    const { result } = renderHook(() => useCustomersState(refreshRef));
+    const { result } = renderHook(() => useCustomersState());
 
     let response;
     await act(async () => {

@@ -7,21 +7,26 @@ import {
 import { getApiErrorMessage } from '../../shared/utils/getApiErrorMessage';
 import type { Customer } from '../../../types';
 
-type RefreshRef = {
-  current: () => Promise<void>;
-};
-
 type OperationResult = { success: boolean; msg: string };
 
-export function useCustomersState(refreshRef: RefreshRef) {
+export function useCustomersState() {
   const [customers, setCustomers] = useState<Customer[]>([]);
+
+  const upsertCustomer = (updated: Customer) =>
+    setCustomers((prev) => {
+      const exists = prev.some((customer) => customer.id === updated.id);
+      return exists
+        ? prev.map((customer) =>
+            customer.id === updated.id ? updated : customer,
+          )
+        : [...prev, updated];
+    });
 
   const addCustomer = async (
     customer: Omit<Customer, 'id' | 'balance' | 'history'>,
   ): Promise<OperationResult> => {
     try {
-      await createCustomer(customer);
-      await refreshRef.current();
+      upsertCustomer(await createCustomer(customer));
       return { success: true, msg: 'Cliente cadastrado com sucesso.' };
     } catch (error) {
       return {
@@ -36,13 +41,13 @@ export function useCustomersState(refreshRef: RefreshRef) {
   ): Promise<OperationResult> => {
     try {
       const original = customers.find((customer) => customer.id === updated.id);
-      await saveCustomer(
+      const saved = await saveCustomer(
         updated,
         original && (original.active ?? true) !== (updated.active ?? true)
           ? (updated.active ?? true)
           : undefined,
       );
-      await refreshRef.current();
+      upsertCustomer(saved);
       return { success: true, msg: 'Cliente atualizado com sucesso.' };
     } catch (error) {
       return {
@@ -54,8 +59,7 @@ export function useCustomersState(refreshRef: RefreshRef) {
 
   const deleteCustomer = async (id: string): Promise<OperationResult> => {
     try {
-      await inactivateCustomer(id);
-      await refreshRef.current();
+      upsertCustomer(await inactivateCustomer(id));
       return { success: true, msg: 'Cliente inativado com sucesso.' };
     } catch (error) {
       return {

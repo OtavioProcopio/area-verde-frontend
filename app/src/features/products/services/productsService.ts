@@ -93,10 +93,28 @@ export async function syncProductComposition(
   }
 }
 
+export async function fetchProductById(id: string): Promise<Product> {
+  const numericId = Number(id);
+  const product = await apiRequest<ApiProduct>(`/produtos/${numericId}`);
+  const recipe =
+    product.tipoProduto === 'COMPOSTO'
+      ? (
+          await apiRequest<ApiProductComposition>(
+            `/produtos/${numericId}/composicao`,
+          )
+        ).componentes.map((component) => ({
+          ingredientId: String(component.produtoComponenteId),
+          quantity: toNumber(component.quantidadeBaixa),
+        }))
+      : [];
+
+  return mapProduct(product, recipe);
+}
+
 export async function createProduct(
   product: Omit<Product, 'id'>,
   categories: Category[],
-) {
+): Promise<Product> {
   const categoriaId = getCategoryIdByName(categories, product.category);
   let createdId: number;
 
@@ -146,13 +164,15 @@ export async function createProduct(
   if (!product.active) {
     await apiRequest(`/produtos/${createdId}/inativar`, { method: 'PATCH' });
   }
+
+  return fetchProductById(String(createdId));
 }
 
 export async function saveProduct(
   product: Product,
   categories: Category[],
   activeChanged?: boolean,
-) {
+): Promise<Product> {
   await apiRequest(`/produtos/${product.id}`, {
     method: 'PUT',
     body: {
@@ -180,10 +200,13 @@ export async function saveProduct(
       },
     );
   }
+
+  return fetchProductById(product.id);
 }
 
-export async function inactivateProduct(id: string) {
+export async function inactivateProduct(id: string): Promise<Product> {
   await apiRequest(`/produtos/${id}/inativar`, {
     method: 'PATCH',
   });
+  return fetchProductById(id);
 }

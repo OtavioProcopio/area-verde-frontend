@@ -24,10 +24,26 @@ export async function fetchCustomers(): Promise<Customer[]> {
   return detailedCustomers;
 }
 
+async function fetchCustomerPendencias(
+  customerId: string | number,
+): Promise<ApiCustomerPendencias> {
+  return apiRequest<ApiCustomerPendencias>(
+    `/clientes/${customerId}/pendencias`,
+  );
+}
+
+export async function fetchCustomerById(id: string): Promise<Customer> {
+  const [detail, pendencias] = await Promise.all([
+    apiRequest<ApiCustomerDetail>(`/clientes/${id}`),
+    fetchCustomerPendencias(id),
+  ]);
+  return mapCustomer(detail, pendencias);
+}
+
 export async function createCustomer(
   customer: Omit<Customer, 'id' | 'balance' | 'history'>,
-) {
-  const created = await apiRequest<ApiCustomerDetail>('/clientes', {
+): Promise<Customer> {
+  let created = await apiRequest<ApiCustomerDetail>('/clientes', {
     method: 'POST',
     body: {
       nome: customer.name,
@@ -38,15 +54,20 @@ export async function createCustomer(
   });
 
   if (customer.active === false) {
-    await apiRequest(`/clientes/${created.id}/inativar`, { method: 'PATCH' });
+    created = await apiRequest<ApiCustomerDetail>(
+      `/clientes/${created.id}/inativar`,
+      { method: 'PATCH' },
+    );
   }
+
+  return mapCustomer(created, await fetchCustomerPendencias(created.id));
 }
 
 export async function saveCustomer(
   customer: Customer,
   activeChanged?: boolean,
-) {
-  await apiRequest(`/clientes/${customer.id}`, {
+): Promise<Customer> {
+  let saved = await apiRequest<ApiCustomerDetail>(`/clientes/${customer.id}`, {
     method: 'PUT',
     body: {
       nome: customer.name,
@@ -57,17 +78,23 @@ export async function saveCustomer(
   });
 
   if (activeChanged !== undefined) {
-    await apiRequest(
+    saved = await apiRequest<ApiCustomerDetail>(
       `/clientes/${customer.id}/${activeChanged ? 'ativar' : 'inativar'}`,
       {
         method: 'PATCH',
       },
     );
   }
+
+  return mapCustomer(saved, await fetchCustomerPendencias(saved.id));
 }
 
-export async function inactivateCustomer(id: string) {
-  await apiRequest(`/clientes/${id}/inativar`, {
-    method: 'PATCH',
-  });
+export async function inactivateCustomer(id: string): Promise<Customer> {
+  const saved = await apiRequest<ApiCustomerDetail>(
+    `/clientes/${id}/inativar`,
+    {
+      method: 'PATCH',
+    },
+  );
+  return mapCustomer(saved, await fetchCustomerPendencias(saved.id));
 }

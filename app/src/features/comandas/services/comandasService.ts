@@ -8,21 +8,34 @@ import type {
   ApiPagamento,
 } from '../types';
 
+async function fetchComandaPayments(
+  comandaId: string | number,
+  status: ApiComandaSummary['status'],
+): Promise<ApiPagamento[]> {
+  return status === 'FECHADA' || status === 'PENDENTE'
+    ? apiRequest<ApiPagamento[]>(`/comandas/${comandaId}/pagamentos`)
+    : [];
+}
+
 export async function fetchComandas(): Promise<Comanda[]> {
   const comandas = await apiRequest<ApiComandaSummary[]>('/comandas');
   const detailedComandas = await Promise.all(
     comandas.map(async (comanda) => {
       const [detail, payments] = await Promise.all([
         apiRequest<ApiComandaDetail>(`/comandas/${comanda.id}`),
-        comanda.status === 'FECHADA' || comanda.status === 'PENDENTE'
-          ? apiRequest<ApiPagamento[]>(`/comandas/${comanda.id}/pagamentos`)
-          : Promise.resolve([]),
+        fetchComandaPayments(comanda.id, comanda.status),
       ]);
       return mapComanda(detail, payments);
     }),
   );
 
   return detailedComandas;
+}
+
+export async function fetchComandaById(comandaId: string): Promise<Comanda> {
+  const detail = await apiRequest<ApiComandaDetail>(`/comandas/${comandaId}`);
+  const payments = await fetchComandaPayments(comandaId, detail.status);
+  return mapComanda(detail, payments);
 }
 
 export async function createComanda(
@@ -40,64 +53,96 @@ export async function createComanda(
   return mapComanda(created, []);
 }
 
+// As mutações de comanda abaixo (cliente, cancelar, itens) já retornam o
+// ComandaDetalheResponse completo e atualizado — mapeamos direto da
+// resposta, sem precisar de um refetch (nem da comanda, nem do sistema).
+
 export async function linkCustomerToComanda(
   comandaId: string,
   customerId: string,
-) {
-  await apiRequest(`/comandas/${comandaId}/cliente`, {
-    method: 'PATCH',
-    body: {
-      clienteId: Number(customerId),
+): Promise<Comanda> {
+  const detail = await apiRequest<ApiComandaDetail>(
+    `/comandas/${comandaId}/cliente`,
+    {
+      method: 'PATCH',
+      body: {
+        clienteId: Number(customerId),
+      },
     },
-  });
+  );
+  return mapComanda(
+    detail,
+    await fetchComandaPayments(comandaId, detail.status),
+  );
 }
 
-export async function cancelComanda(comandaId: string) {
-  await apiRequest(`/comandas/${comandaId}/cancelar`, {
-    method: 'PATCH',
-    body: {},
-  });
+export async function cancelComanda(comandaId: string): Promise<Comanda> {
+  const detail = await apiRequest<ApiComandaDetail>(
+    `/comandas/${comandaId}/cancelar`,
+    {
+      method: 'PATCH',
+      body: {},
+    },
+  );
+  return mapComanda(detail, []);
 }
 
 export async function addItemToComanda(
   comandaId: string,
   item: Omit<TabItem, 'id'>,
-) {
-  await apiRequest(`/comandas/${comandaId}/itens`, {
-    method: 'POST',
-    body: {
-      produtoId: Number(item.productId),
-      quantidade: item.quantity,
+): Promise<Comanda> {
+  const detail = await apiRequest<ApiComandaDetail>(
+    `/comandas/${comandaId}/itens`,
+    {
+      method: 'POST',
+      body: {
+        produtoId: Number(item.productId),
+        quantidade: item.quantity,
+      },
     },
-  });
+  );
+  return mapComanda(detail, []);
 }
 
-export async function deleteComandaItem(comandaId: string, itemId: string) {
-  await apiRequest(`/comandas/${comandaId}/itens/${itemId}`, {
-    method: 'DELETE',
-  });
+export async function deleteComandaItem(
+  comandaId: string,
+  itemId: string,
+): Promise<Comanda> {
+  const detail = await apiRequest<ApiComandaDetail>(
+    `/comandas/${comandaId}/itens/${itemId}`,
+    { method: 'DELETE' },
+  );
+  return mapComanda(detail, []);
 }
 
 export async function incrementComandaItem(
   comandaId: string,
   itemId: string,
   quantidade: number,
-) {
-  await apiRequest(`/comandas/${comandaId}/itens/${itemId}/incrementar`, {
-    method: 'PATCH',
-    body: { quantidade },
-  });
+): Promise<Comanda> {
+  const detail = await apiRequest<ApiComandaDetail>(
+    `/comandas/${comandaId}/itens/${itemId}/incrementar`,
+    {
+      method: 'PATCH',
+      body: { quantidade },
+    },
+  );
+  return mapComanda(detail, []);
 }
 
 export async function decrementComandaItem(
   comandaId: string,
   itemId: string,
   quantidade: number,
-) {
-  await apiRequest(`/comandas/${comandaId}/itens/${itemId}/diminuir`, {
-    method: 'PATCH',
-    body: { quantidade },
-  });
+): Promise<Comanda> {
+  const detail = await apiRequest<ApiComandaDetail>(
+    `/comandas/${comandaId}/itens/${itemId}/diminuir`,
+    {
+      method: 'PATCH',
+      body: { quantidade },
+    },
+  );
+  return mapComanda(detail, []);
 }
 
 export async function markComandaAsFiado(

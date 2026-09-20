@@ -3,20 +3,25 @@ import { renderHook, act } from '@testing-library/react';
 import { useCaixaState } from './useCaixaState';
 import * as caixaService from '../services/caixaService';
 import { EMPTY_CASHIER } from '../mappers/caixaMapper';
+import type { Cashier } from '../../../types';
 
 vi.mock('../services/caixaService');
 
-describe('useCaixaState', () => {
-  const refreshRef = { current: vi.fn().mockResolvedValue(undefined) };
+const CAIXA_ABERTO: Cashier = {
+  ...EMPTY_CASHIER,
+  id: '1',
+  isOpen: true,
+  currentCashInMoney: 200,
+};
 
+describe('useCaixaState', () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    refreshRef.current = vi.fn().mockResolvedValue(undefined);
   });
 
-  it('abrirCaixa retorna sucesso e atualiza o sistema quando a API funciona', async () => {
-    vi.mocked(caixaService.openCaixa).mockResolvedValue(undefined as never);
-    const { result } = renderHook(() => useCaixaState(refreshRef));
+  it('abrirCaixa retorna sucesso e atualiza o caixa com a resposta da API', async () => {
+    vi.mocked(caixaService.openCaixa).mockResolvedValue(CAIXA_ABERTO);
+    const { result } = renderHook(() => useCaixaState());
 
     let response;
     await act(async () => {
@@ -27,14 +32,14 @@ describe('useCaixaState', () => {
       success: true,
       msg: 'Caixa aberto com sucesso.',
     });
-    expect(refreshRef.current).toHaveBeenCalledTimes(1);
+    expect(result.current.caixa).toEqual(CAIXA_ABERTO);
   });
 
   it('abrirCaixa retorna erro tratado em vez de lançar quando a API falha', async () => {
     vi.mocked(caixaService.openCaixa).mockRejectedValue(
       new Error('Falha de rede'),
     );
-    const { result } = renderHook(() => useCaixaState(refreshRef));
+    const { result } = renderHook(() => useCaixaState());
 
     let response;
     await act(async () => {
@@ -42,14 +47,13 @@ describe('useCaixaState', () => {
     });
 
     expect(response).toEqual({ success: false, msg: 'Falha de rede' });
-    expect(refreshRef.current).not.toHaveBeenCalled();
   });
 
   it('fecharCaixa retorna erro tratado quando a API rejeita (ex: comanda aberta)', async () => {
     vi.mocked(caixaService.closeCaixa).mockRejectedValue(
       new Error('Não é possível fechar o caixa com comandas abertas'),
     );
-    const { result } = renderHook(() => useCaixaState(refreshRef));
+    const { result } = renderHook(() => useCaixaState());
 
     act(() => {
       result.current.setCaixa({
@@ -78,7 +82,7 @@ describe('useCaixaState', () => {
     vi.mocked(caixaService.createSangria).mockRejectedValue(
       new Error('erro sangria'),
     );
-    const { result } = renderHook(() => useCaixaState(refreshRef));
+    const { result } = renderHook(() => useCaixaState());
 
     act(() => {
       result.current.setCaixa({
