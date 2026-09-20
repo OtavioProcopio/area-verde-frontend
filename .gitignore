@@ -30,3 +30,7 @@ pnpm-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# Byte Union spec-driven method (regenerated localmente por /bu:constitution)
+/.specify/memory/constitution.md
+/CLAUDE.md
