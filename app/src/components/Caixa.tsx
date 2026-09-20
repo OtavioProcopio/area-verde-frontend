@@ -16,6 +16,7 @@ import {
   X,
 } from 'lucide-react';
 import { InlineFeedback } from '../features/shared/components/InlineFeedback';
+import { useToast } from '../features/shared/contexts/ToastContext';
 
 type OperationResult = { success: boolean; msg: string };
 
@@ -66,6 +67,8 @@ export default function Caixa({
   // Feedback de erro do formulário atualmente aberto
   const [formError, setFormError] = useState<string | null>(null);
 
+  const { showToast } = useToast();
+
   // Log filter state inside cashier
   const [logFilter, setLogFilter] = useState<
     'all' | 'venda' | 'suprimento' | 'sangria'
@@ -86,6 +89,7 @@ export default function Caixa({
         return;
       }
       // Reset & close
+      showToast('success', res.msg);
       setAberturaObs('');
       setIsAbrirModalOpen(false);
     }
@@ -102,6 +106,7 @@ export default function Caixa({
         return;
       }
       // Reset & close
+      showToast('success', res.msg);
       setReforcoValor('');
       setReforcoDesc('');
       setIsReforcoModalOpen(false);
@@ -114,7 +119,7 @@ export default function Caixa({
     if (!isNaN(val) && val > 0 && sangriaDesc.trim() !== '') {
       // Prevent withdrawing more than available cash physically
       if (val > caixa.currentCashInMoney) {
-        alert(
+        setFormError(
           `Sangria excede o dinheiro físico disponível na gaveta (${fmt(caixa.currentCashInMoney)})!`,
         );
         return;
@@ -126,6 +131,7 @@ export default function Caixa({
         return;
       }
       // Reset & close
+      showToast('success', res.msg);
       setSangriaValor('');
       setSangriaDesc('');
       setIsSangriaModalOpen(false);
@@ -141,6 +147,7 @@ export default function Caixa({
       return;
     }
     // Reset & close
+    showToast('success', res.msg);
     setFechamentoObs('');
     setIsFecharModalOpen(false);
   };

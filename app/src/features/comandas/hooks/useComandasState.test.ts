@@ -31,7 +31,6 @@ describe('useComandasState', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     refreshRef.current = vi.fn().mockResolvedValue(undefined);
-    vi.spyOn(window, 'alert').mockImplementation(() => {});
   });
 
   it('addComanda retorna a comanda criada quando a API funciona', async () => {
@@ -85,7 +84,7 @@ describe('useComandasState', () => {
     expect(response).toEqual({ success: false, msg: 'Comanda já fechada' });
   });
 
-  it('addItemToComanda avisa com alert e retorna erro tratado quando a API falha', async () => {
+  it('addItemToComanda retorna erro tratado quando a API falha', async () => {
     vi.mocked(comandasService.addItemToComanda).mockRejectedValue(
       new Error('Produto sem estoque'),
     );
@@ -102,7 +101,37 @@ describe('useComandasState', () => {
     });
 
     expect(response).toEqual({ success: false, msg: 'Produto sem estoque' });
-    expect(window.alert).toHaveBeenCalledWith('Produto sem estoque');
+  });
+
+  it('addItemToComanda retorna erro tratado quando o item é manual (sem productId numérico)', async () => {
+    const { result } = renderHook(() => useComandasState(refreshRef));
+
+    let response;
+    await act(async () => {
+      response = await result.current.addItemToComanda('1', {
+        productId: 'manual',
+        productName: 'Item manual',
+        quantity: 1,
+        price: 10,
+      });
+    });
+
+    expect(response).toEqual({
+      success: false,
+      msg: 'Item manual não suportado.',
+    });
+    expect(comandasService.addItemToComanda).not.toHaveBeenCalled();
+  });
+
+  it('reativarComanda retorna erro tratado, sem lançar', async () => {
+    const { result } = renderHook(() => useComandasState(refreshRef));
+
+    const response = await result.current.reativarComanda();
+
+    expect(response).toEqual({
+      success: false,
+      msg: 'Reabrir comanda não é suportado pela API atual.',
+    });
   });
 
   it('pagarComanda (dinheiro/pix/cartão) retorna erro tratado quando a API falha', async () => {
