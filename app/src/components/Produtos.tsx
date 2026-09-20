@@ -265,7 +265,9 @@ export default function Produtos({
     }
 
     if (compIngrId === activeComposite.id) {
-      setCompFormError('Produto componente não pode ser o próprio produto pai!');
+      setCompFormError(
+        'Produto componente não pode ser o próprio produto pai!',
+      );
       return;
     }
 

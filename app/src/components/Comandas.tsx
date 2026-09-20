@@ -218,7 +218,6 @@ export default function Comandas({
 
   return (
     <div id="comandas-module">
-
       {viewMode === 'list' && (
         <ComandaListView
           comandas={comandas}
