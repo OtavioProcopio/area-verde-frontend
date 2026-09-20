@@ -1,10 +1,10 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useProductsState } from './useProductsState';
-import * as productsService from '../services/productsService';
-import type { Category, Product } from '../../../types';
+import { useProductsState } from '@/features/products/hooks/useProductsState';
+import * as productsService from '@/features/products/services/productsService';
+import type { Category, Product } from '@/types';
 
-vi.mock('../services/productsService');
+vi.mock('@/features/products/services/productsService');
 
 const CATEGORIES: Category[] = [{ id: '1', name: 'Bebidas', active: true }];
 

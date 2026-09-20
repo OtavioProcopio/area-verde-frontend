@@ -214,3 +214,40 @@ export async function fecharRecibo(page: Page) {
   await expect(botao).toBeVisible({ timeout: 10_000 });
   await botao.click();
 }
+
+/**
+ * Registra os console.error/pageerror da página a partir do momento em que
+ * é chamado. Use `assertNoUnexpectedErrors()` ao fim do fluxo pra falhar o
+ * teste se algo inesperado apareceu.
+ *
+ * O Chrome loga "Failed to load resource: ... 404" no console pra *qualquer*
+ * request HTTP que falhe, mesmo quando o app trata o erro graciosamente (ex.:
+ * GET /api/caixas/aberto responder 404 quando não há caixa aberto — o mapper
+ * já espera esse código e devolve estado vazio, sem nunca chamar
+ * console.error). `ignorePatterns` filtra esse ruído esperado, pra sobrar só
+ * erro de verdade.
+ */
+export function captureConsoleErrors(page: Page, ignorePatterns: RegExp[] = []) {
+  const erros: string[] = [];
+
+  page.on('console', (msg) => {
+    if (msg.type() !== 'error') return;
+    const text = msg.text();
+    const url = msg.location().url;
+    if (ignorePatterns.some((pattern) => pattern.test(text) || pattern.test(url))) {
+      return;
+    }
+    erros.push(`${text} (${url})`);
+  });
+  page.on('pageerror', (err) => {
+    erros.push(err.message);
+  });
+
+  return {
+    assertNoUnexpectedErrors() {
+      expect(erros, `console/page errors inesperados: ${erros.join('\n')}`).toEqual(
+        [],
+      );
+    },
+  };
+}

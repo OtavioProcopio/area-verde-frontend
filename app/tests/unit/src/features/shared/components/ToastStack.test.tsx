@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
-import { ToastProvider, useToast } from '../contexts/ToastContext';
-import { ToastStack } from './ToastStack';
+import {
+  ToastProvider,
+  useToast,
+} from '@/features/shared/contexts/ToastContext';
+import { ToastStack } from '@/features/shared/components/ToastStack';
 
 function Trigger({
   tone,

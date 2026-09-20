@@ -1,11 +1,11 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useCaixaState } from './useCaixaState';
-import * as caixaService from '../services/caixaService';
-import { EMPTY_CASHIER } from '../mappers/caixaMapper';
-import type { Cashier } from '../../../types';
+import { useCaixaState } from '@/features/caixa/hooks/useCaixaState';
+import * as caixaService from '@/features/caixa/services/caixaService';
+import { EMPTY_CASHIER } from '@/features/caixa/mappers/caixaMapper';
+import type { Cashier } from '@/types';
 
-vi.mock('../services/caixaService');
+vi.mock('@/features/caixa/services/caixaService');
 
 const CAIXA_ABERTO: Cashier = {
   ...EMPTY_CASHIER,

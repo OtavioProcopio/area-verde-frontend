@@ -55,11 +55,15 @@ export default defineConfig(() => {
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
       proxy: {
         '/api': {
-          target: 'http://area-verde-api-devcontainer:8001',
+          target:
+            process.env.API_PROXY_TARGET ??
+            'http://area-verde-api-devcontainer:8001',
           changeOrigin: true,
         },
         '/health': {
-          target: 'http://area-verde-api-devcontainer:8001',
+          target:
+            process.env.API_PROXY_TARGET ??
+            'http://area-verde-api-devcontainer:8001',
           changeOrigin: true,
         },
       },

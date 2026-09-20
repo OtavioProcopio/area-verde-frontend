@@ -1,4 +1,4 @@
 {
-  "active": "specs/001-toast-feedback-formularios",
-  "title": "Adicionar sistema de toast de feedback nos formularios"
+  "active": "specs/002-testes-unitarios-e2e-docs",
+  "title": "Criar testes unitários para a camada de API (apiRequest) e para os mappers de produtos, categorias, clientes, comandas, caixa e fiados (issue #7), adicionar suporte a testes E2E via scripts npm (test:e2e, test:e2e:ui, test:e2e:report) cobrindo o cenário de caixa fechado com 404 esperado em /api/caixas/aberto e captura de console errors (issue #11), e atualizar a documentação do frontend (README raiz, app/README.md e docs/mapa-fluxos-e-cobertura-testes.md) refletindo a arquitetura atual (features/<dominio>/{hooks,services,mappers}), os módulos implementados e a suíte de testes (Vitest + Playwright), corrigindo a nota já sinalizada como desatualizada sobre Configurações/PIN."
 }

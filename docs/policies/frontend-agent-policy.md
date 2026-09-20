@@ -338,17 +338,15 @@ Evitar relatório calculado em cima de arrays locais quando houver endpoint cons
 
 ### Configurações
 
-Configurações ainda não possuem endpoint backend oficial.
+Configurações consomem o endpoint oficial `/api/configuracoes` (`GET`/`PUT`), via
+`features/configuracoes/services/configuracoesService.ts`. Não reintroduzir estado de
+configuração local/provisório — qualquer parâmetro novo do sistema entra pelo backend.
 
-Enquanto isso, qualquer configuração local deve ficar isolada e marcada como provisória.
+### Acesso / Senha
 
-### Acesso / PIN
-
-O PIN local atual é provisório.
-
-Não tratar PIN em `localStorage` como autenticação real.
-
-Não criar fluxo de auth fictício antes de existir contrato backend.
+O acesso usa a API real: `/api/acesso/validar` (login) e `/api/acesso/senha` (definir/trocar),
+via `features/acesso/services/acessoService.ts`. Não existe mais PIN em `localStorage` — não
+reintroduzir esse padrão nem tratar estado de sessão local como autenticação.
 
 ---
 

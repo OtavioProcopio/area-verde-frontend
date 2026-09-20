@@ -1,10 +1,10 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useCustomersState } from './useCustomersState';
-import * as customersService from '../services/customersService';
-import type { Customer } from '../../../types';
+import { useCustomersState } from '@/features/customers/hooks/useCustomersState';
+import * as customersService from '@/features/customers/services/customersService';
+import type { Customer } from '@/types';
 
-vi.mock('../services/customersService');
+vi.mock('@/features/customers/services/customersService');
 
 const CUSTOMER: Customer = {
   id: '1',

@@ -1,7 +1,10 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { ToastProvider, useToast } from './ToastContext';
+import {
+  ToastProvider,
+  useToast,
+} from '@/features/shared/contexts/ToastContext';
 
 const wrapper = ({ children }: { children: ReactNode }) => (
   <ToastProvider>{children}</ToastProvider>

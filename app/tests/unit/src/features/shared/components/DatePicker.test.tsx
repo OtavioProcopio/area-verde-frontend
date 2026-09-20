@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { DatePicker } from './DatePicker';
-import { todayDateKey } from '../utils/dateKey';
+import { DatePicker } from '@/features/shared/components/DatePicker';
+import { todayDateKey } from '@/features/shared/utils/dateKey';
 
 describe('DatePicker', () => {
   it('exibe o valor recebido e chama onChange ao selecionar outra data', () => {

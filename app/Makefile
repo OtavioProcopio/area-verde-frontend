@@ -1,4 +1,4 @@
-.PHONY: help install doctor dev build preview typecheck lint format format-check test test-coverage validate check ci docker-build compose-config ci-docker clean
+.PHONY: help install doctor dev build preview typecheck lint format format-check test test-coverage test-e2e test-e2e-ui test-e2e-report validate check ci docker-build compose-config ci-docker clean
 
 IMAGE_NAME=area-verde-frontend
 NODE ?= node
@@ -21,6 +21,9 @@ help:
 	@echo "  make format-check     Verifica formatacao sem alterar arquivos"
 	@echo "  make test             Executa testes"
 	@echo "  make test-coverage    Executa testes com cobertura"
+	@echo "  make test-e2e         Executa a suite Playwright (exige API + frontend de pe)"
+	@echo "  make test-e2e-ui      Abre a suite Playwright em modo UI"
+	@echo "  make test-e2e-report  Abre o ultimo relatorio HTML do Playwright"
 	@echo "  make validate         Executa format, typecheck, lint, cobertura e build"
 	@echo "  make check            Executa format-check, typecheck, lint, cobertura e build"
 	@echo "  make ci               Alias para check"
@@ -70,6 +73,15 @@ test:
 
 test-coverage:
 	$(NPM) run test:coverage
+
+test-e2e:
+	$(NPM) run test:e2e
+
+test-e2e-ui:
+	$(NPM) run test:e2e:ui
+
+test-e2e-report:
+	$(NPM) run test:e2e:report
 
 validate: format typecheck lint test-coverage build
 	@echo "Full validation complete"

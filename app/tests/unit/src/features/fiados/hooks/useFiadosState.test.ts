@@ -1,10 +1,10 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useFiadosState } from './useFiadosState';
-import * as fiadosService from '../services/fiadosService';
-import type { Fiado } from '../../../types';
+import { useFiadosState } from '@/features/fiados/hooks/useFiadosState';
+import * as fiadosService from '@/features/fiados/services/fiadosService';
+import type { Fiado } from '@/types';
 
-vi.mock('../services/fiadosService');
+vi.mock('@/features/fiados/services/fiadosService');
 
 const PENDENCIA: Fiado = {
   id: 'fiado-1',

@@ -9,6 +9,7 @@ import {
   apiMarcarComoFiado,
   apiSetupProdutoUnico,
   apiSetupSenha,
+  captureConsoleErrors,
   loginUI,
 } from './helpers';
 
@@ -18,6 +19,22 @@ test.beforeEach(async () => {
   await apiSetupSenha(SENHA);
   const aberto = await apiCaixaAberto();
   if (aberto) await apiFecharCaixaForcado(aberto.id);
+});
+
+test('mostra o estado de caixa fechado sem erro, quando GET /api/caixas/aberto responde 404 (esperado)', async ({
+  page,
+}) => {
+  const consoleErrors = captureConsoleErrors(page, [/\/caixas\/aberto/]);
+
+  await loginUI(page, SENHA);
+  await page.locator('#nav-link-caixa').click();
+
+  await expect(page.locator('#state-caixa-fechado-card')).toBeVisible({
+    timeout: 10_000,
+  });
+  await expect(page.locator('#state-caixa-aberto-container')).toHaveCount(0);
+
+  consoleErrors.assertNoUnexpectedErrors();
 });
 
 test('bloqueia fechar o caixa com uma comanda aberta', async ({ page }) => {
@@ -141,15 +158,9 @@ test('bloqueia sangria maior que o dinheiro disponível na gaveta', async ({
     .getByPlaceholder(/Compra de saco de gelo/)
     .fill('Tentativa inválida');
 
-  let message = '';
-  page.once('dialog', (dialog) => {
-    message = dialog.message();
-    void dialog.accept();
-  });
   await page.getByRole('button', { name: 'Salvar Retirada' }).click();
-  await expect.poll(() => message, { timeout: 10_000 }).not.toBe('');
 
-  expect(message.toLowerCase()).toContain('excede');
+  await expect(page.getByText(/excede/i)).toBeVisible({ timeout: 10_000 });
 });
 
 test('fecha o caixa sem comandas abertas e mostra no histórico', async ({

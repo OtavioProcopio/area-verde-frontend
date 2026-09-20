@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import Login from './Login';
+import Login from '@/components/Login';
 
 describe('Login', () => {
   it('habilita o envio quando uma senha e informada', () => {

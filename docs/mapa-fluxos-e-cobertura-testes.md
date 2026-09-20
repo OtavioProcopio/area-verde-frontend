@@ -44,11 +44,23 @@ usuário.
   `ToastContext`/`ToastStack` para confirmações e avisos, `InlineFeedback`
   para erro de validação dentro do próprio formulário/modal); não há mais
   `alert()` de feedback de operação no código de produção.
-- Duas partes da política parecem desatualizadas frente ao código atual:
-  diz que "Configurações ainda não possui endpoint backend oficial" e que o
-  PIN é "provisório em localStorage" — mas hoje `Configuracoes.tsx` e o
-  login já usam API real (`/api/configuracoes`, `/api/acesso/*`) e não usam
-  `localStorage`. Vale uma atualização de doc separada.
+- **Corrigido em `feature/testes-unitarios-e2e-docs`**: a política (seções
+  "Configurações" e "Acesso / PIN") dizia que Configurações não tinha
+  endpoint oficial e que o acesso usava PIN provisório em `localStorage` —
+  ambos desatualizados. `Configuracoes.tsx` e o login já usam API real
+  (`/api/configuracoes`, `/api/acesso/*`) e não usam `localStorage`; a
+  política foi atualizada pra refletir isso.
+- **Também nesta feature**: os testes unitários ganharam a camada de API
+  (`apiRequest`) e os 6 mappers de domínio (produtos, categorias, clientes,
+  comandas, caixa, fiados), até então sem teste direto (issue #7); os testes
+  passaram a viver em `app/tests/unit/src/`, espelhando `app/src/`, em vez de
+  colocados ao lado do arquivo. A suíte E2E ganhou scripts formais
+  (`make test-e2e`/`test:e2e`) e um cenário novo que confirma que o 404
+  esperado de `GET /api/caixas/aberto` não gera erro de console (issue #11).
+  De quebra, achou uma regressão real: o teste de sangria excedendo o caixa
+  ainda esperava um `window.alert()` que a feature `toast-feedback-
+  formularios` já tinha substituído por `InlineFeedback` — corrigido pra
+  checar o texto na tela em vez do dialog.
 
 **Recomendação:** tratar como duas frentes paralelas — Vitest unitário
 (hooks/services com mock, seguindo a política) para lógica e regressão

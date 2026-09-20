@@ -1,10 +1,10 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useComandasState } from './useComandasState';
-import * as comandasService from '../services/comandasService';
-import type { Comanda } from '../../../types';
+import { useComandasState } from '@/features/comandas/hooks/useComandasState';
+import * as comandasService from '@/features/comandas/services/comandasService';
+import type { Comanda } from '@/types';
 
-vi.mock('../services/comandasService');
+vi.mock('@/features/comandas/services/comandasService');
 
 const COMANDA_COM_ITEM: Comanda = {
   id: '1',
