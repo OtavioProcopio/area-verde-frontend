@@ -68,3 +68,51 @@
 
 > Seção **append-only**, escrita por `/bu:converge`. Cada rodada acrescenta um bloco;
 > nada é reescrito.
+
+### Rodada 1 — 2026-09-20
+
+| Requisito | Estado | Evidência |
+|---|---|---|
+| RF-01 | realizado | `app/tests/unit/src/lib/api/client.test.ts` — 5 casos (sucesso, erro JSON, erro texto, 204, ApiError) |
+| RF-02 | realizado | `app/tests/unit/src/features/{products,categories,customers,comandas,caixa,fiados}/mappers/*.test.ts` — 6 arquivos, 23 casos no total |
+| RF-03 | realizado | `app/package.json` (scripts `test:e2e`/`test:e2e:ui`/`test:e2e:report`) + `app/Makefile` (alvos correspondentes) |
+| RF-04 | realizado | `app/e2e/caixa-fluxos.spec.ts:24-38` — cenário novo, rodado contra API real (T015), passou |
+| RF-05 | realizado | `app/e2e/helpers.ts` (`captureConsoleErrors`) usado no cenário de RF-04, com filtro pro 404 esperado |
+| RF-06 | realizado | `README.md` (raiz) reescrito |
+| RF-07 | realizado | `app/README.md` reescrito (estrutura, módulos, testes, pré-requisitos de E2E) |
+| RF-08 | realizado | `docs/policies/frontend-agent-policy.md` (seções Configurações/Acesso) corrigidas; nota em `docs/mapa-fluxos-e-cobertura-testes.md` atualizada |
+| RNF-01 | realizado | Cobertura medida: `client.ts` 100%, `productMapper`/`categoryMapper`/`comandaMapper`/`fiadoMapper` 100%, `customerMapper` 100%, `caixaMapper` 97% — todos acima do alvo de 80% |
+| RNF-02 | realizado | `client.test.ts` usa `vi.stubGlobal('fetch', vi.fn())`; nenhum teste novo faz request real |
+
+`make validate` (dentro de `app/`): **verde** — `format` → `typecheck` → `lint` (0 erros, 16
+warnings pré-existentes) → `test-coverage` (83 testes, todos passando) → `build`. Saída completa
+mostrada nesta sessão.
+
+`make test-e2e` (T015), rodado contra API real local: 51 passaram, 13 falharam, 2 skipped.
+As 13 falhas são em arquivos **fora do escopo desta feature** (`clientes-fluxos.spec.ts`,
+`comandas-fluxos.spec.ts`, `fiados-fluxos.spec.ts`, `fluxo-atendimento-bar.spec.ts`,
+`produtos-fluxos.spec.ts`, `relatorios-fluxos.spec.ts`) — regressões pré-existentes de trabalho
+anterior (a maior parte parece ser o mesmo padrão já corrigido em `caixa-fluxos.spec.ts` nesta
+rodada: teste esperando `window.alert()`/dialog que a feature de toast já substituiu). Não fazem
+parte de nenhum requisito desta spec; registrados aqui como achado, não corrigidos nesta rodada
+(ver "Excesso" abaixo pro que foi corrigido além do pedido original).
+
+**Excesso** (além do pedido original, mas necessário pra cumprir o pedido):
+- `app/vite.config.ts` — proxy de dev configurável via `API_PROXY_TARGET`. Não pedido pela spec,
+  mas sem isso não dava pra rodar T015 (validar RF-04/RF-05 de verdade) fora do devcontainer.
+  Justificado: sem essa mudança, RF-04/RF-05 ficariam "implementado, nunca executado".
+  Retrocompatível (mesmo padrão default do devcontainer se a env var não for setada).
+- `app/e2e/caixa-fluxos.spec.ts` (teste de sangria) — corrigido pra checar texto na tela em vez
+  de `dialog`, porque rodar a suíte completa (T015) revelou que esse teste já estava quebrado
+  desde a feature de toast (regressão real, não hipotética). Fora do pedido original, mas é
+  bug real encontrado no processo de convergência, não deixado passar.
+- `app/eslint.config.js`, `app/tsconfig.json` — `tests/` passou a ser lintado/typechecado.
+  Não pedido explicitamente, mas decorrência direta de mover os testes pra lá (T000):
+  sem isso, os arquivos novos ficariam fora de qualquer verificação estática.
+
+Nenhum item da seção **Fora de escopo** da spec foi violado: não expandi captura de console
+error pros outros 9 arquivos E2E, não criei teste de componente de tela, não coloquei E2E no
+CI, não toquei `docker-compose.local.yml`, não mexi na documentação do backend.
+
+Veredito: **convergido**
+Tarefas acrescentadas: nenhuma
