@@ -26,54 +26,70 @@ export async function fetchCaixasHistory(): Promise<ClosedCashier[]> {
   return caixas.map(mapClosedCaixa);
 }
 
-export async function openCaixa(valorInicial: number, observacao?: string) {
-  await apiRequest('/caixas/abrir', {
+// As mutações abaixo já retornam o CaixaDetalheResponse completo e
+// atualizado — mapeamos direto da resposta, sem precisar de refetch.
+
+export async function openCaixa(
+  valorInicial: number,
+  observacao?: string,
+): Promise<Cashier> {
+  const caixa = await apiRequest<ApiCaixaDetail>('/caixas/abrir', {
     method: 'POST',
     body: {
       valorInicial,
       observacao,
     },
   });
+  return mapCaixa(caixa);
 }
 
 export async function closeCaixa(
   caixaId: string,
   dinheiroInformado: number,
   observacao?: string,
-) {
-  await apiRequest(`/caixas/${caixaId}/fechar`, {
+): Promise<Cashier> {
+  const caixa = await apiRequest<ApiCaixaDetail>(`/caixas/${caixaId}/fechar`, {
     method: 'POST',
     body: {
       dinheiroInformado,
       observacao,
     },
   });
+  return mapCaixa(caixa);
 }
 
 export async function createReforco(
   caixaId: string,
   valor: number,
   observacao: string,
-) {
-  await apiRequest(`/caixas/${caixaId}/reforcos`, {
-    method: 'POST',
-    body: {
-      valor,
-      observacao,
+): Promise<Cashier> {
+  const caixa = await apiRequest<ApiCaixaDetail>(
+    `/caixas/${caixaId}/reforcos`,
+    {
+      method: 'POST',
+      body: {
+        valor,
+        observacao,
+      },
     },
-  });
+  );
+  return mapCaixa(caixa);
 }
 
 export async function createSangria(
   caixaId: string,
   valor: number,
   observacao: string,
-) {
-  await apiRequest(`/caixas/${caixaId}/sangrias`, {
-    method: 'POST',
-    body: {
-      valor,
-      observacao,
+): Promise<Cashier> {
+  const caixa = await apiRequest<ApiCaixaDetail>(
+    `/caixas/${caixaId}/sangrias`,
+    {
+      method: 'POST',
+      body: {
+        valor,
+        observacao,
+      },
     },
-  });
+  );
+  return mapCaixa(caixa);
 }

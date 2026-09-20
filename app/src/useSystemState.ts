@@ -15,15 +15,15 @@ export function useSystemState() {
 
   const configuracoesState = useConfiguracoesState(refreshRef);
   const access = useAccessPin();
-  const categoriesState = useCategoriesState(refreshRef);
-  const productsState = useProductsState(
-    categoriesState.categories,
-    refreshRef,
+  const categoriesState = useCategoriesState();
+  const productsState = useProductsState(categoriesState.categories);
+  const customersState = useCustomersState();
+  const caixaState = useCaixaState();
+  const fiadosState = useFiadosState(caixaState.refreshCaixa);
+  const comandasState = useComandasState(
+    caixaState.refreshCaixa,
+    fiadosState.refreshFiados,
   );
-  const customersState = useCustomersState(refreshRef);
-  const fiadosState = useFiadosState(refreshRef);
-  const caixaState = useCaixaState(refreshRef);
-  const comandasState = useComandasState(refreshRef);
 
   const bootstrap = useRemoteBootstrap({
     setConfiguracao: configuracoesState.setConfiguracao,

@@ -8,29 +8,32 @@ export async function fetchCategories(): Promise<Category[]> {
   return categories.map(mapCategory);
 }
 
-export async function createCategory(name: string) {
-  await apiRequest('/categorias', {
+export async function createCategory(name: string): Promise<Category> {
+  const created = await apiRequest<ApiCategory>('/categorias', {
     method: 'POST',
     body: { nome: name },
   });
+  return mapCategory(created);
 }
 
 export async function saveCategory(
   categoryId: string,
   name: string,
   activeChanged?: boolean,
-) {
-  await apiRequest(`/categorias/${categoryId}`, {
+): Promise<Category> {
+  let saved = await apiRequest<ApiCategory>(`/categorias/${categoryId}`, {
     method: 'PUT',
     body: { nome: name },
   });
 
   if (activeChanged !== undefined) {
-    await apiRequest(
+    saved = await apiRequest<ApiCategory>(
       `/categorias/${categoryId}/${activeChanged ? 'ativar' : 'inativar'}`,
       {
         method: 'PATCH',
       },
     );
   }
+
+  return mapCategory(saved);
 }

@@ -19,16 +19,17 @@ const PENDENCIA: Fiado = {
 };
 
 describe('useFiadosState', () => {
-  const refreshRef = { current: vi.fn().mockResolvedValue(undefined) };
+  const refreshCaixa = vi.fn().mockResolvedValue(undefined);
 
   beforeEach(() => {
     vi.resetAllMocks();
-    refreshRef.current = vi.fn().mockResolvedValue(undefined);
+    refreshCaixa.mockResolvedValue(undefined);
+    vi.mocked(fiadosService.fetchFiados).mockResolvedValue([]);
   });
 
   it('pagarFiado retorna sucesso quando settleFiado funciona', async () => {
     vi.mocked(fiadosService.settleFiado).mockResolvedValue(undefined as never);
-    const { result } = renderHook(() => useFiadosState(refreshRef));
+    const { result } = renderHook(() => useFiadosState(refreshCaixa));
 
     act(() => {
       result.current.setFiados([PENDENCIA]);
@@ -43,6 +44,7 @@ describe('useFiadosState', () => {
       success: true,
       msg: 'Fiado quitado com sucesso.',
     });
+    expect(refreshCaixa).toHaveBeenCalled();
   });
 
   it('pagarFiado retorna erro tratado em vez de lançar quando settleFiado falha no meio do loop', async () => {
@@ -52,7 +54,7 @@ describe('useFiadosState', () => {
     vi.mocked(fiadosService.settleFiado).mockRejectedValue(
       new Error('Nenhum caixa aberto encontrado'),
     );
-    const { result } = renderHook(() => useFiadosState(refreshRef));
+    const { result } = renderHook(() => useFiadosState(refreshCaixa));
 
     act(() => {
       result.current.setFiados([PENDENCIA]);
@@ -70,7 +72,7 @@ describe('useFiadosState', () => {
   });
 
   it('pagarFiado retorna erro sem chamar a API quando o valor não é exato (pagamento parcial)', async () => {
-    const { result } = renderHook(() => useFiadosState(refreshRef));
+    const { result } = renderHook(() => useFiadosState(refreshCaixa));
 
     act(() => {
       result.current.setFiados([PENDENCIA]);

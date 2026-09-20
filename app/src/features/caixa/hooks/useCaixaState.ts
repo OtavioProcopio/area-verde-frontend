@@ -4,18 +4,16 @@ import {
   closeCaixa,
   createReforco,
   createSangria,
+  fetchCaixaAtual,
+  fetchCaixasHistory,
   openCaixa,
 } from '../services/caixaService';
 import { getApiErrorMessage } from '../../shared/utils/getApiErrorMessage';
 import type { Cashier, ClosedCashier } from '../../../types';
 
-type RefreshRef = {
-  current: () => Promise<void>;
-};
-
 type OperationResult = { success: boolean; msg: string };
 
-export function useCaixaState(refreshRef: RefreshRef) {
+export function useCaixaState() {
   const [caixa, setCaixa] = useState<Cashier>(EMPTY_CASHIER);
   const [caixasHistory, setCaixasHistory] = useState<ClosedCashier[]>([]);
 
@@ -24,8 +22,7 @@ export function useCaixaState(refreshRef: RefreshRef) {
     observacao?: string,
   ): Promise<OperationResult> => {
     try {
-      await openCaixa(valorInicial, observacao);
-      await refreshRef.current();
+      setCaixa(await openCaixa(valorInicial, observacao));
       return { success: true, msg: 'Caixa aberto com sucesso.' };
     } catch (error) {
       return {
@@ -43,12 +40,12 @@ export function useCaixaState(refreshRef: RefreshRef) {
     }
 
     try {
-      await closeCaixa(
-        caixa.id,
-        caixa.currentCashInMoney,
-        observacaoFechamento,
-      );
-      await refreshRef.current();
+      const [updated, history] = await Promise.all([
+        closeCaixa(caixa.id, caixa.currentCashInMoney, observacaoFechamento),
+        fetchCaixasHistory(),
+      ]);
+      setCaixa(updated);
+      setCaixasHistory(history);
       return { success: true, msg: 'Caixa fechado com sucesso.' };
     } catch (error) {
       return {
@@ -67,8 +64,7 @@ export function useCaixaState(refreshRef: RefreshRef) {
     }
 
     try {
-      await createReforco(caixa.id, valor, descricao);
-      await refreshRef.current();
+      setCaixa(await createReforco(caixa.id, valor, descricao));
       return { success: true, msg: 'Reforço registrado com sucesso.' };
     } catch (error) {
       return {
@@ -87,8 +83,7 @@ export function useCaixaState(refreshRef: RefreshRef) {
     }
 
     try {
-      await createSangria(caixa.id, valor, descricao);
-      await refreshRef.current();
+      setCaixa(await createSangria(caixa.id, valor, descricao));
       return { success: true, msg: 'Sangria registrada com sucesso.' };
     } catch (error) {
       return {
@@ -96,6 +91,10 @@ export function useCaixaState(refreshRef: RefreshRef) {
         msg: getApiErrorMessage(error, 'Não foi possível registrar a sangria.'),
       };
     }
+  };
+
+  const refreshCaixa = async () => {
+    setCaixa(await fetchCaixaAtual());
   };
 
   return {
@@ -107,5 +106,6 @@ export function useCaixaState(refreshRef: RefreshRef) {
     fecharCaixa,
     adicionarSuprimento,
     realizarSangria,
+    refreshCaixa,
   };
 }
