@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { PlusCircle, Receipt, Search, User } from 'lucide-react';
 import { Comanda, Customer } from '../../types';
+import { DatePicker } from '../../features/shared/components/DatePicker';
 import { formatCurrency } from '../../features/shared/utils/formatCurrency';
+import { toDateKey, todayDateKey } from '../../features/shared/utils/dateKey';
 import { getComandaTotals } from './comandaCalculations';
 
 type StatusFilter = 'all' | 'active' | 'paid' | 'cancelled' | 'fiado';
@@ -60,9 +62,12 @@ export function ComandaListView({
 }: ComandaListViewProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [selectedDate, setSelectedDate] = useState(todayDateKey());
 
   const filteredComandas = comandas
     .filter((c) => {
+      if (toDateKey(c.createdAt) !== selectedDate) return false;
+
       const term = searchTerm.toLowerCase();
       const customer = customers.find((cu) => cu.id === c.customerId);
       const matchesSearch =
@@ -112,17 +117,24 @@ export function ComandaListView({
       </div>
 
       <div className="flex flex-col items-stretch justify-between gap-3 border-b-2 border-counter-700 bg-counter-900/60 p-4 sm:flex-row sm:items-center">
-        <div className="relative w-full sm:max-w-xs">
-          <Search
-            size={22}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cream-400"
-          />
-          <input
-            type="text"
-            placeholder="Buscar por nome, id ou cliente..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full rounded-lg border border-counter-700 bg-counter-950 py-2.5 pl-10 pr-3 text-sm text-cream-100 outline-none placeholder:text-cream-400/50 focus:border-gold-500"
+        <div className="flex w-full flex-col gap-3 sm:max-w-md sm:flex-row sm:items-center">
+          <div className="relative w-full">
+            <Search
+              size={22}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cream-400"
+            />
+            <input
+              type="text"
+              placeholder="Buscar por nome, id ou cliente..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full rounded-lg border border-counter-700 bg-counter-950 py-2.5 pl-10 pr-3 text-sm text-cream-100 outline-none placeholder:text-cream-400/50 focus:border-gold-500"
+            />
+          </div>
+          <DatePicker
+            value={selectedDate}
+            onChange={setSelectedDate}
+            label="Filtrar comandas por data"
           />
         </div>
 
